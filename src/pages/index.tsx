@@ -5,6 +5,7 @@ import Head from "next/head";
 import Link from "next/link";
 import dayjs from "dayjs"
 import relativetTime from "dayjs/plugin/relativeTime"
+import { LoadingPage } from "src/components/loading";
 
 dayjs.extend(relativetTime);
 
@@ -43,13 +44,27 @@ const Postview = (props: PostWithUser) => {
     );
 }
 
+const Feed = () => {
+  const {data, isLoading: postsLoding} = api.posts.getAll.useQuery();
+
+  if (postsLoding) return <LoadingPage />
+  if (!data) return <div>something is wrong</div>
+
+  return (
+    <div className="flex flex-col">
+    {[...data,...data]?.map((fullPost) => (
+      <Postview {...fullPost} key={fullPost.author?.id} />  
+      ))}
+
+   </div>
+  );
+}
 const Home: NextPage = () => {
-  const user = useUser();
-  const {data, isLoading} = api.posts.getAll.useQuery();
+  const {isLoaded: userLoaded, isSignedIn} = useUser();
+  api.posts.getAll.useQuery();
 
-  if (isLoading) return <div>loading...</div>;
-  if (!data) return <div>something went wrong</div>;
-
+  //return empty div if nothing is loaded
+  if (!userLoaded ) return <div></div>;
   return (
     <>
       <Head>
@@ -60,17 +75,12 @@ const Home: NextPage = () => {
       <main className="flex justify-center h-screen">
       <div className="w-full h-full border-x md:max-w-2xl border-slate-400 ">
           <div className="flex border-b border-slate-400 p-4">
-              {!user.isSignedIn && <SignInButton />}
-              {!!user.isSignedIn && <SignOutButton /> && <CreatePost />}
+              {!isSignedIn && <SignInButton />}
+              {!!isSignedIn && <SignOutButton /> && <CreatePost />}
           </div>
          <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
 
-         <div className="flex flex-col">
-          {[...data,...data]?.map((fullPost) => (
-            <Postview {...fullPost} key={fullPost.author?.id} />  
-            ))}
-
-         </div>
+      <Feed />
       </div>
       </main>
     </>
