@@ -10,8 +10,116 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Example {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Post {
+  id          String     @id @default(cuid()) 
+  content     String     @db.Text
+  authorId    String        @unique
+  author      User       @relation(fields: [authorId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  reactions   Reaction[]
+  media       String?
+  comments    Comment[]
+  hashtags    PostHashtag[]
+  categories  Category[]
+  @@index([authorId])
+  @@index([id])
 }
+
+model Hashtag {
+  id          String        @id @default(cuid())
+  tag         String        @unique
+  posts       PostHashtag[]
+
+  @@index([id])
+}
+
+
+model PostHashtag {
+  id          String @id @default(cuid())
+  postId      String
+  post        Post   @relation(fields: [postId], references: [id])
+  hashtagId   String
+  hashtag     Hashtag @relation(fields: [hashtagId], references: [id])
+
+  @@index([postId])
+  @@index([hashtagId])
+}
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String
+  posts Post[]
+}
+
+model User {
+  id              String    @id @default(cuid())
+  username        String?    @unique
+  displayname     String?
+  email           String?   @unique
+  token           String?
+  followings      UserFollows[]  @relation("following")
+  followers       UserFollows[]  @relation("follower")
+  posts           Post[]
+  premiumStatus   Boolean   @default(false)
+  authorizedUser  Boolean   @default(false)
+  reactions       Reaction[]
+  comments        Comment[]
+  @@index([id])
+}
+
+model UserFollows {
+  id          String @id @default(cuid())
+  followingId String
+  following   User   @relation("following", fields: [followingId], references: [id])
+  followerId  String
+  follower    User   @relation("follower", fields: [followerId], references: [id])
+
+  @@index([followerId])
+  @@index([followingId])
+}
+
+
+
+model Reaction {
+  id          String        @id @default(cuid())
+  type      ReactionType
+  userId    String
+  postId    String?
+  commentID String?    
+  comment   Comment?     @relation(fields: [commentID], references: [id])
+  user      User        @relation(fields: [userId], references: [id])
+  post      Post?        @relation(fields: [postId], references: [id])
+  createdAt DateTime    @default(now())
+
+  @@index([userId])
+  @@index([postId])
+  @@index([commentID])
+}
+
+model Comment {
+  id          String        @id @default(cuid())
+  pinned      Boolean   @default(false)
+  content     String      @db.Text
+  authorId    String
+  author      User       @relation(fields: [authorId], references: [id])
+  postId      String
+  post        Post       @relation(fields: [postId], references: [id])
+  reactions   Reaction[] 
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([authorId])
+  @@index([postId])
+}
+
+enum ReactionType {
+  LIKE
+  LOVE
+  HAHA
+  WOW
+  SAD
+  ANGRY
+}
+
+
