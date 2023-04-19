@@ -6,6 +6,7 @@ import { IntlProvider } from "react-intl";
 import { useRouter } from "next/router";
 import { TRPCClientError } from "@trpc/client";
 import { appWithTranslation } from 'next-i18next'
+import { Toaster } from "react-hot-toast";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   const {locale} = useRouter();
@@ -15,6 +16,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
 
   return (    
       <ClerkProvider {...pageProps}>
+        <Toaster position="bottom-center" />
         <Component {...pageProps} />
       </ClerkProvider>
   );

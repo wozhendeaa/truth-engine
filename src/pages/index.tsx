@@ -5,28 +5,40 @@ import Head from "next/head";
 import Link from "next/link";
 import dayjs from "dayjs"
 import relativetTime from "dayjs/plugin/relativeTime"
-import { LoadingPage } from "src/components/loading";
+import { LoadingPage, LoadingSpinner } from "src/components/loading";
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { RouterOutputs, api } from "~/utils/api";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
+import toast, { Toaster } from 'react-hot-toast';
+import { ZodError } from "zod";
 
 dayjs.extend(relativetTime);
+
 
 
 const CreatePost = () => {
   const [newPost, setPost] = useState("");
   const {user} = useUser();
   const ctx = api.useContext();
+  const {t} = useTranslation();
 
   const {mutate, isLoading: isPosting} = api.posts.createPost.useMutation({
     onSuccess: () => {
       setPost("");
       ctx.posts.getAll.invalidate();
-    }
+    },
+    onError: (e) => {
+       const errorMessage = e.data?.code;
+       if (errorMessage) {
+        toast.error(t(errorMessage));       
+       } else {
+        toast.error(t("something_went_wrong"));
+       
+       }
+    }     
   });
-  const { t } = useTranslation()
   
   if(!user) return null;
 
@@ -38,10 +50,22 @@ const CreatePost = () => {
     <input placeholder="type"
      className="grow bg-transparent outline-none"
      value={newPost}
-     onChange={(e) => setPost(e.target.value)} />
-     <button onClick={() => mutate({content: newPost})}
+     onChange={(e) => setPost(e.target.value)} 
+     onKeyDown={(e) => {
+         if(e.key === "Enter") {
+          e.preventDefault();
+          if (newPost !== "") {
+            mutate({content: newPost});
+          }
+       }
+     
+     }}
+     disabled={isPosting}/>
+
+   {!isPosting && newPost !== "" && <button onClick={() => mutate({content: newPost})}
      disabled={isPosting}
-     className="bg-slate-400 text-white px-4 py-2 rounded-md"> {t("post")}</button>
+     className="bg-slate-400 text-white px-4 py-2 rounded-md"> {t("post")}</button>}
+     {isPosting && <div className="flex items-center justify-center"><LoadingSpinner size={20}/></div>}
   </div>
 }
 

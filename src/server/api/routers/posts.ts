@@ -10,7 +10,7 @@ import { Redis } from "@upstash/redis";
 
 const ratelimit = new Ratelimit({
     redis: Redis.fromEnv(),
-    limiter: Ratelimit.slidingWindow(5, "60 s"),
+    limiter: Ratelimit.slidingWindow(3, "60 s"),
     analytics: true,
     /**
      * Optional prefix for the keys used in redis. This is useful if you want to share a redis
@@ -54,7 +54,7 @@ export const postsRouter = createTRPCRouter({
   })).mutation(async ({ctx, input}) => {
     const authorId = ctx.curretnUserId;
     const {success} = await ratelimit.limit(authorId);
-    if (!success) throw new TRPCError({code: "BAD_REQUEST", message: "发送请求太过频繁"});
+    if (!success) throw new TRPCError({code: "TOO_MANY_REQUESTS", message: "too many requests"});
 
     const post = await ctx.prisma.post.create({
         data:{

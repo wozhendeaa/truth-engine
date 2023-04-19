@@ -4,5 +4,10 @@
       "submit": "提交",
       "cancel": "发送"
     },
-    "post" : "提交"
+    "post" : "发布",
+    "TOO_MANY_REQUESTS" : "你在短时间内发出太多请求",
+    "something_went_wrong" : "你运气不好，服务器发生了说不清道不明的错误",
+    "post_too_short" : "你发的内容太短，必须大于一个字",
+    "post_too_long" : "你发的内容太长，必须小于5000字"
+
    }
