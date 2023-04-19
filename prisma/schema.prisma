@@ -13,7 +13,7 @@ generator client {
 model Post {
   id          String     @id @default(cuid()) 
   content     String     @db.Text
-  authorId    String        @unique
+  authorId    String      
   author      User       @relation(fields: [authorId], references: [id])
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt

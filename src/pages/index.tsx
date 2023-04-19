@@ -18,7 +18,14 @@ dayjs.extend(relativetTime);
 const CreatePost = () => {
   const [newPost, setPost] = useState("");
   const {user} = useUser();
-  const {mutate} = api.posts.createPost.useMutation();
+  const ctx = api.useContext();
+
+  const {mutate, isLoading: isPosting} = api.posts.createPost.useMutation({
+    onSuccess: () => {
+      setPost("");
+      ctx.posts.getAll.invalidate();
+    }
+  });
   const { t } = useTranslation()
   
   if(!user) return null;
@@ -32,7 +39,9 @@ const CreatePost = () => {
      className="grow bg-transparent outline-none"
      value={newPost}
      onChange={(e) => setPost(e.target.value)} />
-     <button onClick={() => mutate({content: newPost})} className="bg-slate-400 text-white px-4 py-2 rounded-md"> {t("post")}</button>
+     <button onClick={() => mutate({content: newPost})}
+     disabled={isPosting}
+     className="bg-slate-400 text-white px-4 py-2 rounded-md"> {t("post")}</button>
   </div>
 }
 
@@ -41,7 +50,6 @@ const CreatePost = () => {
 type PostWithUser = RouterOutputs["posts"]["getAll"][number]
 const Postview = (props: PostWithUser) => {
     const {post, author} = props;
-    const {nutate} = api.posts.createPost.useMutation();
 
     return(
         <div key={post.id} className="flex gap-3 border-b border-slate-400 p-8 ">
@@ -67,12 +75,12 @@ const Feed = () => {
   const {data, isLoading: postsLoding} = api.posts.getAll.useQuery();
 
   if (postsLoding) return <LoadingPage />
-  if (!data) return <div>something is wrong</div>
+  if (!data) return <div>没有找到任何消息</div>
 
   return (
     <div className="flex flex-col">
-    {[...data,...data]?.map((fullPost) => (
-      <Postview {...fullPost} key={fullPost.author?.id} />  
+    {data?.map((fullPost) => (
+      <Postview {...fullPost} key={fullPost.post?.id} />  
       ))}
 
    </div>
