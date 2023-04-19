@@ -12,14 +12,31 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
 import toast, { Toaster } from 'react-hot-toast';
-import { ZodError } from "zod";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, SubmitHandler } from "react-hook-form";
+
 
 dayjs.extend(relativetTime);
 
+function getText(key: string) {
+  const {t} = useTranslation();
+
+  return t(key);
+} 
+
+
+//create react hook validation schema for post
+const postSchema = z.object({
+  content: z.string().min(1, getText("post_too_short")),
+});
 
 
 const CreatePost = () => {
   const [newPost, setPost] = useState("");
+  const {register} = useForm({
+    resolver: zodResolver(postSchema)
+  });
   const {user} = useUser();
   const ctx = api.useContext();
   const {t} = useTranslation();
@@ -35,14 +52,14 @@ const CreatePost = () => {
         toast.error(t(errorMessage));       
        } else {
         toast.error(t("something_went_wrong"));
-       
+  
        }
     }     
   });
   
   if(!user) return null;
 
-  if(!user) return null;
+
 
 
   return <div className="flex gap-3 w-full ">
