@@ -151,7 +151,7 @@ const Home: NextPage = () => {
   );
 };
 
-export const getStaticProps = async ({ locale }) => ({
+export const getStaticProps = async (locale: string ) => ({
   props: {
     ...await serverSideTranslations(locale, ['common', 'footer']),
   },
