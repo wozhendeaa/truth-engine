@@ -31,7 +31,7 @@ export const config = { matcher:  '/((?!_next/image|_next/static|favicon.ico).*)
 
 const PUBLIC_FILE = /\.(.*)$/
 
-export async function it8nMiddleware(req: NextRequest) {
+export function it8nMiddleware(req: NextRequest) {
   if (
     req.nextUrl.pathname.startsWith('/_next') ||
     req.nextUrl.pathname.includes('/api/') ||
@@ -41,7 +41,7 @@ export async function it8nMiddleware(req: NextRequest) {
   }
 
   if (req.nextUrl.locale === 'default') {
-    const locale = await req.cookies.get('NEXT_LOCALE')?.value || 'ch-ZH'
+    const locale = req.cookies.get('NEXT_LOCALE')?.value || 'ch-ZH'
 
     return NextResponse.redirect(
       new URL(`/${locale}${req.nextUrl.pathname}${req.nextUrl.search}`, req.url)

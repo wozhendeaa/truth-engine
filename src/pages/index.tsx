@@ -11,30 +11,26 @@ import { RouterOutputs, api } from "~/utils/api";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
-import toast, { Toaster } from 'react-hot-toast';
-import { z } from "zod";
+import toast, { ToastBar, Toaster } from 'react-hot-toast';
+import { ZodString, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, FieldValues } from "react-hook-form";
 
 
 dayjs.extend(relativetTime);
 
-function getText(key: string) {
-  const {t} = useTranslation();
-
-  return t(key);
-} 
-
-
 //create react hook validation schema for post
 const postSchema = z.object({
-  content: z.string().min(1, getText("post_too_short")),
+  content: z.string().min(4, {message: "post_too_short"}),
 });
+
+type postFormSchema = z.infer<typeof postSchema>;
+
 
 
 const CreatePost = () => {
   const [newPost, setPost] = useState("");
-  const {register} = useForm({
+  const {register, watch, handleSubmit, formState: {errors}} = useForm<postFormSchema>({
     resolver: zodResolver(postSchema)
   });
   const {user} = useUser();
@@ -50,43 +46,47 @@ const CreatePost = () => {
        const errorMessage = e.data?.code;
        if (errorMessage) {
         toast.error(t(errorMessage));       
-       } else {
-        toast.error(t("something_went_wrong"));
-  
-       }
+       } 
     }     
   });
+
+  const onSubmit= (data : postFormSchema) => {
+    if (!errors.content) {
+      mutate(data);     
+    }
+  }
   
   if(!user) return null;
 
-
-
-
-  return <div className="flex gap-3 w-full ">
+  return <> 
+  <div className="flex gap-3 w-full ">
     <img src={user.profileImageUrl} alt="profile image" className="w-14 h-14 rounded-full"/>
+    <form onSubmit={handleSubmit(onSubmit)} className="flex gap-3 w-full ">
     <input placeholder="type"
-     className="grow bg-transparent outline-none"
+     className="grow bg-transparent outline-none "
      value={newPost}
-     onChange={(e) => setPost(e.target.value)} 
-     onKeyDown={(e) => {
+     onKeyDown={(e) => {      
          if(e.key === "Enter") {
           e.preventDefault();
-          if (newPost !== "") {
+          if (errors.content) {
+            toast.error(t("post_too_short"));
+          } else {
             mutate({content: newPost});
-          }
-       }
-     
-     }}
-     disabled={isPosting}/>
-
-   {!isPosting && newPost !== "" && <button onClick={() => mutate({content: newPost})}
+          }            
+     }}}
      disabled={isPosting}
+     aria-invalid={errors.content ? "true" : "false"} 
+     {...register("content", {required:true, onChange: (e) => setPost(e.target.value)})}  
+     />
+    {errors.content ? <span className="text-red-500 absolute top-center right-center flex items-center justify-center">{t('post_too_short')}</span>: null}
+
+   {!isPosting && <button disabled={isPosting}  type="submit"
      className="bg-slate-400 text-white px-4 py-2 rounded-md"> {t("post")}</button>}
      {isPosting && <div className="flex items-center justify-center"><LoadingSpinner size={20}/></div>}
+    </form>
   </div>
+  </>
 }
-
-
 
 type PostWithUser = RouterOutputs["posts"]["getAll"][number]
 const Postview = (props: PostWithUser) => {
@@ -168,7 +168,7 @@ const Home: NextPage = () => {
   );
 };
 
-export const getStaticProps = async (locale: string ) => ({
+export const getStaticProps = async ({locale}: {locale: string} ) => ({
   props: {
     ...await serverSideTranslations(locale, ['common', 'footer']),
   },
