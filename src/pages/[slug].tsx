@@ -9,9 +9,7 @@ const ProfilePage: NextPage = () => {
   return (
     <>
       <Head>
-        <title>home_title</title>
-        <meta name="description" content="" />
-        <link rel="icon" href="/favicon.ico" />
+        <title>Profile</title>
       </Head>
       <main className="flex justify-center h-screen" >
        <div>
