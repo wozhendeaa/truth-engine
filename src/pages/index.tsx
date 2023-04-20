@@ -1,9 +1,7 @@
 import { SignIn, SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import Image from"next/image"
-import Link from "next/link";
 import dayjs from "dayjs"
-import relativetTime from "dayjs/plugin/relativeTime"
 import { LoadingPage, LoadingSpinner } from "src/components/loading";
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { RouterOutputs, api } from "~/utils/api";
@@ -14,11 +12,8 @@ import toast from 'react-hot-toast';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, } from "react-hook-form";
 import { z } from "zod";
-import { Result } from "postcss";
 import { PageLayout } from "~/components/layout";
-
-
-dayjs.extend(relativetTime);
+import Postview from "~/components/PostView";
 
 //create react hook validation schema for post
 const postSchema = z.object({
@@ -98,32 +93,7 @@ const CreatePost = () => {
   </>
 }
 
-type PostWithUser = RouterOutputs["posts"]["getAll"][number]
-const Postview = (props: PostWithUser) => {
-    const {post, author} = props;
-    const username = String(author.username).toString();
 
-    return(
-        <div key={post.id} className="flex gap-3 border-b border-slate-400 p-8 ">
-          <Image 
-          src={author.profileImageUrl}
-          className="w-12 h-12 rounded-full" alt="头像"
-          width="56"
-          height="56" />          
-          
-          <div className="flex flex-col">
-            <div className="flex text-slate-300">              
-              <Link href={`/@${username}`}><span>{`@${username}`}</span> </Link>
-              <span className="mx-1">·</span>
-              <Link href={`/posts/${post.id}`}>
-                <span className="font-thin">{dayjs(post.createdAt).fromNow()}</span>
-              </Link>
-            </div>
-          <span>{post.content} </span>          
-          </div>
-        </div>      
-    );
-}
 
 const Feed = () => {
   const {data, isLoading: postsLoding} = api.posts.getAll.useQuery();

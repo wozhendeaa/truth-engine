@@ -7,6 +7,23 @@ import { createTRPCRouter, privateProcedure, publicProcedure } from "~/server/ap
 import { Ratelimit } from "@upstash/ratelimit"; // for deno: see above
 import { Redis } from "@upstash/redis";
 import { filterClerkUserForClient } from "~/server/helpers/filterUserForClient";
+import { Post } from "@prisma/client";
+
+const addUserDataToPost = async (posts:Post[]) => {
+  const users = (await clerkClient.users.getUserList({
+        userId: posts.map((post) => post.authorId),
+        limit:100 
+    })).map(filterClerkUserForClient);
+
+    return posts.map((post) => {
+        const author = users.find((user) => user.id == post.authorId);
+        if (!author || !author.username) throw new TRPCError({code: "INTERNAL_SERVER_ERROR", message: "author for post not found"});
+        return {
+            post,
+            author
+        };
+    });
+}
 
 const ratelimit = new Ratelimit({
     redis: Redis.fromEnv(),
@@ -29,22 +46,23 @@ export const postsRouter = createTRPCRouter({
         orderBy: [{createdAt: "desc"}],
     });
 
-    const users = (await clerkClient.users.getUserList({
-        userId: posts.map((post) => post.authorId),
-        limit:100 
-    })).map(filterClerkUserForClient);
-
-    return posts.map((post) => {
-        const author = users.find((user) => user.id == post.authorId);
-        console.log("sdf",author?.profileImageUrl);
-        if (!author || !author.username) throw new TRPCError({code: "INTERNAL_SERVER_ERROR", message: "author for post not found"});
-        return {
-            post,
-            author
-        };
-    });
-
+    return addUserDataToPost(posts);
   }),
+
+  //a public trpc procedure that gets all posts by author id(user id)
+  getPostsByUserId: publicProcedure
+  .input(z.object({userId: z.string()}))
+  .query(({ctx, input}) => {
+    const posts = ctx.prisma.post.findMany({
+        take:100,   
+        where:{
+            authorId: input.userId
+        },
+        orderBy: [{createdAt: "desc"}],
+    }).then(addUserDataToPost)
+    return posts;
+    }),
+
 
   createPost: privateProcedure.input(z.object({
     content:z.string().min(1, {message: "post_too_short"}),
@@ -61,4 +79,7 @@ export const postsRouter = createTRPCRouter({
     });
     return post;
   })
+  
+
+  
 });

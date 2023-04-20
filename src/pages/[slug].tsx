@@ -1,8 +1,21 @@
 import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType, type NextPage } from "next";
 import Head from "next/head";
-import { RouterOutputs, api } from "~/utils/api";
-import { useRouter } from "next/router";
 import Image from 'next/image';
+import { LoadingPage } from "src/components/loading";
+
+
+const ProfileFeed = (props: {userId: string}) => {
+  const {data, isLoading} = api.posts.getPostsByUserId.useQuery({userId: props.userId});
+  if (isLoading) <LoadingPage />
+
+  if (!data) return <div>你没有发任何文章</div>
+  return<div className="flex flex-col">
+          {data.map((fullPost) => {
+            return <Postview key={fullPost.post.id} {...fullPost} />
+          })}
+        </div>
+
+}
 
 const ProfilePage: NextPage<{username: string}> = (username) => {
   const {data} = api.profile.getUserByUsername.useQuery({username: "billyyang520"})
@@ -25,6 +38,7 @@ const ProfilePage: NextPage<{username: string}> = (username) => {
           <div className="w-full border-b border-slate-500"></div>
 
        </div>
+       <ProfileFeed userId={data.id} />
        </PageLayout>
     </>
   );
@@ -35,6 +49,8 @@ import { prisma } from '../server/db';
 import superjson from 'superjson';
 import { appRouter } from "~/server/api/root";
 import { PageLayout } from "~/components/layout";
+import Postview from "~/components/PostView";
+import { api } from "~/utils/api";
 
 
 export const getStaticProps: GetStaticProps = async (context) => {
