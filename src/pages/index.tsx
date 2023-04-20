@@ -7,7 +7,7 @@ import relativetTime from "dayjs/plugin/relativeTime"
 import { LoadingPage, LoadingSpinner } from "src/components/loading";
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { RouterOutputs, api } from "~/utils/api";
-import { useEffect, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
 import toast from 'react-hot-toast';
@@ -25,7 +25,6 @@ const postSchema = z.object({
 });
 
 type postFormSchema = z.infer<typeof postSchema>;
-
 
 
 const CreatePost = () => {
@@ -52,15 +51,26 @@ const CreatePost = () => {
     }     
   });
 
+  function onPromise<T>(promise: (event: SyntheticEvent) => Promise<T>) {
+    return (event: SyntheticEvent) => {
+      if (promise) {
+        promise(event).catch((error) => {
+          console.log("Unexpected error", error);
+        });
+      }
+    };
+  }
+
   const onSubmit= (data : postFormSchema) => {
     if (!errors.content) {
-      void mutate(data);
+      mutate(data);
     }
   }
   return <> 
   <div className="flex gap-3 w-full ">
-    <Image src={user.profileImageUrl} alt="profile image" className="w-14 h-14 rounded-full"/>
-    <form onSubmit={void handleSubmit(onSubmit)} className="flex gap-3 w-full ">
+    <Image src={user.profileImageUrl} alt="profile image" className="w-14 h-14 rounded-full" width="56"
+          height="56"/>
+    <form onSubmit={ onPromise(handleSubmit(onSubmit))} className="flex gap-3 w-full ">
     <input placeholder="type"
      className="grow bg-transparent outline-none "
      value={newPost}
