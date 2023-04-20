@@ -2,12 +2,11 @@ import { type AppType } from "next/app";
 import { api } from "~/utils/api";
 import "~/styles/globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import { IntlProvider } from "react-intl";
 import { useRouter } from "next/router";
 import { TRPCClientError } from "@trpc/client";
 import { appWithTranslation, useTranslation } from 'next-i18next'
 import { Toaster } from "react-hot-toast";
-import { Head } from "next/document";
+import Head from "next/head";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   const {locale} = useRouter();

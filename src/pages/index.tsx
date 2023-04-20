@@ -1,7 +1,6 @@
 import { SignIn, SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import Image from"next/image"
-import Head from "next/head";
 import Link from "next/link";
 import dayjs from "dayjs"
 import relativetTime from "dayjs/plugin/relativeTime"
@@ -11,10 +10,11 @@ import { RouterOutputs, api } from "~/utils/api";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
-import toast, { ToastBar, Toaster } from 'react-hot-toast';
-import { ZodString, z } from "zod";
+import toast from 'react-hot-toast';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, SubmitHandler, FieldValues } from "react-hook-form";
+import { useForm, } from "react-hook-form";
+import { z } from "zod";
+import { Result } from "postcss";
 
 
 dayjs.extend(relativetTime);
@@ -30,17 +30,19 @@ type postFormSchema = z.infer<typeof postSchema>;
 
 const CreatePost = () => {
   const [newPost, setPost] = useState("");
-  const {register, watch, handleSubmit, formState: {errors}} = useForm<postFormSchema>({
+  const {register, handleSubmit, formState: {errors}} = useForm<postFormSchema>({
     resolver: zodResolver(postSchema)
   });
   const {user} = useUser();
   const ctx = api.useContext();
   const {t} = useTranslation();
 
+  if(!user) return null;
+
   const {mutate, isLoading: isPosting} = api.posts.createPost.useMutation({
     onSuccess: () => {
       setPost("");
-      ctx.posts.getAll.invalidate();
+      void ctx.posts.getAll.invalidate();
     },
     onError: (e) => {
        const errorMessage = e.data?.code;
@@ -52,16 +54,13 @@ const CreatePost = () => {
 
   const onSubmit= (data : postFormSchema) => {
     if (!errors.content) {
-      mutate(data);     
+      void mutate(data);
     }
   }
-  
-  if(!user) return null;
-
   return <> 
   <div className="flex gap-3 w-full ">
-    <img src={user.profileImageUrl} alt="profile image" className="w-14 h-14 rounded-full"/>
-    <form onSubmit={handleSubmit(onSubmit)} className="flex gap-3 w-full ">
+    <Image src={user.profileImageUrl} alt="profile image" className="w-14 h-14 rounded-full"/>
+    <form onSubmit={void handleSubmit(onSubmit)} className="flex gap-3 w-full ">
     <input placeholder="type"
      className="grow bg-transparent outline-none "
      value={newPost}
@@ -76,7 +75,7 @@ const CreatePost = () => {
      }}}
      disabled={isPosting}
      aria-invalid={errors.content ? "true" : "false"} 
-     {...register("content", {required:true, onChange: (e) => setPost(e.target.value)})}  
+     {...register("content", {required:true, onChange: (e: React.FormEvent<HTMLInputElement>) => setPost(e.currentTarget.value)})}  
      />
     {errors.content ? <span className="text-red-500 absolute top-center right-center flex items-center justify-center">{t('post_too_short')}</span>: null}
 
@@ -91,6 +90,7 @@ const CreatePost = () => {
 type PostWithUser = RouterOutputs["posts"]["getAll"][number]
 const Postview = (props: PostWithUser) => {
     const {post, author} = props;
+    const displayName = String(author.username).toString();
 
     return(
         <div key={post.id} className="flex gap-3 border-b border-slate-400 p-8 ">
@@ -102,7 +102,7 @@ const Postview = (props: PostWithUser) => {
           
           <div className="flex flex-col">
             <div className="flex text-slate-300">              
-              <Link href={`/@${author.username}`}><span>{`@${author.username}`}</span> </Link>
+              <Link href={`/@${displayName}`}><span>{`@${displayName}`}</span> </Link>
               <span className="mx-1">·</span>
               <Link href={`/posts/${post.id}`}>
                 <span className="font-thin">{dayjs(post.createdAt).fromNow()}</span>
@@ -142,7 +142,7 @@ const Home: NextPage = () => {
   // bindI18n: loaded is needed because of the reloadResources call
   // if all pages use the reloadResources mechanism, the bindI18n option can also be defined in next-i18next.config.js
   useEffect(() => {
-    i18n.reloadResources(i18n.resolvedLanguage, ['common', 'footer'])
+     void i18n.reloadResources(i18n.resolvedLanguage, ['common', 'footer'])
   }, [])
 
   //return empty div if nothing is loaded
