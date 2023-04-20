@@ -15,6 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, } from "react-hook-form";
 import { z } from "zod";
 import { Result } from "postcss";
+import { PageLayout } from "~/components/layout";
 
 
 dayjs.extend(relativetTime);
@@ -100,7 +101,7 @@ const CreatePost = () => {
 type PostWithUser = RouterOutputs["posts"]["getAll"][number]
 const Postview = (props: PostWithUser) => {
     const {post, author} = props;
-    const displayName = String(author.username).toString();
+    const username = String(author.username).toString();
 
     return(
         <div key={post.id} className="flex gap-3 border-b border-slate-400 p-8 ">
@@ -112,7 +113,7 @@ const Postview = (props: PostWithUser) => {
           
           <div className="flex flex-col">
             <div className="flex text-slate-300">              
-              <Link href={`/@${displayName}`}><span>{`@${displayName}`}</span> </Link>
+              <Link href={`/@${username}`}><span>{`@${username}`}</span> </Link>
               <span className="mx-1">·</span>
               <Link href={`/posts/${post.id}`}>
                 <span className="font-thin">{dayjs(post.createdAt).fromNow()}</span>
@@ -160,18 +161,15 @@ const Home: NextPage = () => {
 
   return (
     <>
-
-      <main className="flex justify-center h-screen" >
-      <div className="w-full h-full border-x md:max-w-2xl border-slate-400 ">
-          <div className="flex border-b border-slate-400 p-4">
+        <PageLayout>
+         <div className="flex border-b border-slate-400 p-4">
               {!isSignedIn && <SignInButton />}
               {!!isSignedIn && <SignOutButton /> && <CreatePost />}
-          </div>
          <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
+         </div>
+         <Feed />
+      </PageLayout>
 
-      <Feed />
-      </div>
-      </main>
     </>
   );
 };

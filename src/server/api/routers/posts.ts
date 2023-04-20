@@ -1,4 +1,3 @@
-import { User } from "@clerk/nextjs/dist/api";
 import { clerkClient } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -7,6 +6,7 @@ import { createTRPCRouter, privateProcedure, publicProcedure } from "~/server/ap
 
 import { Ratelimit } from "@upstash/ratelimit"; // for deno: see above
 import { Redis } from "@upstash/redis";
+import { filterClerkUserForClient } from "~/server/helpers/filterUserForClient";
 
 const ratelimit = new Ratelimit({
     redis: Redis.fromEnv(),
@@ -20,10 +20,6 @@ const ratelimit = new Ratelimit({
     prefix: "@upstash/ratelimit",
   });
 
-const filterUserForClient = (user: User) => {
-    const name = user.firstName;
-    return {id: user.id, username: name, profileImageUrl: user.profileImageUrl}
-}
 
 export const postsRouter = createTRPCRouter({
 
@@ -36,10 +32,11 @@ export const postsRouter = createTRPCRouter({
     const users = (await clerkClient.users.getUserList({
         userId: posts.map((post) => post.authorId),
         limit:100 
-    })).map(filterUserForClient);
+    })).map(filterClerkUserForClient);
 
     return posts.map((post) => {
         const author = users.find((user) => user.id == post.authorId);
+        console.log("sdf",author?.profileImageUrl);
         if (!author || !author.username) throw new TRPCError({code: "INTERNAL_SERVER_ERROR", message: "author for post not found"});
         return {
             post,
@@ -50,7 +47,7 @@ export const postsRouter = createTRPCRouter({
   }),
 
   createPost: privateProcedure.input(z.object({
-    content:z.string().min(1),
+    content:z.string().min(1, {message: "post_too_short"}),
   })).mutation(async ({ctx, input}) => {
     const authorId = ctx.curretnUserId;
     const {success} = await ratelimit.limit(authorId);
