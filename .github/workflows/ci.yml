@@ -1,13 +1,7 @@
 name: CI
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
+on: [push, pull,_request]
+  
 env:
   DATABASE_URL:"mysql://k6ywf4hzi6rsfjrgkwbk:pscale_pw_LLCmeHTzAfDKUCkqIUbspgGr265rj03hNRx46BThvQo"
 
