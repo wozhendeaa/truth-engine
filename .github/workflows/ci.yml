@@ -28,4 +28,4 @@ jobs:
       run: npm run type-check
 
     - name: Run Lighthouse tests (lit)
-      run: npm lit
+      run: npm run lint
