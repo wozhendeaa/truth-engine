@@ -1,12 +1,10 @@
 import { SignIn, SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import Image from"next/image"
-import dayjs from "dayjs"
 import { LoadingPage, LoadingSpinner } from "src/components/loading";
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { RouterOutputs, api } from "~/utils/api";
 import { SyntheticEvent, useEffect, useState } from "react";
-import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
 import toast from 'react-hot-toast';
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -115,7 +113,6 @@ const Feed = () => {
 
 const Home: NextPage = () => {
   const {isLoaded: userLoaded, isSignedIn} = useUser();
-  const {locale} = useRouter();
 
   api.posts.getAll.useQuery();
   

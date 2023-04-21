@@ -2,6 +2,9 @@ import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType, type NextPage 
 import Head from "next/head";
 import Image from 'next/image';
 import { LoadingPage } from "src/components/loading";
+import Postview from "~/components/PostView";
+import { PageLayout } from "~/components/layout";
+import { api } from "~/utils/api";
 
 
 const ProfileFeed = (props: {userId: string}) => {
@@ -17,8 +20,11 @@ const ProfileFeed = (props: {userId: string}) => {
 
 }
 
-const ProfilePage: NextPage<{username: string}> = (username) => {
-  const {data} = api.profile.getUserByUsername.useQuery({username: "billyyang520"})
+const ProfilePage: NextPage<{username: string}> = ({username}) => {
+  const {data} = api.profile.getUserByUsername.useQuery({
+    username,
+  });
+
   if (!data) return <div>404...</div>
   if (!data.profileImageUrl) data.profileImageUrl = "https://images.clerk.dev/oauth_google/img_2OPYWwzL5YW33Nv2LCZaH7tz7JM.jpeg"
   return (
@@ -44,22 +50,11 @@ const ProfilePage: NextPage<{username: string}> = (username) => {
   );
 };
 
-import { createServerSideHelpers } from '@trpc/react-query/server';
-import { prisma } from '../server/db';
-import superjson from 'superjson';
-import { appRouter } from "~/server/api/root";
-import { PageLayout } from "~/components/layout";
-import Postview from "~/components/PostView";
-import { api } from "~/utils/api";
+import { generateSSGHelper } from "~/server/helpers/ssgHelper";
 
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  const ssg = createServerSideHelpers({
-    router: appRouter,
-    ctx: {prisma, userId: null},
-    transformer: superjson, // optional - adds superjson serialization
-  });
-
+  const ssg =  generateSSGHelper();
   const slug = context.params?.slug as string;
   if (typeof slug !== 'string') throw new Error('slug is not a string')
   const username = slug.replace("@", "");
@@ -72,6 +67,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
     }
   }
 }    
+
 
 export const getStaticPaths: GetStaticPaths  = () => {
   return {

@@ -1,11 +1,8 @@
-import { User } from "@clerk/nextjs/dist/api";
-import { clerkClient } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { createTRPCRouter, privateProcedure, publicProcedure } from "~/server/api/trpc";
-import { filterMyUserForClient, filterClerkUserForClient } from "~/server/helpers/filterUserForClient";
-import { getStaticProps } from '../../../pages/index';
+import { createTRPCRouter,  publicProcedure } from "~/server/api/trpc";
+import { filterMyUserForClient } from "~/server/helpers/filterUserForClient";
 
 
 
