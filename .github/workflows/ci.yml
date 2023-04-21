@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  DATABASE_URL:"mysql://k6ywf4hzi6rsfjrgkwbk:pscale_pw_LLCmeHTzAfDKUCkqIUbspgGr265rj03hNRx46BThvQo"
+  DATABASE_URL: "mysql://k6ywf4hzi6rsfjrgkwbk:pscale_pw_LLCmeHTzAfDKUCkqIUbspgGr265rj03hNRx46BThvQo"
 
 jobs:
   build:
