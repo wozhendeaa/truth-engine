@@ -25,6 +25,15 @@ const addUserDataToPost = async (posts:Post[]) => {
     });
 }
 
+//create react hook validation schema for post
+export const postSchema = z.object({
+  content: z.string().min(4, {message: "post_too_short"}),
+});
+
+type postFormSchema = z.infer<typeof postSchema>;
+export default postFormSchema;
+
+
 const ratelimit = new Ratelimit({
     redis: Redis.fromEnv(),
     limiter: Ratelimit.slidingWindow(3, "60 s"),
@@ -63,16 +72,16 @@ export const postsRouter = createTRPCRouter({
   //a public trpc procedure that gets all posts by author id(user id)
   getPostsByUserId: publicProcedure
   .input(z.object({userId: z.string()}))
-  .query(({ctx, input}) => {
-    const posts = ctx.prisma.post.findMany({
+  .query(({ctx, input}) => 
+    ctx.prisma.post.findMany({
         take:100,   
         where:{
             authorId: input.userId
         },
         orderBy: [{createdAt: "desc"}],
     }).then(addUserDataToPost)
-    return posts;
-    }),
+    )
+    ,
 
 
   createPost: privateProcedure.input(z.object({
