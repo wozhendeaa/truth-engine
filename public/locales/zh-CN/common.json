@@ -8,6 +8,17 @@
     "TOO_MANY_REQUESTS" : "你在短时间内发出太多请求",
     "something_went_wrong" : "你运气不好，服务器发生了说不清道不明的错误",
     "post_too_short" : "你发的内容太短，必须大于一个字",
-    "post_too_long" : "你发的内容太长，必须小于5000字"
+    "post_too_long" : "你发的内容太长，必须小于5000字",
+    "professor_videos" : "小明视频",
+    "natural_healing" : "自然疗法",
+    "redpill_academy" : "红药丸学院",
+    "discussion" : "真相引擎",
+    "search" : "搜索",
+    "profile_page" : "个人页面",
+    "settings" : "设置",
+    "view_notifications" : "查看通知",
+    "open_user_menu" : "大开用户菜单",
+    "sign_out" : "登出",
 
+    "empty":""
    }

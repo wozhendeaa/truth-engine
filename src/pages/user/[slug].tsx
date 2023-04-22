@@ -51,10 +51,12 @@ const ProfilePage: NextPage<{username: string}> = ({username}) => {
 };
 
 import { generateSSGHelper } from "~/server/helpers/ssgHelper";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const ssg =  generateSSGHelper();
+  const locale = "zh-CN";
   const slug = context.params?.slug as string;
   if (typeof slug !== 'string') throw new Error('slug is not a string')
   const username = slug.replace("@", "");
@@ -63,7 +65,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
   return {
     props:{
       trpcState: ssg.dehydrate(),
-      username
+      username,
+      ...await serverSideTranslations(locale, ['common', 'footer']),
     }
   }
 }    
