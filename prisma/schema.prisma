@@ -16,14 +16,26 @@ model Post {
   authorId    String      
   author      User       @relation(fields: [authorId], references: [id])
   createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  updatedAt   DateTime?   @updatedAt
   reactions   Reaction[]
   media       String?
+  postType    PostType   @default(POST)
+  likes       Int         @default(0)
+  dislikes    Int         @default(0)
+  ViewCount   Int         @default(0)
   comments    Comment[]
   hashtags    PostHashtag[]
   categories  Category[]
+  reports     Report[]
+  
+
   @@index([authorId])
   @@index([id])
+}
+
+enum PostType{
+  POST
+  QUESTION
 }
 
 model Hashtag {
@@ -54,18 +66,26 @@ model Category {
 model User {
   id              String    @id @default(cuid())
   username        String?    @unique
-  profileImageUrl String?      
+  profileImageUrl String?   @default("/images/default_avatar.png")     
   displayname     String?
   email           String?   @unique
   token           String?
+  role            Role     @default(SHEEP)
   followings      UserFollows[]  @relation("following")
   followers       UserFollows[]  @relation("follower")
   posts           Post[]
+  reports         Report[]
   premiumStatus   Boolean   @default(false)
-  authorizedUser  Boolean   @default(false)
   reactions       Reaction[]
   comments        Comment[]
+  notifications   Notification[]
   @@index([id])
+}
+
+enum Role {
+  SHEEP
+  ENGIINE
+  ADMIN
 }
 
 model UserFollows {
@@ -78,7 +98,6 @@ model UserFollows {
   @@index([followerId])
   @@index([followingId])
 }
-
 
 
 model Reaction {
@@ -99,14 +118,18 @@ model Reaction {
 
 model Comment {
   id          String        @id @default(cuid())
+  
   pinned      Boolean   @default(false)
   content     String      @db.Text
   authorId    String
   author      User       @relation(fields: [authorId], references: [id])
   postId      String
   post        Post       @relation(fields: [postId], references: [id])
+  media       String?
   reactions   Reaction[] 
-
+  reports     Report[]
+  likes       Int         @default(0)
+  dislikes    Int         @default(0)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
@@ -114,8 +137,32 @@ model Comment {
   @@index([postId])
 }
 
+model Report {
+  id          String    @id @default(cuid())
+  reporterId    String
+  reporter      User      @relation(fields: [reporterId], references: [id])
+  postId      String?
+  post        Post?       @relation(fields: [postId], references: [id])
+  commentId      String?
+  comment        Comment?       @relation(fields: [commentId], references: [id])
+
+  createdAt   DateTime   @default(now())
+
+  @@index([reporterId])
+  @@index([commentId])
+  @@index([postId])
+}
+
+model Notification{
+  id          String    @id @default(cuid())
+  senderId    String
+  sender      User      @relation(fields: [senderId], references: [id])
+  conent     String 
+}
+
 enum ReactionType {
   LIKE
+  DISLIKE
   LOVE
   HAHA
   WOW

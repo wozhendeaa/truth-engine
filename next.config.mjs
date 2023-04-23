@@ -34,6 +34,7 @@ const config = {
     // should handle (these are only required when setting up domain routing)
     // Note: subdomains must be included in the domain value to be matched e.g. "fr.example.com".
   },
+  
 
   typescript:{
     ignoreBuildErrors:true,
@@ -41,7 +42,7 @@ const config = {
   eslint: {
     ignoreDuringBuilds:true
   },
-  swcMinify:true
+  swcMinify:true,
 
 
 };
