@@ -11,7 +11,7 @@ export const Postview = (props: PostWithUser) => {
     const username = String(author.username).toString();
 
     return(
-        <div key={post.id} className="flex gap-3 border-b border-slate-400 p-8 ">
+        <div key={post.id} className="flex gap-3 border-b border-slate-400 p-8 font-chinese">
           <Image 
           src={author.profileImageUrl}
           className="w-12 h-12 rounded-full" alt="头像"
@@ -26,8 +26,12 @@ export const Postview = (props: PostWithUser) => {
                 <span className="font-thin">{dayjs(post.createdAt).fromNow()}</span>
               </Link>
             </div>
-          <span>{post.content} </span>          
+
+
+          <span>{post.content} </span>       
+
           </div>
+          
         </div>      
     );
 }

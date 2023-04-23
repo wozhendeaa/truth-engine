@@ -24,6 +24,8 @@ const MyApp: AppType = ({ Component, pageProps }) => {
             <title>{t('home_title')}</title>
             <meta name="Q真相引擎" content="Q真相引擎" />
             <link rel="icon" href="/favicon.ico" />
+            <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500&display=swap" rel="stylesheet" />
+            <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500&display=swap" rel="stylesheet" />
           </Head>
         <Component {...pageProps} />
       </ClerkProvider>

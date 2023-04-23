@@ -33,10 +33,12 @@ export default function MainNavBar() {
   const {t} = useTranslation();
 
   return (
-    <Disclosure as="nav" className="bg-white shadow sticky top-0">
+    <>
+
+    <Disclosure as="nav" className="bg-white shadow sticky top-0 font-chinese"  >
       {({ open }) => (
         <>
-          <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8">
+          <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8" >
             <div className="flex h-16 justify-between">
               <div className="flex px-2 lg:px-0">
                 <div className="flex flex-shrink-0 items-center">
@@ -55,11 +57,11 @@ export default function MainNavBar() {
                     alt="Q真相引擎"
                   />
                 </div>
-                <div className="hidden lg:ml-6 lg:flex lg:space-x-8">
+                <div className="hidden lg:ml-6 lg:flex lg:space-x-8 ">
                   {/* Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" */}
                   <a
                     href="#"
-                    className="inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-medium text-gray-900"
+                    className="inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-medium text-gray-900 font-Noto+Sans+TC"
                   >
                     { !isSSR && t('professor_videos')}
                   </a>
@@ -160,7 +162,7 @@ export default function MainNavBar() {
                             href="#"
                             className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                           >
-                            !isSSR && {t('settings')}
+                            {!isSSR && t('settings')}
                           </a>
                         )}
                       </Menu.Item>
@@ -264,5 +266,6 @@ export default function MainNavBar() {
         </>
       )}
     </Disclosure>
+    </>
   )
 }
