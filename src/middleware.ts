@@ -1,6 +1,7 @@
-import { getAuth, withClerkMiddleware } from "@clerk/nextjs/server";
+import { clerkClient, getAuth, withClerkMiddleware } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { api } from "./utils/api";
 
 const publicPaths = ['/', '/sign-in*', '/sign-up*']
 
@@ -19,17 +20,18 @@ export default withClerkMiddleware((request: NextRequest) => {
 
   if (!userId) {
     // redirect the users to /pages/sign-in/[[...index]].ts
-    
     const signInUrl = new URL('/sign-in', request.url)
     signInUrl.searchParams.set('redirect_url', request.url)
     return NextResponse.redirect(signInUrl)
   }
+
   return NextResponse.next()
 });
  
 export const config = { matcher:  '/((?!_next/image|_next/static|favicon.ico).*)'};
 
 const PUBLIC_FILE = /\.(.*)$/
+
 
 export function it8nMiddleware(req: NextRequest) {
   if (

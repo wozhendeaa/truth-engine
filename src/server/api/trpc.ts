@@ -42,15 +42,20 @@ const createInnerTRPCContext = (_opts: CreateContextOptions) => {
  *
  * @see https://trpc.io/docs/context
  */
-export const createTRPCContext = (opts: CreateNextContextOptions) => {
-  const {req} = opts;
+export const createTRPCContext = async (opts: CreateNextContextOptions) => {
+  const {req,res} = opts;
 
-  const sesh = getAuth(req);
-  const userId = sesh.userId;
+
+  const _session = getAuth(req);
+  const userId = _session.userId
+  const user = userId? await clerkClient.users.getUser(userId) : null;
 
   return {
-    prisma,
-    userId,
+      req: req as NextApiRequest | null,
+      res: res as NextApiResponse | null,
+      prisma,
+      user,
+      userId,
   };
 };
 
@@ -61,10 +66,15 @@ export const createTRPCContext = (opts: CreateNextContextOptions) => {
  * ZodErrors so that you get typesafety on the frontend if your procedure fails due to validation
  * errors on the backend.
  */
-import { TRPCError, initTRPC } from "@trpc/server";
+import { TRPCError, initTRPC, router } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { getAuth } from "@clerk/nextjs/server";
+import { clerkClient, getAuth } from "@clerk/nextjs/server";
+import { redirect } from 'next/navigation';
+import { openStdin } from "process";
+import { NextRequest, NextResponse } from 'next/server';
+import { NextApiRequest, NextApiResponse } from "next";
+import { userRouter } from "./routers/user";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
@@ -105,22 +115,21 @@ export const createTRPCRouter = t.router;
  */
 export const publicProcedure = t.procedure;
 
-
-
 const enforceUserIsAuthed = t.middleware(async ({ctx, next}) => {
   if(!ctx.userId) {
     throw new TRPCError(
       {code: "UNAUTHORIZED"}
     );    
   }
-
-  return next({
-     ctx: {
-      curretnUserId:ctx.userId,
-     }
-  })
-
-})
+  
+  return next({ctx: {
+    curretnUserId:ctx.userId,
+   } });
+}
+  
+)
 
 
 export const privateProcedure = t.procedure.use(enforceUserIsAuthed);
+
+

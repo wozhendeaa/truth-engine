@@ -18,6 +18,8 @@
     "settings" : "设置",
     "view_notifications" : "查看通知",
     "open_user_menu" : "大开用户菜单",
+    "sign_in" : "登录",
+    "sign_up" : "注册",
     "sign_out" : "登出",
 
     "empty":""

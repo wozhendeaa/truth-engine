@@ -7,6 +7,7 @@ import { TRPCClientError } from "@trpc/client";
 import { appWithTranslation, useTranslation } from 'next-i18next'
 import { Toaster } from "react-hot-toast";
 import Head from "next/head";
+import { Link } from "react-router-dom";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   const {locale} = useRouter();
