@@ -8,6 +8,7 @@ import { appWithTranslation, useTranslation } from 'next-i18next'
 import { Toaster } from "react-hot-toast";
 import Head from "next/head";
 import { Link } from "react-router-dom";
+import { ChakraProvider } from '@chakra-ui/react'
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   const {locale} = useRouter();
@@ -18,7 +19,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
   }
 
   return (    
-
+    <ChakraProvider>
       <ClerkProvider {...pageProps}>
         <Toaster position="bottom-center" />
            <Head>
@@ -30,6 +31,8 @@ const MyApp: AppType = ({ Component, pageProps }) => {
           </Head>
         <Component {...pageProps} />
       </ClerkProvider>
+      </ChakraProvider>
+
   );
 };
 

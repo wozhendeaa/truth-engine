@@ -33,10 +33,11 @@ model Post {
   @@index([id])
 }
 
-enum PostType{
+enum PostType {
   POST
   QUESTION
 }
+
 
 model Hashtag {
   id          String        @id @default(cuid())
@@ -70,6 +71,7 @@ model User {
   displayname     String?
   email           String?   @unique
   token           String?
+  NiuBi           Decimal  @default(10)
   role            Role     @default(SHEEP)
   followings      UserFollows[]  @relation("following")
   followers       UserFollows[]  @relation("follower")
@@ -124,8 +126,11 @@ model Comment {
   content     String      @db.Text
   authorId    String
   author      User       @relation(fields: [authorId], references: [id])
-  postId      String
-  post        Post       @relation(fields: [postId], references: [id])
+  replyToPostId String?
+  post        Post?       @relation(fields: [replyToPostId], references: [id])
+  replyToCommentId String? 
+  replyToComment    Comment? @relation(name:"CommentToComment", fields: [replyToCommentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  comments Comment[] @relation(name: "CommentToComment")
   media       String?
   reactions   Reaction[] 
   reports     Report[]
@@ -134,8 +139,9 @@ model Comment {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
+  @@index([replyToCommentId])
   @@index([authorId])
-  @@index([postId])
+  @@index([replyToPostId])
 }
 
 model Report {
@@ -159,6 +165,8 @@ model Notification{
   senderId    String
   sender      User      @relation(fields: [senderId], references: [id])
   conent     String 
+
+  @@index([senderId])
 }
 
 enum ReactionType {
