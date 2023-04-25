@@ -21,6 +21,24 @@
     "sign_in" : "登录",
     "sign_up" : "注册",
     "sign_out" : "登出",
+    "change_avatar" : "修改头像",
+    "save_changes" : "保存",
+    "username" : "用户名",
+    "username_hint" : "只能包含子母，数字和下划线",
+    "username_error_length" : "长度大于7，小于15",
+    "displayname_error_length" : "长度大于2，小于15",
+    "input_box_empty_or_short" : "内容为空或太短",
+    "username_taken" : "你运气不好，这个用户名早就被用了",
+    "displayname" : "给别人看的名称",
+    "displayname_hint" : "不要写肮脏的词汇，小心被举报",
+    "email" : "电邮地址",
+    "email_taken" : "这个邮件地址已经有人用了",
+    "email_error" : "不要乱写邮件地址",
+    "receive_notification" : "接受小明教授的更新邮件",
+    "receive_notification_desc" : "只有小明更新视频和发布重要信息时你才会受到邮件",
+
+    "register_success" : "注册成功！快去学习争取成为引擎",
+    "server_error" : "天有不测风云，服务器出错了",
 
     "empty":""
    }

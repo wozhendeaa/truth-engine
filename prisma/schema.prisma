@@ -94,6 +94,7 @@ model UserFollows {
   following   User   @relation("following", fields: [followingId], references: [id])
   followerId  String
   follower    User   @relation("follower", fields: [followerId], references: [id])
+  recieveImportantEmailNotification Boolean @default(true)
 
   @@index([followerId])
   @@index([followingId])

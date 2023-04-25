@@ -8,9 +8,103 @@ import { useAuth, useUser } from '@clerk/nextjs';
 import { getAuth } from '@clerk/nextjs/server';
 import { api } from '~/utils/api';
 import { UserResource } from '@clerk/types';
-import { use } from 'react';
+import { use, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Switch } from '@headlessui/react';
+import { Controller, FieldErrors, SubmitHandler, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { LoadingSpinner } from '~/components/loading';
+import toast from 'react-hot-toast';
+import axios from 'axios';
+import { trpcCaller } from '~/server/helpers/trpcCallerHelper';
+import { createTRPCContext } from '~/server/api/trpc';
+import { appRouter } from '~/server/api/root';
+import { prisma } from '~/server/db';
+
+function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(' ')
+}
+
+
+export const accountSetupSchema = z.object({
+  username: z.string().regex(/^[a-zA-Z0-9_]+$/, 'username_hint')
+  .min(8,"username_error_length")
+  .max(15, "username_error_length"),
+
+  userId:z.string(),
+
+  displayName: z.string()
+  .min(2,"displayname_error_length")
+  .max(15,"displayname_error_length"),
+
+  email: z.string().email({ message: "email_hint"}),
+  receiveNotification: z.boolean().default(true)
+});
+
+export type AccountSetupSchema = z.infer<typeof accountSetupSchema>;
 
 export function AccountSetupSection( props: {user: UserResource}) {
+  const {t} = useTranslation()
+  const router= useRouter()
+
+  const { user } = props; 
+  const {register,
+    control,
+    watch,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting }} = useForm<AccountSetupSchema>({
+      resolver: zodResolver(accountSetupSchema),
+      defaultValues: {
+        displayName: user.firstName + " " + user.lastName,
+        email: user.primaryEmailAddress?.emailAddress,
+      },
+    })
+
+    const watchAllFields = watch();
+    const onSubmit: SubmitHandler<AccountSetupSchema> = async (data) => {
+      axios.post('/api/prepareNewUser/register', 
+            data
+        )
+        .then(function (response) {
+          console.log(" response",response);
+          alert(" hahahah");
+        })
+        .catch(function (e) {
+          const errors = e.response.data.errors;
+
+          if (errors.username) {
+
+            setError('username', {
+              type: "custom",
+              message: errors.username,
+            });
+          }
+
+          if (errors.email) {
+            setError('email', {
+              type: "custom",
+              message: errors.email,
+            });
+          }
+
+        });
+      }
+
+
+    const onError = async (errors: FieldErrors) => {
+       
+    }
+
+    const checkIsUsernameTaken = async (username: string) => {
+      // const {data} = await api.user.isUsernameTaken.useQuery({username: username});
+      // const isTaken = data?.props.isTaken
+      console.log("isTaken");
+      return false
+    }
+
   return (
     <section className="isolate overflow-hidden bg-white px-6 lg:px-8 grow">
       <div className="relative mx-auto max-w-2xl py-24 sm:py-32 lg:max-w-4xl">
@@ -30,27 +124,118 @@ export function AccountSetupSection( props: {user: UserResource}) {
               />
               <use href="#b56e9dab-6ccb-4d32-ad02-6b4bb5d9bbeb" x={86} />
             </svg>
-            <blockquote className="text-xl font-semibold leading-8 text-gray-900 sm:text-2xl sm:leading-9">
-              <p>
-                Commodo amet fugiat excepteur sunt qui ea elit cupidatat ullamco consectetur ipsum elit consequat. Elit
-                sunt proident ea nulla ad nulla dolore ad pariatur tempor non. Sint veniam minim et ea.
-              </p>
-            </blockquote>
+  
+        <form className="space-y-0 pt-8" action='/api/prepareNewUser/register' method="post" onSubmit={handleSubmit(onSubmit, onError)}>
+        <Controller
+          name="userId"
+          control={control}
+          defaultValue={user.id}
+          
+          render={({ field }) => <input type="hidden" {...field} />}
+      />
+        <div className="flex items-center">
+          <div className="flex-grow ">
+            <label htmlFor="username" className="block text-sm font-medium text-slate-700">{t('username')}</label>
+            <input
+              type="text"
+              id="username"
+              placeholder={t('username_hint').toString()}
+              {...register('username')}
+              disabled={isSubmitting}
+              className="input input-bordered input-primary w-full max-w-xs mt-1 text-slate-950"
+            />
+          {errors.username && 
+          <span className="text-sm text-red-500 ml-2">{t(String(errors.username.message))}</span>}
           </div>
-          <div className="col-end-1 w-16 lg:row-span-4 lg:w-72">
+        </div>
+
+  <div className="flex items-center">
+    <div className="flex-grow">
+      <label htmlFor="displayName" className="block text-sm font-medium text-slate-700">{t('displayname')}</label>
+      <input
+         {...register('displayName')}
+         disabled={isSubmitting}
+        type="text"
+        id="displayName"
+        placeholder={t('displayname_hint').toString()}
+        className="input input-bordered input-primary w-full max-w-xs mt-1 text-slate-950"
+      />
+   {errors.displayName && <span className="text-sm text-red-500 ml-2">
+   {t(String(errors.displayName.message))}</span>}
+    </div>
+  </div>
+  
+  <div className="flex items-center">
+    <div className="flex-grow">
+      <label htmlFor="emailAddress" className="block text-sm font-medium text-slate-700">{t('email')}</label>
+      <input
+        type="email"
+        {...register('email')}
+        disabled={isSubmitting}
+        id="emailAddress"
+        className="input input-bordered input-primary w-full max-w-xs mt-1 text-slate-950"
+      />
+{   errors.email && <span className="text-sm text-red-500 ml-2">{t(String(errors.email.message))}</span>
+}    </div>
+  </div>
+
+  <div className="flex items-center w-[20rem]">
+  <Controller
+        name="receiveNotification"
+        control={control}
+        defaultValue={true}
+        render={({ field: { onChange, value } }) => (
+          <Switch.Group as="div" className="flex items-center justify-between grow ">
+            <span className="flex flex-grow flex-col">
+              <Switch.Label as="span" className="text-sm font-medium leading-6 text-gray-900" passive>
+                {t('receive_notification')}
+              </Switch.Label>
+              <Switch.Description as="span" className="text-sm text-gray-500">
+              {t('receive_notification_desc')}
+              </Switch.Description>
+            </span>
+            <Switch
+              checked={Boolean(value)}
+              onChange={onChange}
+              className={`${
+                value ? 'bg-indigo-600' : 'bg-gray-200'
+              } relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2`}
+            >
+              <span
+                aria-hidden="true"
+                className={`${
+                  value ? 'translate-x-5' : 'translate-x-0'
+                } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
+              />
+            </Switch>
+          </Switch.Group>
+        )}
+      />
+  </div>
+
+  <button  type="submit" disabled={isSubmitting} className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold 
+  text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2
+  focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+    {t('save_changes')}
+  </button>
+  {/* <pre className='text-slate-800'>{JSON.stringify(watchAllFields, null, 2)}</pre> */}
+
+</form>
+          </div>
+          <div className="col-end-1 w-16 lg:row-span-4 lg:w-72 relative">
             <img
               className="rounded-xl bg-indigo-50 lg:rounded-3xl"
               src={props.user.profileImageUrl || "/images/avatar.svg"}
-              alt=""
-            />
+              alt=""/>
+          <div className="overlay-content absolute bottom-0 left-0 w-full h-1/3 md:h-1/6 bg-opacity-50 bg-slate-300 hover:bg-indigo-500 transition-colors duration-300 flex justify-center items-center rounded-b-xl lg:rounded-b-3xl cursor-pointer">
+            <span className="text-slate-800 text-sm">{t('change_avatar')}</span>
           </div>
-          <figcaption className="text-base lg:col-start-1 lg:row-start-3">
-            <div className="font-semibold text-gray-900">{props.user.firstName} {props.user.lastName}</div>
-            <div className="mt-1 text-gray-500">CEO of Workcation</div>
-          </figcaption>
+          </div>
+        
         </figure>
       </div>
     </section>
+    
   )
 }
 
@@ -69,4 +254,38 @@ const PrepareNewUser: NextPage = () => {
     </div>
   );
 };
+
+//write a getInitialprops function
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const {res, req, locale } = ctx;
+  const {user} = getAuth(req);
+
+  const exist = await prisma.user.findFirst({
+    select: {
+      id:true
+    },
+    where: {
+      id: user?.id,
+   }
+ })
+
+  if (exist != null) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/"
+      }
+    }
+  }
+
+  return {
+    props: {
+      ...await serverSideTranslations(locale?.toString() ?? 'ch-ZH', ['common', 'footer']),
+    },
+  }
+}
+
 export default PrepareNewUser;
+
+
+

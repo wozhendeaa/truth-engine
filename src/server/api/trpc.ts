@@ -30,9 +30,10 @@ type CreateContextOptions = Record<string, never>;
  *
  * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
  */
-const createInnerTRPCContext = (_opts: CreateContextOptions) => {
+export const createInnerTRPCContext = (_opts: CreateContextOptions) => {
   return {
-    prisma,
+    req:_opts.req,
+    res:_opts.res,
   };
 };
 
@@ -92,6 +93,22 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
   },
 });
 
+const t2 = initTRPC.context<typeof createInnerTRPCContext>().create({
+  transformer: superjson,
+  errorFormatter({ shape, error }) {
+    return {
+      ...shape,
+      data: {
+        ...shape.data,
+        zodError:
+        error.cause instanceof ZodError
+          ? error.cause.flatten()
+          : null,
+      },
+    };
+  },
+});
+
 /**
  * 3. ROUTER & PROCEDURE (THE IMPORTANT BIT)
  *
@@ -105,6 +122,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
  * @see https://trpc.io/docs/router
  */
 export const createTRPCRouter = t.router;
+export const createApiRouter = t2.router;
 
 /**
  * Public (unauthenticated) procedure

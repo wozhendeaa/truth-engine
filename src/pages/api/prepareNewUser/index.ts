@@ -18,9 +18,9 @@ export default async function handler(req:  NextApiRequest, res: NextApiResponse
   })
 
   if (!user) {
-    return res.redirect("/misc/NewAccountSetup?userid=" + userId)
+    return res.redirect("/api/NewAccountSetup")
   }
 
   const url = process.env.NEXT_PUBLIC_BASE_URL?.toString() + "";
-  return res.redirect(url)
+   return res.redirect(url)
 }
