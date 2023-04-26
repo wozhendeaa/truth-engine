@@ -14,7 +14,9 @@ model Post {
   id          String     @id @default(cuid()) 
   content     String     @db.Text
   authorId    String      
-  author      User       @relation(fields: [authorId], references: [id])
+  author      User       @relation(name:"author", fields: [authorId], references: [id])
+  originalAuthorId    String?      
+  originalAuthor      User?       @relation(name:"repost", fields: [originalAuthorId], references: [id])
   createdAt   DateTime   @default(now())
   updatedAt   DateTime?   @updatedAt
   reactions   Reaction[]
@@ -23,12 +25,15 @@ model Post {
   likes       Int         @default(0)
   dislikes    Int         @default(0)
   ViewCount   Int         @default(0)
+  repost      Int         @default(0)
+  reported    Int         @default(0)
   comments    Comment[]
   hashtags    PostHashtag[]
   categories  Category[]
   reports     Report[]
   
 
+  @@index([originalAuthorId])
   @@index([authorId])
   @@index([id])
 }
@@ -75,7 +80,8 @@ model User {
   role            Role     @default(SHEEP)
   followings      UserFollows[]  @relation("following")
   followers       UserFollows[]  @relation("follower")
-  posts           Post[]
+  reenginedPosts    Post[] @relation(name: "repost")
+  posts           Post[] @relation(name: "author")
   reports         Report[]
   premiumStatus   Boolean   @default(false)
   reactions       Reaction[]
@@ -135,6 +141,8 @@ model Comment {
   reactions   Reaction[] 
   reports     Report[]
   likes       Int         @default(0)
+  commentCount  Int         @default(0)
+  reEnginedCount Int     @default(0)
   dislikes    Int         @default(0)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt

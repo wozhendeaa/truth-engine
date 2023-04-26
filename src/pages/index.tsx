@@ -12,87 +12,7 @@ import { useForm, } from "react-hook-form";
 import { z } from "zod";
 import { PageLayout } from "~/components/layout";
 import Postview from "~/components/PostView";
-
-//create react hook validation schema for post
-const postSchema = z.object({
-  content: z.string().min(4, {message: "post_too_short"}),
-});
-
-type postFormSchema = z.infer<typeof postSchema>;
-
-
-const CreatePost = () => {
-  const [newPost, setPost] = useState("");
-  const {register, handleSubmit, formState: {errors}} = useForm<postFormSchema>({
-    resolver: zodResolver(postSchema)
-  });
-  const {user} = useUser();
-  const ctx = api.useContext();
-  const {t} = useTranslation();
-
-  if(!user) return null;
-
-  const {mutate, isLoading: isPosting} = api.posts.createPost.useMutation({
-    onSuccess: () => {
-      setPost("");
-      void ctx.posts.getAll.invalidate();
-    },
-    onError: (e) => {
-       const errorMessage = e.data?.code;
-       if (errorMessage) {
-        toast.error(t(errorMessage));       
-       } 
-    }     
-  });
-
-  function onPromise<T>(promise: (event: SyntheticEvent) => Promise<T>) {
-    return (event: SyntheticEvent) => {
-      if (promise) {
-        promise(event).catch((error) => {
-          console.log("Unexpected error", error);
-        });
-      }
-    };
-  }
-
-  const onSubmit= (data : postFormSchema) => {
-    if (!errors.content) {
-      mutate(data);
-    }
-  }
-  
-  return <> 
-  <div className="flex gap-3 w-full ">
-    <Image src={user.profileImageUrl} alt="profile image" className="w-14 h-14 rounded-full" width="56"
-          height="56"/>
-    <form onSubmit={ onPromise(handleSubmit(onSubmit))} className="flex gap-3 w-full ">
-    <input placeholder="type"
-     className="grow bg-transparent outline-none "
-     value={newPost}
-     onKeyDown={(e) => {      
-         if(e.key === "Enter") {
-          e.preventDefault();
-          if (errors.content) {
-            toast.error(t("post_too_short"));
-          } else {
-            mutate({content: newPost});
-          }            
-     }}}
-     disabled={isPosting}
-     aria-invalid={errors.content ? "true" : "false"} 
-     {...register("content", {required:true, onChange: (e: React.FormEvent<HTMLInputElement>) => setPost(e.currentTarget.value)})}  
-     />
-    {errors.content ? <span className="text-red-500 absolute top-center right-center flex items-center justify-center">{t('post_too_short')}</span>: null}
-
-   {!isPosting && <button disabled={isPosting}  type="submit"
-     className="bg-slate-400 text-white px-4 py-2 rounded-md"> {t("post")}</button>}
-     {isPosting && <div className="flex items-center justify-center"><LoadingSpinner size={20}/></div>}
-    </form>
-  </div>
-  </>
-}
-
-
+import { PostCreator } from "~/components/posting/PostCreator";
 
 const Feed = () => {
   const {data, isLoading: postsLoding} = api.posts.getAll.useQuery();
@@ -109,8 +29,6 @@ const Feed = () => {
    </div>
   );
 }
-
-
 
 const Home: NextPage = () => {
   const {isLoaded: userLoaded, isSignedIn} = useUser();
@@ -131,10 +49,10 @@ const Home: NextPage = () => {
     <>
         <PageLayout>
          <div className="flex border-b border-slate-400 p-4">
-              {!isSignedIn && <SignInButton />}
-              {!!isSignedIn && <SignOutButton /> && <CreatePost />}
+              {!!isSignedIn &&<PostCreator />}
          <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
          </div>
+
          <Feed />
       </PageLayout>
 

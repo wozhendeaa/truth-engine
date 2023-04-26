@@ -29,7 +29,9 @@ const MyApp: AppType = ({ Component, pageProps }) => {
             <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500&display=swap" rel="stylesheet" />
             <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500&display=swap" rel="stylesheet" />
           </Head>
-        <Component {...pageProps} />
+          <div className="dark">
+          <Component {...pageProps} />
+        </div>
       </ClerkProvider>
       </ChakraProvider>
 

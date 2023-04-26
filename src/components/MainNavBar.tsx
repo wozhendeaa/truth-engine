@@ -36,6 +36,7 @@ export const UnLoggedInUserSection = ({t} :{ t: TFunction<"translation">}) => {
            focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center -mr-2 -mb-1 -mt-1 grow">
          {t('sign_in')}</button>
          </SignInButton>
+         <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" afterSignInUrl={"/api/prepareNewUser"}  />
          </div>
     </>
 }
@@ -203,7 +204,7 @@ export default function MainNavBar() {
   return (
     <>
 
-    <Disclosure as="nav" className="bg-white shadow sticky top-0 font-chinese"  >
+    <Disclosure as="nav" className="bg-white shadow sticky top-0 font-chinese z-50"  >
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8" >

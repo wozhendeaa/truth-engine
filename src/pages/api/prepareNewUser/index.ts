@@ -22,5 +22,5 @@ export default async function handler(req:  NextApiRequest, res: NextApiResponse
   }
 
   const url = process.env.NEXT_PUBLIC_BASE_URL?.toString() + "";
-   return res.redirect(url)
+  return res.redirect(url)
 }

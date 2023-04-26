@@ -20,7 +20,7 @@ const config = {
    */
 
   images:{
-    domains: ["images.clerk.dev"],
+    domains: ["images.clerk.dev", "images.unsplash.com"],
   },
   i18n: {
     // These are all the locales you want to support in
@@ -38,6 +38,7 @@ const config = {
     config.resolve.fallback = { fs: false };
     return config;
   },
+  
 
   typescript:{
     ignoreBuildErrors:true,
