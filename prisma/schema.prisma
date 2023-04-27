@@ -27,6 +27,8 @@ model Post {
   ViewCount   Int         @default(0)
   repost      Int         @default(0)
   reported    Int         @default(0)
+  commentCount    Int         @default(0)
+  MarkAsDelete Boolean @default(false)
   comments    Comment[]
   hashtags    PostHashtag[]
   categories  Category[]
@@ -88,12 +90,15 @@ model User {
   comments        Comment[]
   notifications   Notification[]
   @@index([id])
+  @@index([username])
 }
 
 enum Role {
   SHEEP
   ENGIINE
+  VERYFIED_ENGINE
   ADMIN
+  ADMIN_VERYFIED_ENGINE
 }
 
 model UserFollows {
@@ -143,6 +148,8 @@ model Comment {
   likes       Int         @default(0)
   commentCount  Int         @default(0)
   reEnginedCount Int     @default(0)
+  MarkAsDelete Boolean @default(false)
+
   dislikes    Int         @default(0)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt

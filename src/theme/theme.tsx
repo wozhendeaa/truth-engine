@@ -10,9 +10,20 @@ import { switchStyles } from './components/switch';
 import { linkStyles } from './components/link';
 import { breakpoints } from './foundations/breakpoints';
 import { globalStyles } from './styles';
+import {type ThemeConfig } from '@chakra-ui/react'
+
+// 2. Add your color mode config
+const config: ThemeConfig = {
+  initialColorMode: 'dark',
+  useSystemColorMode: false,
+}
+
+// 3. extend the theme
+
 
 export default extendTheme(
 	{ breakpoints }, // Breakpoints
+	config,
 	globalStyles,
 	badgeStyles, // badge styles
 	buttonStyles, // button styles
@@ -26,3 +37,5 @@ export default extendTheme(
 );
 
 export interface CustomCardProps extends HTMLChakraProps<'div'>, ThemingProps {}
+
+

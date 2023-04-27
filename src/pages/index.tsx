@@ -6,34 +6,21 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { RouterOutputs, api } from "~/utils/api";
 import { SyntheticEvent, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import toast from 'react-hot-toast';
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, } from "react-hook-form";
-import { z } from "zod";
 import { PageLayout } from "~/components/layout";
-import Postview from "~/components/PostView";
-import { PostCreator } from "~/components/posting/PostCreator";
+import { PostCreator as PostBox } from "~/components/posting/PostBox";
+import { Flex, useColorModeValue } from "@chakra-ui/react";
 
-const Feed = () => {
-  const {data, isLoading: postsLoding} = api.posts.getAll.useQuery();
-
-  if (postsLoding) return <LoadingPage />
-  if (!data) return <div>没有找到任何消息</div>
-
-  return (
-    <div className="flex flex-col">
-    {data?.map((fullPost) => (
-      <Postview {...fullPost} key={fullPost.post?.id} />  
-      ))}
-
-   </div>
-  );
-}
+import TruthEngineSideBar from "~/components/QTruthEngineSidebar";
+import FeedThread from "~/components/FeedThread"
 
 const Home: NextPage = () => {
   const {isLoaded: userLoaded, isSignedIn} = useUser();
+	// Chakra color mode
+	const textColor = useColorModeValue('gray.700', 'white');
+	const paleGray = useColorModeValue('secondaryGray.400', 'whiteAlpha.100');
 
-  api.posts.getAll.useQuery();
+  const {data} = api.posts.getAll.useQuery();
+
   
   const { t, i18n } = useTranslation(['common', 'footer'], { bindI18n: 'languageChanged loaded' })
   // bindI18n: loaded is needed because of the reloadResources call
@@ -48,14 +35,27 @@ const Home: NextPage = () => {
   return (
     <>
         <PageLayout>
-         <div className="flex border-b border-slate-400 p-4">
-              {!!isSignedIn &&<PostCreator />}
-         <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
+          <div className="col-span-1 h-full hidden md:inline" >    
+          
+          </div>
+          <TruthEngineSideBar />
+
+          {/* {!!isSignedIn && <PostCreator />} */}
+     
+         <div className="col-span-4 lg:col-span-2"> 
+             <PostBox />
+            
+             {
+              //@ts-ignore
+             <FeedThread posts={data} />}
+             
          </div>
 
-         <Feed />
-      </PageLayout>
+          <div className="col-span-1 hidden lg:inline ">
 
+          </div>
+       </PageLayout>
+     
     </>
   );
 };

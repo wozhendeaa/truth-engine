@@ -9,6 +9,9 @@ import { Toaster } from "react-hot-toast";
 import Head from "next/head";
 import { Link } from "react-router-dom";
 import { ChakraProvider } from '@chakra-ui/react'
+import theme from "~/theme/theme";
+import { extendTheme } from '@chakra-ui/react'
+
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   const {locale} = useRouter();
@@ -19,7 +22,8 @@ const MyApp: AppType = ({ Component, pageProps }) => {
   }
 
   return (    
-    <ChakraProvider>
+
+    <ChakraProvider  theme={theme }>
       <ClerkProvider {...pageProps}>
         <Toaster position="bottom-center" />
            <Head>

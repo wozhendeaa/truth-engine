@@ -1,27 +1,17 @@
 // pages/prepare-new-user.tsx
 import { GetServerSideProps, NextPage, GetStaticProps } from 'next';
-import { redirect } from 'next/navigation';
 import { useRouter } from "next/router";
-import { Navigate, Router, Routes, useNavigate } from 'react-router-dom';
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { useAuth, useUser } from '@clerk/nextjs';
 import { getAuth } from '@clerk/nextjs/server';
-import { api } from '~/utils/api';
 import { UserResource } from '@clerk/types';
-import { use, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Switch } from '@headlessui/react';
 import { Controller, FieldErrors, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { LoadingSpinner } from '~/components/loading';
-import toast from 'react-hot-toast';
 import axios from 'axios';
-import { trpcCaller } from '~/server/helpers/trpcCallerHelper';
-import { createTRPCContext } from '~/server/api/trpc';
-import { appRouter } from '~/server/api/root';
 import { prisma } from '~/server/db';
+import { useUser } from '@clerk/nextjs';
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -69,8 +59,7 @@ export function AccountSetupSection( props: {user: UserResource}) {
             data
         )
         .then(function (response) {
-          console.log(" response",response);
-          alert(" hahahah");
+       
         })
         .catch(function (e) {
           const errors = e.response.data.errors;
@@ -96,13 +85,6 @@ export function AccountSetupSection( props: {user: UserResource}) {
 
     const onError = async (errors: FieldErrors) => {
        
-    }
-
-    const checkIsUsernameTaken = async (username: string) => {
-      // const {data} = await api.user.isUsernameTaken.useQuery({username: username});
-      // const isTaken = data?.props.isTaken
-      console.log("isTaken");
-      return false
     }
 
   return (
@@ -239,8 +221,6 @@ export function AccountSetupSection( props: {user: UserResource}) {
   )
 }
 
-
-
 const PrepareNewUser: NextPage = () => {
   const {user} = useUser();
   const route = useRouter();
@@ -249,7 +229,7 @@ const PrepareNewUser: NextPage = () => {
   }
   
   return (
-    <div className='w-full h-screen bg-AccountSetup flex items-center justify-center '>
+    <div className='w-full min-h-screen bg-AccountSetup flex items-center justify-center '>
       <AccountSetupSection user={user}/>
     </div>
   );

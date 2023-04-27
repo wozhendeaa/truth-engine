@@ -31,7 +31,7 @@ export const UnLoggedInUserSection = ({t} :{ t: TFunction<"translation">}) => {
     return <>
      <div className="flex border-b border-slate-400 p-4">
          <SignInButton afterSignInUrl="/api/prepareNewUser">
-         <button type="button" className="text-white bg-gradient-to-r
+         <button type="button" className="text-white  bg-gradient-to-r
           from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none
            focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center -mr-2 -mb-1 -mt-1 grow">
          {t('sign_in')}</button>
@@ -42,11 +42,13 @@ export const UnLoggedInUserSection = ({t} :{ t: TFunction<"translation">}) => {
 }
 
 export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"translation">}) => {
+  const {user} =  useUser();
+
   return <>
-    <div className="hidden lg:ml-4 lg:flex lg:items-center ">
+    <div className="hidden md:ml-4 md:flex md:items-center  shadow-xl ">
                 <button
                   type="button"
-                  className="flex-shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  className="flex-shrink-0 rounded-full bg-gray-700 p-1 text-slate-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
                   <span className="sr-only"> {!isSSR && t('view_notifications')}</span>
                   <BellIcon className="h-6 w-6" aria-hidden="true" />
@@ -55,11 +57,14 @@ export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-4 flex-shrink-0">
                   <div>
-                    <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2
+                     focus:ring-indigo-500 focus:ring-offset-2 hover:focus:outline-solid">
                       <span className="sr-only">{!isSSR && t('open_user_menu')}</span>
-                      <img
-                        className="h-8 w-8 rounded-full"
-                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                      <Image 
+                        className="rounded-full"
+                        width={40}
+                        height={40}
+                        src={user?.profileImageUrl ?? "/images/default-profile.png"}
                         alt=""
                       />
                     </Menu.Button>
@@ -73,12 +78,12 @@ export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"
                     leaveFrom="transform opacity-100 scale-100"
                     leaveTo="transform opacity-0 scale-95"
                   >
-                    <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-gray-800 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                       <Menu.Item>
                         {({ active }) => (
                           <a
                             href="#"
-                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
+                            className={classNames(active ? 'bg-gray-100 dark:bg-purple-800' : '', 'block px-4 py-2 text-sm text-gray-700 dark:text-slate-300')}
                           >
                               {!isSSR && t('profile_page')}
                           </a>
@@ -88,7 +93,7 @@ export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"
                         {({ active }) => (
                           <a
                             href="#"
-                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
+                            className={classNames(active ? 'bg-gray-100 dark:bg-purple-800' : '', 'block px-4 py-2 text-sm text-gray-700 dark:text-slate-300')}
                           >
                             {!isSSR && t('settings')}
                           </a>
@@ -99,7 +104,7 @@ export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"
                            <SignOutButton>
                             {<a
                             href="#"
-                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}>
+                            className={classNames(active ? 'bg-gray-100 dark:bg-purple-800' : '', 'block px-4 py-2 text-sm text-gray-700 dark:text-slate-300')}>
                               {!isSSR && t('sign_out')} </a>}
                             </SignOutButton>
                         )}
@@ -109,7 +114,7 @@ export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"
                 </Menu>
               </div>
               <Disclosure.Panel className="lg:hidden">
-            <div className="space-y-1 pb-3 pt-2">
+            <div className="space-y-1 pb-3 pt-2 ">
               {/* Current: "bg-indigo-50 border-indigo-500 text-indigo-700", Default: "border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800" */}
               <Disclosure.Button
                 as="a"
@@ -142,12 +147,14 @@ export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"
              {!isSSR && t('discussion')}
               </Disclosure.Button>
             </div>
-            <div className="border-t border-gray-200 pb-3 pt-4">
+            <div className="border-t border-gray-200 pb-3 pt-4 ">
               <div className="flex items-center px-4">
                 <div className="flex-shrink-0">
-                  <img
-                    className="h-10 w-10 rounded-full"
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                  <Image
+                    className="rounded-full"
+                    width={20}
+                    height={20}
+                    src={user?.profileImageUrl ?? "/images/default-profile.png"}
                     alt=""
                   />
                 </div>
@@ -157,7 +164,7 @@ export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"
                 </div>
                 <button
                   type="button"
-                  className="ml-auto flex-shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  className="ml-auto flex-shrink-0 rounded-full bg-white p-1 dark:bg-gray-800 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
                   <span className="sr-only"> {!isSSR && t('view_notifications')}</span>
                   <BellIcon className="h-6 w-6" aria-hidden="true" />
@@ -204,7 +211,7 @@ export default function MainNavBar() {
   return (
     <>
 
-    <Disclosure as="nav" className="bg-white shadow sticky top-0 font-chinese z-50"  >
+    <Disclosure as="nav" className="bg-white dark:bg-gray-900 shadow-xl border-b-4 border-b-gray-800 sticky top-0 font-chinese z-30"  >
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8" >
@@ -226,47 +233,48 @@ export default function MainNavBar() {
                     alt="Q真相引擎"
                   />
                 </div>
-                <div className="hidden lg:ml-6 lg:flex lg:space-x-8 ">
+                <div className="hidden md:ml-6 md:flex md:space-x-8 dark: text-slate-300">
                   {/* Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" */}
                   <a
                     href="#"
-                    className="inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-medium text-gray-900 font-Noto+Sans+TC"
+                    className="inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-medium dark:text-slate-100 dark:hover:text-purple-300 text-gray-900 font-Noto+Sans+TC hover:border-gray-300 "
                   >
                     { !isSSR && t('professor_videos')}
                   </a>
                   <a
                     href="#"
-                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium dark:text-slate-100 text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-purple-300"
                   >
                    {!isSSR && t('natural_healing')}
                   </a>
                   <a
                     href="#"
-                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium dark:text-slate-100 dark:hover:text-purple-300 text-gray-500 hover:border-gray-300 hover:text-gray-700"
                   >
                     {!isSSR && t('redpill_academy')}
                   </a>
                   <a
                     href="#"
-                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium dark:text-slate-100 dark:hover:text-purple-300 text-gray-500 hover:border-gray-300 hover:text-gray-700"
                   >
                  {!isSSR && t('discussion')}
                   </a>
                 </div>
               </div>
-              <div className="flex flex-1 items-center justify-center px-2 lg:ml-6 lg:justify-end">
+              {/* {search} */}
+              {/* <div className="flex flex-1 items-center justify-center px-2 lg:ml-6 lg:justify-end">
                 <div className="w-full max-w-lg lg:max-w-xs">
                   <label htmlFor="search" className="sr-only">
                   {!isSSR && t('search')}
                   </label>
                   <div className="relative">
                     <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                      <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                      <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 dark:text-slate-100 dark:hover:text-purple-300" aria-hidden="true" />
                     </div>
                     <input
                       id="search"
                       name="search"
-                      className="block w-full rounded-md border-0 bg-white py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      className="block w-full rounded-md border-0 bg-white dark:text-slate-100 dark:bg-gray-800 dark:hover:text-purple-300 py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       placeholder= {!isSSR ? (t('search') + " ") : " "}
                       type="search"
                     />
@@ -275,21 +283,8 @@ export default function MainNavBar() {
 
                 </div>
 
-              </div>
+              </div> */}
 
-              <div className="flex items-center lg:hidden">
-                {/* Mobile menu button */}
-                <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 
-                 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
-                  <span className="sr-only">Open main menu</span>
-                  {open ? (
-                    <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
-                  ) : (
-                    <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-                  )}
-                </Disclosure.Button>
-
-              </div>
              {isSignedIn ? <LoggedInUserSection isSSR={isSSR} t={t} /> : <UnLoggedInUserSection t={t} />}
             </div>
 

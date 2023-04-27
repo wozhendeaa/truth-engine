@@ -14,7 +14,7 @@ const ProfileFeed = (props: {userId: string}) => {
   if (!data) return <div>你没有发任何文章</div>
   return<div className="flex flex-col">
           {data.map((fullPost) => {
-            return <Postview key={fullPost.post.id} {...fullPost} />
+            return <Postview key={fullPost.id} {...fullPost} />
           })}
         </div>
 
