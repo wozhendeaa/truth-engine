@@ -127,8 +127,8 @@ export const PostCreator = () => {
 
     return <>
        <div>
-        <div className="grid w-full h-auto rounded bg-primary text-primary-content place-content-cente  ">
-            <div className="flex pl-5 pt-5 space-x-3">
+        <div className="grid w-full grow h-auto rounded bg-primary text-primary-content place-content-cente">
+            <div className="flex pl-5 pt-5 space-x-3 grow text-4xl">
                 <div className="h-auto">
                     <Image
                       src={user.profileImageUrl ?? "/images/default_profile.png"} 
@@ -137,28 +137,26 @@ export const PostCreator = () => {
                       height={60}
                       className="flex-none rounded-full " />
                 </div>     
-                <div className="w-full pr-6">
-                <form className="relative mr-[62px] " onSubmit={handleSubmit}>
-                    <div className="overflow-hidden flex flex-1 rounded-lg pb-12 
+                <div className="w-full pr-6 grow  ">
+                <form className="relative mr-[62px] w-full grow" onSubmit={handleSubmit}>
+                    <div className="overflow-hidden flex flex-1 rounded-lg pb-12 grow mr-[62px] text-4xl
                     shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600">
                       <label htmlFor="content" className="sr-only">
                         {t('Add_your_comment')}
                       </label>
-                      <div className="tooltip tooltip-open tooltip-bottom" data-tip="hello">
                         <textarea
-                          rows={2}
                           {...register('content')}
+                          rows={4}
                           disabled={isPosting}
                           name="content"
                           id="content"
-                          className="block resize-none border-0 bg-red-300
-                          flex-1 w-full grow 
-                          font-chinese dark:text-slate-200 antialiased 
-                          bg-transparent py-1.5 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                          className="block border-0  w-full
+                          text-4xl
+                           grow font-chinese dark:text-slate-200
+                            antialiased bg-transparent py-1.5 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6 min-h-[100px] "
                           placeholder={t('Add_your_comment').toString()}
                           defaultValue={''}
                         />
-                      </div>
                     </div>
         
                     <div className="absolute inset-x-0 bottom-0 flex justify-between py-2 pl-3 pr-2">
@@ -187,7 +185,7 @@ export const PostCreator = () => {
                 <button
                   type="submit"
                   disabled={isPosting}
-                  className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                  className="rounded-md bg-white px-2.5 py-1.5 text-sm mr-[62px]  font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                   {t('post')}
                 </button>
               </div>

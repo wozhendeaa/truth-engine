@@ -48,16 +48,16 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
   const filesContent = [1,1,1,1,1,1];
   return (
     <>
-<Card size={'md'} className='mx-20 my-5 font-chinese'
+<Card size={'md'} className='mx-20 my-1 font-chinese'
   cursor="pointer"
   _hover={{
-    bgGradient: 'linear(to-tr, gray.700, purple.800)',
+    bgGradient: 'linear(to-tr, gray.700, violet.800)',
   }}
   _active={{
-    bgGradient: 'linear(to-bl, gray.700, purple.800)',
+    bgGradient: 'linear(to-bl, gray.700, violet.800)',
   }}
 
-bgColor={'gray.700'} textColor={'white'} rounded={'2xl'}  shadow='lg' pb='0' > 
+bgColor={'te_dark_bg.7'} textColor={'te_dark_text.1'} rounded={'2xl'}  shadow='lg' pb='0' > 
   <CardHeader>
     <Flex spacing='4' alignItems={'top'}>
       <Flex flex='1' gap='4' alignItems='center' flexWrap='wrap'>
@@ -129,7 +129,8 @@ bgColor={'gray.700'} textColor={'white'} rounded={'2xl'}  shadow='lg' pb='0' >
       },
     }}
   >
-    <Button flex='1' className='shrink' variant='ghost' leftIcon={<BsHandThumbsUp />} _hover={{ bg: 'gray.600' }}
+    <Button flex='1' className='shrink'
+     variant='ghost' leftIcon={<BsHandThumbsUp />} _hover={{ bg: 'gray.600' }}
      onClick={() =>handleLike(postWithUser)}> 
       {postWithUser.likes > 0 ? postWithUser.likes : ""}
     </Button>

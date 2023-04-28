@@ -25,6 +25,8 @@ export const accountSetupSchema = z.object({
 
   userId:z.string(),
 
+  profileImageUrl: z.string().default("/images/default_profile.png"),
+
   displayName: z.string()
   .min(2,"displayname_error_length")
   .max(15,"displayname_error_length"),
@@ -50,6 +52,7 @@ export function AccountSetupSection( props: {user: UserResource}) {
       defaultValues: {
         displayName: user.firstName + " " + user.lastName,
         email: user.primaryEmailAddress?.emailAddress,
+        profileImageUrl:  user.profileImageUrl,
       },
     })
 

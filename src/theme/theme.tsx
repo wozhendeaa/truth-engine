@@ -11,6 +11,8 @@ import { linkStyles } from './components/link';
 import { breakpoints } from './foundations/breakpoints';
 import { globalStyles } from './styles';
 import {type ThemeConfig } from '@chakra-ui/react'
+import tailwindColors from "tailwindcss/colors"
+
 
 // 2. Add your color mode config
 const config: ThemeConfig = {
@@ -18,11 +20,26 @@ const config: ThemeConfig = {
   useSystemColorMode: false,
 }
 
+const theme = extendTheme({
+	colors: {
+	...tailwindColors,
+	  te_dark_bg: {
+		7: tailwindColors.gray[700],
+	  },
+	  te_dark_text: {
+		1: tailwindColors.slate[50],
+
+	  }
+	},
+  })
+  
+
 // 3. extend the theme
 
 
 export default extendTheme(
 	{ breakpoints }, // Breakpoints
+	theme,
 	config,
 	globalStyles,
 	badgeStyles, // badge styles

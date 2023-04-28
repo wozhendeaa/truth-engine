@@ -70,12 +70,12 @@ export const userRouter = createTRPCRouter({
     registerInMyDatabase: privateProcedure
     .input(accountSetupSchema)
     .mutation(async ({ctx, input}) => {
-
       const user = {
         username: input.username,
         email: input.email,
         displayname: input.displayName,
         id: input.userId,
+        profileImageUrl: input.profileImageUrl,
       }
 
       await prisma.user.create({
