@@ -20,7 +20,7 @@ const config = {
    */
 
   images:{
-    domains: ["images.clerk.dev", "images.unsplash.com"],
+    domains: ["images.clerk.dev", "images.unsplash.com", "truth-engine-image.s3.us-west-1.amazonaws.com"] ,
   },
   i18n: {
     // These are all the locales you want to support in

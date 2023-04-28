@@ -50,7 +50,7 @@ export const PostCreator = () => {
       }     
     });
 
-    const {user} = useUser();
+    const user =  api.user.getCurrentLoggedInUser.useQuery().data;
     const ctx = api.useContext();
     const {t} = useTranslation();
 

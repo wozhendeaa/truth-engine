@@ -12,6 +12,7 @@ import dayjs from "dayjs"
 dayjs.extend(relativetTime);
 
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import ImageModal from './ImageModal';
 
 interface ImageCarouselProps {
   images: string[];
@@ -93,7 +94,23 @@ interface FeedProps {
 }
 
 
+interface SetImageState {
+  state: boolean;
+}
+
+
+
+
 function renderImages(type: string, url: string, index: any) {
+  const [open, setOpen] = useState(false);
+  const showModal = () => {
+    setOpen(true);
+  };
+  
+  const closeModal = () => {
+    setOpen(false);
+  };
+
   if (type === 'image') {
     return (<li key={index} className="relative">
     <div className="group flex-grow block w-full  rounded-lg
@@ -105,8 +122,15 @@ function renderImages(type: string, url: string, index: any) {
           alt=''
           className='pointer-events-none object-cover max-h-full group-hover:opacity-75'
         />
+        <button type="button" className="absolute inset-0 focus:outline-none" 
+                   onClick={() => {showModal()}}>
+              <span className="sr-only"> </span>
+        </button>
+        
+        {open && 
+        //@ts-ignore
+        <ImageModal url={url} open={open} close={closeModal}/>}
     </div>
-
   </li>)
 
   } else {
@@ -153,7 +177,7 @@ bgColor={'te_dark_bg.7'} textColor={'te_dark_text.1'} rounded={'2xl'}  shadow='l
       />
     </Flex>
   </CardHeader>
-  <CardBody   pb='0' pt='0' >
+  <CardBody  pb={{base: '6', sm:'6', md: '0'}} pt='0'  >
     <span className='font-chinese text-xl font-bold text-slate-100 shadow-none ' >
     {postWithUser.content}     
     </span>
@@ -162,7 +186,6 @@ bgColor={'te_dark_bg.7'} textColor={'te_dark_text.1'} rounded={'2xl'}  shadow='l
           {/* image display section */}
           <div className="sm:p-6 mt-auto items-end ">
             <ul role="list" className="grid grid-flow-col auto-cols-auto gap-x-1 gap-y-2 xl:gap-x-1">
-            
               {media.map((file, index) => {
                 //@ts-ignore
                 return renderImages(file.type, file.url, index)

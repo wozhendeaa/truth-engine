@@ -21,6 +21,7 @@ import Image from "next/image"
 import { useEffect, useState } from 'react'
 import { SignIn, SignInButton, SignOutButton,  useUser } from '@clerk/nextjs';
 import { TFunction } from 'i18next';
+import { api } from '~/utils/api';
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -42,7 +43,7 @@ export const UnLoggedInUserSection = ({t} :{ t: TFunction<"translation">}) => {
 }
 
 export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"translation">}) => {
-  const {user} =  useUser();
+  const user =  api.user.getCurrentLoggedInUser.useQuery().data;
 
   return <>
     <div className="hidden md:ml-4 md:flex md:items-center  shadow-xl ">
@@ -206,13 +207,14 @@ export default function MainNavBar() {
         setIsSSR(false);
     }, []);
   const {t} = useTranslation();
+
     //return empty div if nothing is loaded
   if (!userLoaded ) return <div></div>;
   return (
     <>
 
-    <Disclosure as="nav" className="bg-white dark:bg-gray-900 shadow-xl text-4xl
-    border-b-4 border-b-gray-800 sticky top-0 font-chinese z-30"  >
+    <Disclosure as="nav" className="bg-white dark:bg-gray-800 shadow-xl text-4xl
+    border-b-4 border-b-gray-800 sticky top-0 font-chinese z-80"  >
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8" >

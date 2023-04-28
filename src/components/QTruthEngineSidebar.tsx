@@ -12,6 +12,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { useUser } from '@clerk/nextjs'
 import { useTranslation } from 'react-i18next'
+import { api } from '~/utils/api'
 
 const navigation = [
   { name: 'professor_videos', href: '#', icon: HomeIcon, current: true },
@@ -32,7 +33,7 @@ function classNames(...classes) {
 
 export default function TruthEngineSideBar() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const {user} = useUser()
+  const user =  api.user.getCurrentLoggedInUser.useQuery().data;
   const {t} = useTranslation();
 
   return (<>
@@ -198,7 +199,7 @@ export default function TruthEngineSideBar() {
         </div> */}
 
         <div className=" fixed top-2 z-50 right-0 flex items-end
-         bg-gray-900 px-4 py-4 shadow-sm sm:px-6 md:hidden
+         bg-gray-900 px-4 py-4 shadow-sm md:hidden
          hover:bg-gray-700">
           <button type="button" className="-m-2.5 p-2.5 text-gray-400 lg:hidden" onClick={() => setSidebarOpen(true)}>
             <span className="sr-only">Open sidebar</span>
