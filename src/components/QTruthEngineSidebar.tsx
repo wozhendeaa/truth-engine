@@ -90,7 +90,7 @@ export default function TruthEngineSideBar() {
                     <nav className="flex flex-1 flex-col">
                       <ul role="list" className="flex flex-1 flex-col gap-y-7">
                         <li>
-                          <ul role="list" className="-mx-2 space-y-1 ">
+                          <ul role="list" className="-mx-2 space-y-1 gap-2">
                             {navigation.map((item) => (
                               <li key={item.name}>
                                 <a
@@ -197,7 +197,7 @@ export default function TruthEngineSideBar() {
           </div>
         </div> */}
 
-        <div className="absolute top-0 z-50 right-0 flex items-ritht
+        <div className=" fixed top-2 z-50 right-0 flex items-end
          bg-gray-900 px-4 py-4 shadow-sm sm:px-6 md:hidden
          hover:bg-gray-700">
           <button type="button" className="-m-2.5 p-2.5 text-gray-400 lg:hidden" onClick={() => setSidebarOpen(true)}>

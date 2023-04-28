@@ -11,6 +11,56 @@ import dayjs from "dayjs"
 
 dayjs.extend(relativetTime);
 
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+
+interface ImageCarouselProps {
+  images: string[];
+}
+
+const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
+  const [currentImage, setCurrentImage] = useState(0);
+
+  const prevImage = () => {
+    setCurrentImage(currentImage === 0 ? images.length - 1 : currentImage - 1);
+  };
+
+  const nextImage = () => {
+    setCurrentImage((currentImage + 1) % images.length);
+  };
+
+  return (
+    <div className="relative">
+      {images.map((image, index) => (
+        <img
+          key={index}
+          src={image}
+          alt=""
+          className={`absolute w-full h-full object-cover transition-opacity duration-500 ease-in-out ${
+            index === currentImage ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+      ))}
+      <button
+        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 p-2 rounded-md text-gray-800 hover:bg-opacity-75 focus:outline-none"
+        onClick={prevImage}
+      >
+        <FiChevronLeft />
+      </button>
+      <button
+        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 p-2 rounded-md text-gray-800 hover:bg-opacity-75 focus:outline-none"
+        onClick={nextImage}
+      >
+        <FiChevronRight />
+      </button>
+      <div className="absolute top-2 right-2 bg-white bg-opacity-50 p-2 rounded-md text-gray-800">
+        {currentImage + 1}/{images.length}
+      </div>
+    </div>
+  );
+};
+
+
+
 const handleLike = (user: PostsWithUserData) => {
   // setTweets(tweets.map(tweet => tweet.tweetId === tweetId ? { ...tweet, likes: tweet.likes + 1 } : tweet));
 
@@ -46,20 +96,17 @@ interface FeedProps {
 function renderImages(type: string, url: string, index: any) {
   if (type === 'image') {
     return (<li key={index} className="relative">
-    <div className="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
-      <Image
+    <div className="group flex-grow block w-full  rounded-lg
+     bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2
+      focus-within:ring-offset-gray-100">
+         <Image
           objectFit='cover'
-          minH={30}
-          minW={30}
-          maxWidth={'auto'}
-          maxHeight={'auto'}
           src={url}
           alt=''
+          className='pointer-events-none object-cover max-h-full group-hover:opacity-75'
         />
-      <button type="button" className="absolute inset-0 focus:outline-none">
-        <span className="sr-only">View details for </span>
-      </button>
     </div>
+
   </li>)
 
   } else {
@@ -75,7 +122,7 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
  
   return (
     <>
-<Card size={'md'} className='mx-20 my-1 font-chinese'
+<Card size={'md'} className='mx-5 my-1 font-chinese flex-grow '
   cursor="pointer"
   _hover={{
     bgGradient: 'linear(to-tr, gray.700, violet.800)',
@@ -106,16 +153,15 @@ bgColor={'te_dark_bg.7'} textColor={'te_dark_text.1'} rounded={'2xl'}  shadow='l
       />
     </Flex>
   </CardHeader>
-  <CardBody   pb='0' pt='0'>
-    <Text>
+  <CardBody   pb='0' pt='0' >
+    <span className='font-chinese text-xl font-bold text-slate-100 shadow-none ' >
     {postWithUser.content}     
-    </Text>
-  <div className='flex '>
+    </span>
 
-  <div className="grid justify-center w-full h-auto rounded bg-accent text-accent-content place-content-end items-end">
+  <div className="grid justify-center  rounded bg-accent text-accent-content place-content-end ">
           {/* image display section */}
-          <div className="sm:p-6 mt-auto items-end">
-            <ul role="list" className="grid grid-cols-2 gap-x-1 gap-y-1 sm:grid-cols-3 sm:gap-x-1 lg:grid-cols-4 xl:gap-x-1 items-end">
+          <div className="sm:p-6 mt-auto items-end ">
+            <ul role="list" className="grid grid-flow-col auto-cols-auto gap-x-1 gap-y-2 xl:gap-x-1">
             
               {media.map((file, index) => {
                 //@ts-ignore
@@ -124,17 +170,13 @@ bgColor={'te_dark_bg.7'} textColor={'te_dark_text.1'} rounded={'2xl'}  shadow='l
             </ul>
           </div>
       </div>    
-  </div>
-
-
   </CardBody>
 
-  
   <CardFooter
     p='0'
     justify='space-between'
     flexWrap='nowrap'
-    mt='0'
+    mt='-5'
     maxHeight={70}
     sx={{
       '& > button': {
