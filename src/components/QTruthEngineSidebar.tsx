@@ -90,15 +90,15 @@ export default function TruthEngineSideBar() {
                     <nav className="flex flex-1 flex-col">
                       <ul role="list" className="flex flex-1 flex-col gap-y-7">
                         <li>
-                          <ul role="list" className="-mx-2 space-y-1">
+                          <ul role="list" className="-mx-2 space-y-1 ">
                             {navigation.map((item) => (
                               <li key={item.name}>
                                 <a
                                   href={item.href}
                                   className={classNames(
                                     item.current
-                                      ? 'bg-gray-800 text-white'
-                                      : 'text-gray-400 hover:text-white hover:bg-gray-800',
+                                      ? 'bg-gray-800 text-indigo-400 text-lg' 
+                                      : 'text-gray-200 hover:text-white text-lg hover:bg-gray-800',
                                     'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
                                   )}
                                 >
@@ -110,7 +110,7 @@ export default function TruthEngineSideBar() {
                           </ul>
                         </li>
                         <li>
-                          <div className="text-xs font-semibold leading-6 text-gray-400">
+                          <div className="text-md font-semibold leading-6 text-gray-100">
                             {t('private_engine')}</div>
                           <ul role="list" className="-mx-2 mt-2 space-y-1">
                             {teams.map((team) => (
@@ -121,7 +121,7 @@ export default function TruthEngineSideBar() {
                                     team.current
                                       ? 'bg-gray-800 text-white'
                                       : 'text-gray-400 hover:text-white hover:bg-gray-800',
-                                    'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
+                                    'group flex gap-x-3 rounded-md p-2 text-lg leading-6 font-semibold'
                                   )}
                                 >
                                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white">
@@ -197,7 +197,9 @@ export default function TruthEngineSideBar() {
           </div>
         </div> */}
 
-        <div className="absolute top-0 z-50 right-0 flex items-ritht bg-gray-800 px-4 py-4 shadow-sm sm:px-6 md:hidden">
+        <div className="absolute top-0 z-50 right-0 flex items-ritht
+         bg-gray-900 px-4 py-4 shadow-sm sm:px-6 md:hidden
+         hover:bg-gray-700">
           <button type="button" className="-m-2.5 p-2.5 text-gray-400 lg:hidden" onClick={() => setSidebarOpen(true)}>
             <span className="sr-only">Open sidebar</span>
             <Bars3Icon className="h-6 w-6" aria-hidden="true" />

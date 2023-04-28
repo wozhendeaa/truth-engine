@@ -1,19 +1,14 @@
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
+import { any, z } from "zod";
 
 import { createTRPCRouter, privateProcedure, publicProcedure } from "~/server/api/trpc";
 
 import { Ratelimit } from "@upstash/ratelimit"; // for deno: see above
 import { Redis } from "@upstash/redis";
+import { postSchema } from "~/components/posting/PostBox";
 
 
-//create react hook validation schema for post
-export const postSchema = z.object({
-  content: z.string().min(4, {message: "post_too_short"}),
-});
 
-type postFormSchema = z.infer<typeof postSchema>;
-export default postFormSchema;
 
 
 const ratelimit = new Ratelimit({
@@ -28,6 +23,21 @@ const ratelimit = new Ratelimit({
     prefix: "@upstash/ratelimit",
   });
 
+  function classifyMedia(filename: string): "image" | "video" | undefined {
+    const imageExtensions = ["jpg", "jpeg", "png", "gif", "bmp", "webp"];
+    const videoExtensions = ["mp4", "webm", "ogg", "avi", "mov", "wmv"];
+  
+    const extension = filename.toLowerCase();
+  
+    if (extension && imageExtensions.includes(extension)) {
+      return "image";
+    } else if (extension && videoExtensions.includes(extension)) {
+      return "video";
+    } else {
+      return undefined;
+    }
+  }
+
 
 export const postsRouter = createTRPCRouter({
   getPostById: publicProcedure.input(z.object({id: z.string()})).query(async ({ctx, input}) => {
@@ -39,6 +49,19 @@ export const postsRouter = createTRPCRouter({
           author: true
         }
     })
+
+    if (!post) throw new TRPCError({code: "NOT_FOUND", message: "没有找到文章"});
+    return post;
+  }
+  ),
+
+    likePost: privateProcedure.input(z.object({id: z.string()}))
+    .query(async ({ctx, input}) => {
+    const post = await ctx.prisma.post.findUnique({
+          where:{
+              id: input.id
+          },          
+      })
 
     if (!post) throw new TRPCError({code: "NOT_FOUND", message: "没有找到文章"});
     return post;
@@ -90,17 +113,32 @@ export const postsRouter = createTRPCRouter({
     ,
 
 
-  createPost: privateProcedure.input(z.object({
-    content:z.string().min(1, {message: "post_too_short"}),
-  })).mutation(async ({ctx, input}) => {
+  createPost: privateProcedure.input(
+    postSchema
+  ).mutation(async ({ctx, input}) => {
     const authorId = ctx.curretnUserId;
     const {success} = await ratelimit.limit(authorId);
     if (!success) throw new TRPCError({code: "TOO_MANY_REQUESTS", message: "too many requests"});
+
+    let mediaString = "";
+    if (input.media) {
+      let files = JSON.parse(input.media);
+      let processedFiles = [];
+      for  (let file of files) {
+        const ext = file.key.split(".").pop();
+        const type = classifyMedia(ext);
+         processedFiles.push({type: type, 
+          url: process.env.AWS_S3_IMAGE_BUCKET_URL + file.key}
+         );
+      }
+     mediaString = JSON.stringify(processedFiles);
+    }
 
     const post = await ctx.prisma.post.create({
         data:{
             authorId,
             content: input.content,
+            media: mediaString,
         }
     });
     return post;

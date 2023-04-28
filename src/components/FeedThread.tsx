@@ -13,7 +13,7 @@ dayjs.extend(relativetTime);
 
 const handleLike = (user: PostsWithUserData) => {
   // setTweets(tweets.map(tweet => tweet.tweetId === tweetId ? { ...tweet, likes: tweet.likes + 1 } : tweet));
-  alert('!!')
+
 };
 
 const handleRepost = (user: PostsWithUserData) => {
@@ -43,9 +43,36 @@ interface FeedProps {
 }
 
 
+function renderImages(type: string, url: string, index: any) {
+  if (type === 'image') {
+    return (<li key={index} className="relative">
+    <div className="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+      <Image
+          objectFit='cover'
+          minH={30}
+          minW={30}
+          maxWidth={'auto'}
+          maxHeight={'auto'}
+          src={url}
+          alt=''
+        />
+      <button type="button" className="absolute inset-0 focus:outline-none">
+        <span className="sr-only">View details for </span>
+      </button>
+    </div>
+  </li>)
+
+  } else {
+    return null;
+  }
+}
+
+
 const SingleFeed = (singlePostData: SingleFeedProps) => {
   const postWithUser = singlePostData.postWithUser;
-  const filesContent = [1,1,1,1,1,1];
+  const mediaStr = singlePostData.postWithUser.media;
+  let media = mediaStr ? Array.from(JSON.parse(mediaStr)) : [];
+ 
   return (
     <>
 <Card size={'md'} className='mx-20 my-1 font-chinese'
@@ -59,14 +86,14 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
 
 bgColor={'te_dark_bg.7'} textColor={'te_dark_text.1'} rounded={'2xl'}  shadow='lg' pb='0' > 
   <CardHeader>
-    <Flex spacing='4' alignItems={'top'}>
+    <Flex alignItems={'top'}>
       <Flex flex='1' gap='4' alignItems='center' flexWrap='wrap'>
-        <Avatar name='Segun Adebayo' src={postWithUser.author.profileImageUrl} />
+        <Avatar src={postWithUser.author.profileImageUrl ?? "/images/default_profile.png"} />
         <Box>
           <Heading size='md'>{postWithUser.author.displayname}</Heading>
           <Text textColor={'gray.400'} >{'@'+ postWithUser.author.username}</Text>
         </Box>
-        <Text mt='-23px'>
+        <Text mt={{ base: 0, md: '-33px'}}>
           {dayjs(postWithUser.createdAt).fromNow()}
         </Text>
       </Flex>
@@ -89,24 +116,11 @@ bgColor={'te_dark_bg.7'} textColor={'te_dark_text.1'} rounded={'2xl'}  shadow='l
           {/* image display section */}
           <div className="sm:p-6 mt-auto items-end">
             <ul role="list" className="grid grid-cols-2 gap-x-1 gap-y-1 sm:grid-cols-3 sm:gap-x-1 lg:grid-cols-4 xl:gap-x-1 items-end">
-              {filesContent.map((file, index) => (
-                <li key={index} className="relative">
-                  <div className="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
-                    <Image
-                        objectFit='cover'
-                        minH={30}
-                        minW={30}
-                        maxWidth={'auto'}
-                        maxHeight={'auto'}
-                        src='https://images.unsplash.com/photo-1531403009284-440f080d1e12?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80'
-                        alt='Chakra UI'
-                      />
-                    <button type="button" className="absolute inset-0 focus:outline-none">
-                      <span className="sr-only">View details for </span>
-                    </button>
-                  </div>
-                </li>
-              ))}
+            
+              {media.map((file, index) => {
+                //@ts-ignore
+                return renderImages(file.type, file.url, index)
+              })}
             </ul>
           </div>
       </div>    
@@ -141,10 +155,11 @@ bgColor={'te_dark_bg.7'} textColor={'te_dark_text.1'} rounded={'2xl'}  shadow='l
 
     <Button flex='1 'className='shrink' variant='ghost' textColor={'gray.300'}  gridGap={2} 
     disabled={true} _hover={{}} pointerEvents={'none'}>
-        <div><svg xmlns="http://www.w3.org/2000/svg" fill="none"
-         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
-      </svg></div>
+        <div>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+  <path strokeLinecap="round" strokeLinejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zM12 2.25V4.5m5.834.166l-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243l-1.59-1.59" />
+</svg>
+     </div>
        <div>{postWithUser.ViewCount > 0 ? postWithUser.ViewCount : "17"}</div>
     </Button>
   </CardFooter>

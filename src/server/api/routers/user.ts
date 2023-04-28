@@ -2,10 +2,43 @@ import { Schema, z } from "zod";
 import { createTRPCRouter, privateProcedure, publicProcedure } from "~/server/api/trpc";
 import { prisma } from '../../db';
 import {accountSetupSchema} from '~/pages/NewAccountSetup'
-import { Prisma } from "@prisma/client";
+import { Prisma, Role } from "@prisma/client";
 
 
 export const userRouter = createTRPCRouter({
+  getCurrentLoggedInUser: publicProcedure.query(async ({ctx}) => {
+    
+    if (ctx.userId == null) {
+      return null;
+    }
+
+    const user = await prisma.user.findFirst({
+      where: {
+        id: ctx.userId
+      }
+    })
+    return user;
+  
+  }),
+
+  isCurrentUserVerifiedEngine: publicProcedure.query(async ({ctx}) => {
+    if (ctx.userId == null) {
+      return false;
+    }
+
+    const user = await prisma.user.findFirst({
+      where: {
+        id: ctx.userId,
+        OR: [
+          { role: Role.VERYFIED_ENGINE  },
+          { role: Role.ADMIN_VERYFIED_ENGINE },
+        ],
+      }
+    })
+
+    return user != null;
+  
+  }),
 
  doesUserExist: publicProcedure.input(z.object({
   userId: z.string().nullable().nullish()
@@ -46,7 +79,10 @@ export const userRouter = createTRPCRouter({
    getAuthorizedUsers: publicProcedure.query(async ({ctx}) => {
     const users = await prisma.user.findMany({
       where: {
-         role: 'ADMIN_VERYFIED_ENGINE' || 'VERYFIED_ENGINE'
+        OR: [
+          { role: Role.VERYFIED_ENGINE  },
+          { role: Role.ADMIN_VERYFIED_ENGINE },
+        ],
       }
    })
 

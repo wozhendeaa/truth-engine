@@ -20,14 +20,14 @@ model Post {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime?   @updatedAt
   reactions   Reaction[]
-  media       String?
+  media       String?    @db.MediumText
   postType    PostType   @default(POST)
   likes       Int         @default(0)
   dislikes    Int         @default(0)
   ViewCount   Int         @default(0)
   repost      Int         @default(0)
   reported    Int         @default(0)
-  commentCount    Int         @default(0)
+  commentCount    Int?         @default(0)
   MarkAsDelete Boolean @default(false)
   comments    Comment[]
   hashtags    PostHashtag[]

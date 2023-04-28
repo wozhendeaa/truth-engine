@@ -1,7 +1,7 @@
 import { useUser } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { ChangeEvent, FormEvent, Fragment, SyntheticEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, Fragment, SyntheticEvent, useState } from "react";
 import { Controller, FieldValues, UseFormRegister, UseFormSetError, useForm, FieldErrors } from 'react-hook-form';
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -11,6 +11,7 @@ import { useFilePicker } from 'use-file-picker';
 import { Show } from "@chakra-ui/react";
 import Image from "next/image"
 import { watch } from "fs";
+import S3 from "aws-sdk/clients/s3";
 
 //@ts-ignore
 function classNames(...classes) {
@@ -22,15 +23,14 @@ interface UploadProgress {
     [fileName: string]: number;
   }
   
+  //create react hook validation schema for post
+export const postSchema = z.object({
+  content: z.string().min(4, {message: "post_too_short"}),
+  media: z.string().optional()
+});
+type postFormSchema = z.infer<typeof postSchema>;
+
   
-  
-//create react hook validation schema for post
-const postSchema = z.object({
-    content: z.string().min(4, {message: "post_too_short"}),
-    file_upload: z.string().array().nullable()
-  });
-  
-  type postFormSchema = z.infer<typeof postSchema>;
   
 export const PostCreator = () => {
     const {register, setValue , watch, setError,control,formState: {errors}} = useForm<postFormSchema>({
@@ -55,7 +55,7 @@ export const PostCreator = () => {
     const {t} = useTranslation();
 
 
-    const [openFileSelector, { filesContent, loading ,errors:pickerError }] = useFilePicker({
+    const [openFileSelector, { filesContent, loading ,errors:pickerError, clear  }] = useFilePicker({
           readAs: 'DataURL',
           accept: 'image/*',
           multiple: true,
@@ -82,24 +82,30 @@ export const PostCreator = () => {
 
     async function uploadToS3() {
         let keys = [];
+        const s3 = new S3();
 
         //@ts-ignore
         for (let i = 0; i < filesContent.length; i++) {
           //@ts-ignore
             let file = filesContent[i];
-            console.log(file)
-
             //@ts-ignore
-            const fileType = encodeURIComponent(file?.type);
-            console.log("type", fileType);
-
+            const fileType = encodeURIComponent(file?.name.split('.').at(1));
             const {data} = await axios.post(`/api/upload/processMediaUpload?fileType=${fileType}`);
             const {uploadUrl, key} = data;
-            keys.push({uploadUrl, key});
-            await axios.put(uploadUrl, file)
+            keys.push({key,fileType});
+
+            //convert base64 to blob
+            const str = 'data:image/' + {fileType} + 'base64,';
+            const base64Str = file?.content.toString() ?? "";
+            const response = await fetch(base64Str);
+            const blob = await response.blob();
+
+            const ss = await axios.put(uploadUrl, blob)
+            .then(res => {
+                
+            })
             .catch(e => {
                 toast (e.message);
-                console.log(e.message);
             });
         }
         return keys;
@@ -109,26 +115,29 @@ export const PostCreator = () => {
     async function handleSubmit(e: ChangeEvent<HTMLFormElement>) {
           e.preventDefault();
 
-       try{
-        //  const keys = await uploadToS3();
-        mutate({
-          content: watch('content').valueOf()
-        });
+          try{
+              const keys = await uploadToS3();
+              mutate({
+                content: watch('content').valueOf(),
+                media: JSON.stringify(keys),
+              });
+              setValue('content', "");   
+              clear();
+              void ctx.posts.getAll.invalidate();
+              
+          } catch(cause){
+                console.log(cause);
+                setError('content', {type: "custom", message: "媒体文件上传失败"});
+          }
 
-        void ctx.posts.getAll.invalidate();
-        
-       } catch(cause){
-            setError('content', {type: "custom", message: "媒体文件上传失败"});
-       }
-
-       return "";
-    }
+          return "";
+      }
     
 
     return <>
        <div>
         <div className="grid w-full grow h-auto rounded bg-primary text-primary-content place-content-cente">
-            <div className="flex pl-5 pt-5 space-x-3 grow text-4xl">
+            <div className="flex pl-5 pt-5 space-x-3 grow lg:text-xl">
                 <div className="h-auto">
                     <Image
                       src={user.profileImageUrl ?? "/images/default_profile.png"} 
@@ -151,7 +160,7 @@ export const PostCreator = () => {
                           name="content"
                           id="content"
                           className="block border-0  w-full
-                          text-4xl
+                          lg: text-xl
                            grow font-chinese dark:text-slate-200
                             antialiased bg-transparent py-1.5 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6 min-h-[100px] "
                           placeholder={t('Add_your_comment').toString()}
@@ -185,7 +194,7 @@ export const PostCreator = () => {
                 <button
                   type="submit"
                   disabled={isPosting}
-                  className="rounded-md bg-white px-2.5 py-1.5 text-sm mr-[62px]  font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                  className="rounded-md bg-white px-2.5 py-1.5 text-md mr-[62px]  font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                   {t('post')}
                 </button>
               </div>
@@ -196,6 +205,7 @@ export const PostCreator = () => {
 
         <div className="grid w-full h-auto rounded bg-accent text-accent-content place-content-end items-end">
             {/* image display section */}
+            {errors.content && <p className="text-red-500 text-sm">{errors.content.message}</p>}
             <div className="sm:p-6 ml-10 mt-auto items-end">
               <ul role="list" className="grid grid-cols-2 ml-6 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8 items-end">
                 {filesContent.map((file, index) => (

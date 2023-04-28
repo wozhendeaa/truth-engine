@@ -211,7 +211,8 @@ export default function MainNavBar() {
   return (
     <>
 
-    <Disclosure as="nav" className="bg-white dark:bg-gray-900 shadow-xl border-b-4 border-b-gray-800 sticky top-0 font-chinese z-30"  >
+    <Disclosure as="nav" className="bg-white dark:bg-gray-900 shadow-xl text-4xl
+    border-b-4 border-b-gray-800 sticky top-0 font-chinese z-30"  >
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8" >
@@ -233,29 +234,29 @@ export default function MainNavBar() {
                     alt="Q真相引擎"
                   />
                 </div>
-                <div className="hidden md:ml-6 md:flex md:space-x-8 dark: text-slate-300">
+                <div className="hidden md:ml-6 md:flex md:space-x-8 dark: text-slate-300 text-xl ">
                   {/* Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" */}
                   <a
                     href="#"
-                    className="inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-medium dark:text-slate-100 dark:hover:text-purple-300 text-gray-900 font-Noto+Sans+TC hover:border-gray-300 "
+                    className="inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1  dark:text-slate-100 dark:hover:text-purple-300 text-gray-900 font-Noto+Sans+TC hover:border-gray-300 "
                   >
                     { !isSSR && t('professor_videos')}
                   </a>
                   <a
                     href="#"
-                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium dark:text-slate-100 text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-purple-300"
+                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1  dark:text-slate-100 text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-purple-300"
                   >
                    {!isSSR && t('natural_healing')}
                   </a>
                   <a
                     href="#"
-                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium dark:text-slate-100 dark:hover:text-purple-300 text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1  dark:text-slate-100 dark:hover:text-purple-300 text-gray-500 hover:border-gray-300 hover:text-gray-700"
                   >
                     {!isSSR && t('redpill_academy')}
                   </a>
                   <a
                     href="#"
-                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium dark:text-slate-100 dark:hover:text-purple-300 text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                    className="inline-flex items-center  border-b-2 border-transparent px-1 pt-1  dark:text-slate-100 dark:hover:text-purple-300 text-gray-500 hover:border-gray-300 hover:text-gray-700"
                   >
                  {!isSSR && t('discussion')}
                   </a>
