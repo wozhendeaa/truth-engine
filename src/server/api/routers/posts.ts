@@ -1,12 +1,16 @@
 import { TRPCError } from "@trpc/server";
 import { any, z } from "zod";
 
-import { createTRPCRouter, privateProcedure, publicProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, privateProcedure, publicProcedure } from "server/api/trpc";
 
 import { Ratelimit } from "@upstash/ratelimit"; // for deno: see above
 import { Redis } from "@upstash/redis";
-import { postSchema } from "~/components/posting/PostBox";
+import { postSchema } from "components/posting/PostBox";
+import { RouterOutputs } from "utils/api";
+import { createTRPCContext } from '../trpc';
+import type Prisma  from "@prisma/client";
 import { ReactionType } from "@prisma/client";
+
 
 
 const ratelimitPost = new Ratelimit({
@@ -36,9 +40,31 @@ function classifyMedia(filename: string): "image" | "video" | undefined {
   }
 }
 
+type postAuthorType = (Prisma.Post & {author: Prisma.User})[]
+
+async function checkForPostReactions  (ctx: Prisma.PrismaClient,
+   userId:string | null, posts: postAuthorType) : Promise<Prisma.Reaction[]>  {
+
+  if (userId) {
+    const reactions = await ctx.reaction.findMany({
+      where:{
+        userId: userId,
+        postId : {
+          in:  posts.map(post => post.id)
+        }
+      }
+    })
+
+    return reactions;
+  }
+
+  return [];
+}
+
 
 export const postsRouter = createTRPCRouter({
-  getPostById: publicProcedure.input(z.object({id: z.string()})).query(async ({ctx, input}) => {
+  getPostById: publicProcedure.input(z.object({id: z.string()}))
+  .query(async ({ctx, input}) => {
    const post = await ctx.prisma.post.findUnique({
         where:{
             id: input.id
@@ -141,21 +167,37 @@ export const postsRouter = createTRPCRouter({
     return feed;
   }),
 
+  getAllWithReactionsDataForUser: publicProcedure.query(async ({ ctx }) => {
+    const posts = await ctx.prisma.post.findMany({
+        take:100,   
+        orderBy: [{createdAt: "desc"}],
+        include: {
+          author: true
+        }
+    });
+
+    const likedByUser = await checkForPostReactions(ctx.prisma, ctx.userId, posts);
+
+    return {
+      props: {
+        posts: posts,
+        likedByUser: likedByUser,
+      }
+    };
+ 
+  }),
+
   getAll: publicProcedure.query(async ({ ctx }) => {
     const posts = await ctx.prisma.post.findMany({
         take:100,   
         orderBy: [{createdAt: "desc"}],
         include: {
-          author: true,
-          reactions: {
-            where:{
-                userId: ctx.userId ?? ""
-            }
-          }
+          author: true
         }
     });
 
     return posts;
+ 
   }),
 
   //a public trpc procedure that gets all posts by author id(user id)
@@ -170,11 +212,6 @@ export const postsRouter = createTRPCRouter({
         orderBy: [{createdAt: "desc"}],
         include: {
           author:true,
-          reactions: {
-            where:{
-                userId: ctx.userId ?? ""
-            }
-          }
         }
     })
     )

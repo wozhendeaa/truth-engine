@@ -29,7 +29,10 @@ function getSekleton (number: number) {
 const Home: NextPage = () => {
   const {isLoaded: userLoaded, isSignedIn} = useUser();
 
-  const {data,  isLoading} = api.posts.getAll.useQuery();
+  const {data,  isLoading} = api.posts.getAllWithReactionsDataForUser.useQuery();
+
+  
+
   let isVerified = api.user.isCurrentUserVerifiedEngine.useQuery().data;
   
   const { t, i18n } = useTranslation(['common', 'footer'], { bindI18n: 'languageChanged loaded' })
@@ -61,7 +64,9 @@ const Home: NextPage = () => {
           getSekleton(5)
           :
            //@ts-ignore 
-          <FeedThread posts={data} />}
+          <FeedThread posts={data?.props} />}
+
+
          </div>
 
           <div className="col-span-1 hidden lg:inline ">
