@@ -28,8 +28,10 @@ const theme = extendTheme({
 	  },
 	  te_dark_text: {
 		1: tailwindColors.slate[50],
-
-	  }
+	  },
+	  te_dark_action: {
+		4: tailwindColors.lime[400],
+	}
 	},
   })
   

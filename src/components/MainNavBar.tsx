@@ -214,7 +214,7 @@ export default function MainNavBar() {
     <>
 
     <Disclosure as="nav" className="bg-white dark:bg-gray-800 shadow-xl text-4xl
-    border-b-4 border-b-gray-800 sticky top-0 font-chinese z-80"  >
+    border-b-4 border-b-gray-800 sticky top-0 font-chinese z-50"  >
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8" >

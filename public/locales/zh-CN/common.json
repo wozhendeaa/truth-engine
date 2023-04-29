@@ -49,6 +49,7 @@
     "register_success" : "注册成功！快去学习争取成为引擎",
     "private_engine" : "私人引擎",
     "server_error" : "天有不测风云，服务器出错了",
+    "no_data_found" : "居然找不到任何信息。",
 
     "empty":""
    }

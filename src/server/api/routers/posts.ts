@@ -6,12 +6,10 @@ import { createTRPCRouter, privateProcedure, publicProcedure } from "~/server/ap
 import { Ratelimit } from "@upstash/ratelimit"; // for deno: see above
 import { Redis } from "@upstash/redis";
 import { postSchema } from "~/components/posting/PostBox";
+import { ReactionType } from "@prisma/client";
 
 
-
-
-
-const ratelimit = new Ratelimit({
+const ratelimitPost = new Ratelimit({
     redis: Redis.fromEnv(),
     limiter: Ratelimit.slidingWindow(60, "60 s"),
     analytics: true,
@@ -23,20 +21,20 @@ const ratelimit = new Ratelimit({
     prefix: "@upstash/ratelimit",
   });
 
-  function classifyMedia(filename: string): "image" | "video" | undefined {
-    const imageExtensions = ["jpg", "jpeg", "png", "gif", "bmp", "webp"];
-    const videoExtensions = ["mp4", "webm", "ogg", "avi", "mov", "wmv"];
-  
-    const extension = filename.toLowerCase();
-  
-    if (extension && imageExtensions.includes(extension)) {
-      return "image";
-    } else if (extension && videoExtensions.includes(extension)) {
-      return "video";
-    } else {
-      return undefined;
-    }
+function classifyMedia(filename: string): "image" | "video" | undefined {
+  const imageExtensions = ["jpg", "jpeg", "png", "gif", "bmp", "webp"];
+  const videoExtensions = ["mp4", "webm", "ogg", "avi", "mov", "wmv"];
+
+  const extension = filename.toLowerCase();
+
+  if (extension && imageExtensions.includes(extension)) {
+    return "image";
+  } else if (extension && videoExtensions.includes(extension)) {
+    return "video";
+  } else {
+    return undefined;
   }
+}
 
 
 export const postsRouter = createTRPCRouter({
@@ -46,7 +44,12 @@ export const postsRouter = createTRPCRouter({
             id: input.id
         },
         include: {
-          author: true
+          author: true,
+          reactions: {
+            where:{
+                userId: ctx.userId ?? ""
+            }
+          }
         }
     })
 
@@ -55,16 +58,71 @@ export const postsRouter = createTRPCRouter({
   }
   ),
 
-    likePost: privateProcedure.input(z.object({id: z.string()}))
-    .query(async ({ctx, input}) => {
+ likePost: privateProcedure.input(z.object({postId: z.string()}))
+    .mutation(async ({ctx, input}) => {
+     
+    const userId = ctx.curretnUserId;
+    const {success} = await ratelimitPost.limit(userId);
+    if (!success) throw new TRPCError({code: "TOO_MANY_REQUESTS", message: "too many requests"})
+  
     const post = await ctx.prisma.post.findUnique({
           where:{
-              id: input.id
-          },          
+              id: input.postId
+          },   
+
+          include: {
+            reactions: {
+              where :{
+                 userId: userId,
+                 postId: input.postId
+              }
+            }
+          }
       })
 
-    if (!post) throw new TRPCError({code: "NOT_FOUND", message: "没有找到文章"});
-    return post;
+      if (!post) throw new TRPCError({code: "NOT_FOUND", message: "点赞时没有找到要点赞的帖子id"});
+
+      if (post.reactions?.length > 0) {
+        const deleteUser = await ctx.prisma.reaction.delete({
+          where: {
+            id: post.reactions[0]?.id,
+          },
+        })
+
+        const updatedPost = await ctx.prisma.post.update({
+          where: {
+            id: input.postId,
+          },
+          data: {
+            likes: {
+              decrement: 1,
+            },            
+          },
+        });
+        
+      } else {
+        const newReaction = await ctx.prisma.reaction.create({
+          data: {
+            type: ReactionType.LIKE,
+            userId: userId,
+            postId: input.postId,
+          },
+        });
+
+        const updatedPost = await ctx.prisma.post.update({
+          where: {
+            id: input.postId,
+          },
+          data: {
+            likes: {
+              increment: 1,
+            },            
+          },
+        });
+        return updatedPost;
+      }
+
+    return post.likes;
   }
   ),
 
@@ -88,7 +146,12 @@ export const postsRouter = createTRPCRouter({
         take:100,   
         orderBy: [{createdAt: "desc"}],
         include: {
-          author: true
+          author: true,
+          reactions: {
+            where:{
+                userId: ctx.userId ?? ""
+            }
+          }
         }
     });
 
@@ -106,7 +169,12 @@ export const postsRouter = createTRPCRouter({
         },
         orderBy: [{createdAt: "desc"}],
         include: {
-          author:true
+          author:true,
+          reactions: {
+            where:{
+                userId: ctx.userId ?? ""
+            }
+          }
         }
     })
     )
@@ -117,7 +185,7 @@ export const postsRouter = createTRPCRouter({
     postSchema
   ).mutation(async ({ctx, input}) => {
     const authorId = ctx.curretnUserId;
-    const {success} = await ratelimit.limit(authorId);
+    const {success} = await ratelimitPost.limit(authorId);
     if (!success) throw new TRPCError({code: "TOO_MANY_REQUESTS", message: "too many requests"});
 
     let mediaString = "";
@@ -142,8 +210,8 @@ export const postsRouter = createTRPCRouter({
         }
     });
     return post;
-  })
-  
+  }),
+
 
   
 });

@@ -11,6 +11,10 @@ import { Link } from "react-router-dom";
 import { ChakraProvider } from '@chakra-ui/react'
 import theme from "~/theme/theme";
 import { extendTheme } from '@chakra-ui/react'
+import React from "react";
+import { Provider } from "react-redux";
+import { store } from "~/Redux/ReduxStore";
+
 
 
 const MyApp: AppType = ({ Component, pageProps }) => {
@@ -34,7 +38,11 @@ const MyApp: AppType = ({ Component, pageProps }) => {
             <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500&display=swap" rel="stylesheet" />
           </Head>
           <div className="dark">
-          <Component {...pageProps} />
+            <React.StrictMode>
+              <Provider store={store} >
+              <Component {...pageProps} />
+              </Provider>
+          </React.StrictMode>
         </div>
       </ClerkProvider>
       </ChakraProvider>

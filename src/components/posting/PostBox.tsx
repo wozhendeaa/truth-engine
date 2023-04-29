@@ -12,6 +12,7 @@ import { Show } from "@chakra-ui/react";
 import Image from "next/image"
 import { watch } from "fs";
 import S3 from "aws-sdk/clients/s3";
+import Content from '~/components/sidebar/components/Content';
 
 //@ts-ignore
 function classNames(...classes) {
