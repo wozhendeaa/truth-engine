@@ -1,7 +1,7 @@
 // Chakra imports
 import { Badge, Button, Flex, Icon, Image, Link, Text } from '@chakra-ui/react';
 // Custom components
-import Card from '~/components/card/Card';
+import Card from 'components/card/Card';
 // Custom icons
 import { IoCheckmarkCircle } from 'react-icons/io5';
 import { MdDateRange, MdDownload, MdCancel } from 'react-icons/md';

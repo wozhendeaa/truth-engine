@@ -10,7 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import axios from 'axios';
-import { prisma } from '~/server/db';
+import { prisma } from 'server/db';
 import { useUser } from '@clerk/nextjs';
 
 function classNames(...classes: string[]) {

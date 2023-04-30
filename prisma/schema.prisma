@@ -78,7 +78,7 @@ model User {
   displayname     String?
   email           String?   @unique
   token           String?
-  NiuBi           Decimal  @default(10)
+  NiuBi           Float  @default(10)
   role            Role     @default(SHEEP)
   followings      UserFollows[]  @relation("following")
   followers       UserFollows[]  @relation("follower")

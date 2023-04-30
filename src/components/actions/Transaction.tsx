@@ -2,7 +2,7 @@
 import { Flex, Text, useColorModeValue } from '@chakra-ui/react';
 
 // Custom components
-import IconBox from '~/components/icons/IconBox';
+import IconBox from 'components/icons/IconBox';
 
 export default function Transaction(props: {
 	date: string;

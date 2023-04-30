@@ -6,13 +6,13 @@ import { Controller, FieldValues, UseFormRegister, UseFormSetError, useForm, Fie
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { setErrorMap, z } from "zod";
-import { api } from "~/utils/api";
+import { api } from "utils/api";
 import { useFilePicker } from 'use-file-picker';
 import { Show } from "@chakra-ui/react";
 import Image from "next/image"
 import { watch } from "fs";
 import S3 from "aws-sdk/clients/s3";
-import Content from '~/components/sidebar/components/Content';
+import Content from 'components/sidebar/components/Content';
 
 //@ts-ignore
 function classNames(...classes) {

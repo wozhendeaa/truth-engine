@@ -1,6 +1,6 @@
 // Chakra imports
 import { Avatar, Box, Flex, Text, useColorModeValue } from '@chakra-ui/react';
-import { HSeparator } from '~/components/separator/Separator';
+import { HSeparator } from 'components/separator/Separator';
 export default function ChatHeader(props: {
 	lastMessage: string;
 	sum: string | number;

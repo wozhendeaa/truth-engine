@@ -1,6 +1,6 @@
 import { type AppType } from "next/app";
-import { api } from "~/utils/api";
-import "~/styles/globals.css";
+import { api } from "utils/api";
+import "styles/globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { useRouter } from "next/router";
 import { TRPCClientError } from "@trpc/client";
@@ -9,13 +9,12 @@ import { Toaster } from "react-hot-toast";
 import Head from "next/head";
 import { Link } from "react-router-dom";
 import { ChakraProvider } from '@chakra-ui/react'
-import theme from "~/theme/theme";
+import theme from "theme/theme";
 import { extendTheme } from '@chakra-ui/react'
 import React from "react";
 import { Provider } from "react-redux";
-import { store } from "~/Redux/ReduxStore";
-
-
+import { store } from "Redux/ReduxStore";
+import { IntlProvider } from 'react-intl';
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   const {locale} = useRouter();
@@ -38,11 +37,13 @@ const MyApp: AppType = ({ Component, pageProps }) => {
             <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500&display=swap" rel="stylesheet" />
           </Head>
           <div className="dark">
-            <React.StrictMode>
-              <Provider store={store} >
-              <Component {...pageProps} />
-              </Provider>
-          </React.StrictMode>
+          <IntlProvider locale={locale} >
+              <React.StrictMode>
+                <Provider store={store} >
+                <Component {...pageProps} />
+                </Provider>
+            </React.StrictMode>
+          </IntlProvider>
         </div>
       </ClerkProvider>
       </ChakraProvider>

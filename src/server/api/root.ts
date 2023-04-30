@@ -1,4 +1,4 @@
-import { createApiRouter, createTRPCRouter } from "~/server/api/trpc";
+import { createApiRouter, createTRPCRouter } from "server/api/trpc";
 import { postsRouter } from "./routers/posts";
 import { profileRouter } from "./routers/profile";
 import { userRouter } from "./routers/user";

@@ -13,11 +13,11 @@ import {
 } from 'react-icons/md';
 
 // Custom components
-import Card from '~/components/card/Card';
-import { HSeparator } from '~/components/separator/Separator';
+import Card from 'components/card/Card';
+import { HSeparator } from 'components/separator/Separator';
 
-import SeeStory from '~/components/actions/SeeStory';
-import TransparentMenu from '~/components/menu/TransparentMenu';
+import SeeStory from 'components/actions/SeeStory';
+import TransparentMenu from 'components/menu/TransparentMenu';
 
 export default function Post(props: {
 	avatar: string;

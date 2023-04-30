@@ -2,9 +2,9 @@ import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType, type NextPage 
 import Head from "next/head";
 import Image from 'next/image';
 import { LoadingPage } from "src/components/loading";
-import Postview from "~/components/PostView";
-import { PageLayout } from "~/components/layout";
-import { api } from "~/utils/api";
+import Postview from "components/PostView";
+import { PageLayout } from "components/layout";
+import { api } from "utils/api";
 
 
 const ProfileFeed = (props: {userId: string}) => {
@@ -50,7 +50,7 @@ const ProfilePage: NextPage<{username: string}> = ({username}) => {
   );
 };
 
-import { generateSSGHelper } from "~/server/helpers/ssgHelper";
+import { generateSSGHelper } from "server/helpers/ssgHelper";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 

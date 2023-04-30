@@ -1,8 +1,8 @@
 // Chakra imports
 import { Box, Flex, Text, useColorModeValue, Badge, Icon } from '@chakra-ui/react';
 // Custom components
-import Card from '~/components/card/Card';
-import IconBox from '~/components/icons/IconBox';
+import Card from 'components/card/Card';
+import IconBox from 'components/icons/IconBox';
 // Assets
 import { MdOutlineTimer } from 'react-icons/md';
 

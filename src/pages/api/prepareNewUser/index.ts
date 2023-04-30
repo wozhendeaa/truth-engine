@@ -1,8 +1,8 @@
 // pages/prepare-new-user.tsx
-import { api } from '~/utils/api';
+import { api } from 'utils/api';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getAuth } from '@clerk/nextjs/server';
-import { prisma } from '~/server/db';
+import { prisma } from 'server/db';
 
 export default async function handler(req:  NextApiRequest, res: NextApiResponse) {
   

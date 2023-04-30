@@ -3,15 +3,15 @@ import { type NextPage } from "next";
 import Image from"next/image"
 import { LoadingPage, LoadingSpinner } from "src/components/loading";
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { RouterOutputs, api } from "~/utils/api";
+import { RouterOutputs, api } from "utils/api";
 import { SyntheticEvent, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { PageLayout } from "~/components/layout";
-import { PostCreator as PostBox } from "~/components/posting/PostBox";
+import { PageLayout } from "components/layout";
+import { PostCreator as PostBox } from "components/posting/PostBox";
 import { Box, Flex, SkeletonCircle, SkeletonText, useColorModeValue } from "@chakra-ui/react";
 
-import TruthEngineSideBar from "~/components/QTruthEngineSidebar";
-import FeedThread from "~/components/FeedThread"
+import TruthEngineSideBar from "components/QTruthEngineSidebar";
+import FeedThread from "components/FeedThread"
 
 function getSekleton (number: number) {
   const boxes = [];

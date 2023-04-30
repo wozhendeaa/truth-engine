@@ -18,7 +18,7 @@ import {
 	useColorModeValue,
 	useDisclosure
 } from '@chakra-ui/react';
-import storyImage from '~/assets/img/profile/storyImage.png';
+import storyImage from 'assets/img/profile/storyImage.png';
 import { IoPaperPlaneOutline } from 'react-icons/io5';
 import { MdOutlineFavoriteBorder } from 'react-icons/md';
 

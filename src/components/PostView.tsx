@@ -2,7 +2,7 @@ import Image from"next/image"
 import Link from "next/link";
 import dayjs from "dayjs"
 import relativetTime from "dayjs/plugin/relativeTime"
-import { type RouterOutputs } from "~/utils/api";
+import { type RouterOutputs } from "utils/api";
 dayjs.extend(relativetTime);
 
 type PostWithUser = RouterOutputs["posts"]["getAll"][number]

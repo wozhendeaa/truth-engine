@@ -3,8 +3,8 @@ import React, { useReducer, useState } from 'react';
 import { BsThreeDotsVertical, BsHandThumbsUp, BsChat, BsViewList, BsCircleFill } from 'react-icons/bs';
 
 import { appRouter } from '../server/api/root';
-import { RouterOutputs, api } from '~/utils/api';
-import Comment from '~/components/dataDisplay/Comment';
+import { RouterOutputs, api } from 'utils/api';
+import Comment from 'components/dataDisplay/Comment';
 import { Post, User } from '@prisma/client';
 import relativetTime from "dayjs/plugin/relativeTime"
 import dayjs from "dayjs"

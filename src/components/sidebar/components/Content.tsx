@@ -1,10 +1,10 @@
 // chakra imports
 import { Avatar, Box, Flex, Stack, Text, useColorModeValue } from '@chakra-ui/react';
 //   Custom components
-import Brand from '~/components/sidebar/components/Brand';
-import Links from '~/components/sidebar/components/Links';
-import SidebarCard from '~/components/sidebar/components/SidebarCard';
-import avatar4 from '~/assets/img/avatars/avatar4.png';
+import Brand from 'components/sidebar/components/Brand';
+import Links from 'components/sidebar/components/Links';
+import SidebarCard from 'components/sidebar/components/SidebarCard';
+import avatar4 from 'assets/img/avatars/avatar4.png';
 
 // FUNCTIONS
 

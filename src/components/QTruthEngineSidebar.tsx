@@ -12,7 +12,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { useUser } from '@clerk/nextjs'
 import { useTranslation } from 'react-i18next'
-import { api } from '~/utils/api'
+import { api } from 'utils/api'
 
 const navigation = [
   { name: 'professor_videos', href: '#', icon: HomeIcon, current: true },

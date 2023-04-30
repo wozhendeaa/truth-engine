@@ -21,7 +21,7 @@ import Image from "next/image"
 import { useEffect, useState } from 'react'
 import { SignIn, SignInButton, SignOutButton,  useUser } from '@clerk/nextjs';
 import { TFunction } from 'i18next';
-import { api } from '~/utils/api';
+import { api } from 'utils/api';
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')

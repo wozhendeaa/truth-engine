@@ -3,18 +3,18 @@
 import { Flex, Text, useColorModeValue, Box } from '@chakra-ui/react';
 
 // Assets
-import postImage from '~/assets/img/profile/postImage.png';
-import avatar10 from '~/assets/img/avatars/avatar10.png';
-import avatar2 from '~/assets/img/avatars/avatar2.png';
-import avatar4 from '~/assets/img/avatars/avatar4.png';
+import postImage from 'assets/img/profile/postImage.png';
+import avatar10 from 'assets/img/avatars/avatar10.png';
+import avatar2 from 'assets/img/avatars/avatar2.png';
+import avatar4 from 'assets/img/avatars/avatar4.png';
 // Custom components
-import { VSeparator } from '~/components/separator/Separator';
+import { VSeparator } from 'components/separator/Separator';
 import Stories from './components/Stories';
 import Post from './components/Post';
-import Comment from '~/components/dataDisplay/Comment';
+import Comment from 'components/dataDisplay/Comment';
 import Filter from './components/Filter';
-import { api } from '~/utils/api';
-import { LoadingSpinner } from '~/components/loading';
+import { api } from 'utils/api';
+import { LoadingSpinner } from 'components/loading';
 
 export default function Newsfeed() {
 	// Chakra color mode
