@@ -5,7 +5,7 @@ import { BsThreeDotsVertical, BsHandThumbsUp, BsChat, BsViewList, BsCircleFill }
 import { appRouter } from '../server/api/root';
 import { RouterOutputs, api } from 'utils/api';
 import Comment from 'components/dataDisplay/Comment';
-import { Post, User } from '@prisma/client';
+import { Post, Reaction, User } from '@prisma/client';
 import relativetTime from "dayjs/plugin/relativeTime"
 import dayjs from "dayjs"
 
@@ -14,64 +14,8 @@ dayjs.extend(relativetTime);
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import ImageModal from './ImageModal';
 import { useTranslation } from 'react-i18next';
+import toast from 'react-hot-toast';
 
-interface ImageCarouselProps {
-  images: string[];
-}
-
-const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
-  const [currentImage, setCurrentImage] = useState(0);
-
-  const prevImage = () => {
-    setCurrentImage(currentImage === 0 ? images.length - 1 : currentImage - 1);
-  };
-
-  const nextImage = () => {
-    setCurrentImage((currentImage + 1) % images.length);
-  };
-
-  return (
-    <div className="relative">
-      {images.map((image, index) => (
-        <img
-          key={index}
-          src={image}
-          alt=""
-          className={`absolute w-full h-full object-cover transition-opacity duration-500 ease-in-out ${
-            index === currentImage ? 'opacity-100' : 'opacity-0'
-          }`}
-        />
-      ))}
-      <button
-        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 p-2 rounded-md text-gray-800 hover:bg-opacity-75 focus:outline-none"
-        onClick={prevImage}
-      >
-        <FiChevronLeft />
-      </button>
-      <button
-        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 p-2 rounded-md text-gray-800 hover:bg-opacity-75 focus:outline-none"
-        onClick={nextImage}
-      >
-        <FiChevronRight />
-      </button>
-      <div className="absolute top-2 right-2 bg-white bg-opacity-50 p-2 rounded-md text-gray-800">
-        {currentImage + 1}/{images.length}
-      </div>
-    </div>
-  );
-};
-
-
-
-
-
-const handleRepost = (post: PostsWithUserData) => {
-
-};
-
-// const handleBookmark = (id: String) => {
-//   setTweets(tweets.map(tweet => tweet.tweetId === tweetId ? { ...tweet, bookmarks: tweet.bookmarks + 1 } : tweet));
-// };
 
 const handleComment = (post: PostsWithUserData) => {
   // Implement commenting functionality here
@@ -84,19 +28,16 @@ const handleShare = (post: PostsWithUserData) => {
 
 type PostsWithUserData = RouterOutputs["posts"]["getAll"][number]
 interface SingleFeedProps {
-  postWithUser: PostsWithUserData;
+    postWithUser: PostsWithUserData;
+    likedByUser: Reaction[]
 }
 
 interface FeedProps {
-  posts: PostsWithUserData[];
+  posts:{
+    posts: PostsWithUserData[];
+    likedByUser: Reaction[];
+  }
 }
-
-
-interface SetImageState {
-  state: boolean;
-}
-
-
 
 
 function renderImages(type: string, url: string, index: any) {
@@ -141,26 +82,36 @@ function renderImages(type: string, url: string, index: any) {
 const SingleFeed = (singlePostData: SingleFeedProps) => {
   
   const postWithUser = singlePostData.postWithUser;
+  const likedByUser = singlePostData.likedByUser;
   const mediaStr = singlePostData.postWithUser.media;
   let media = mediaStr ? Array.from(JSON.parse(mediaStr)) : [];
 
-  const hasReaction = postWithUser.reactions.length ?? false;
+  const hasReaction = likedByUser.some(reaction => reaction.postId === postWithUser.id);
   const [liked, setLiked] = useState(hasReaction);
   const [likeNumber, setNumber] = useState(postWithUser.likes);
   const likePostMutation = api.posts.likePost.useMutation({
     onSuccess: () => {
-      if (liked) {
+
+    },
+    onError: (error) => {
+       toast("点赞失败");
+       if (liked) {
         setNumber(likeNumber - 1);
       } else {
         setNumber(likeNumber + 1);      
       }
-      
       setLiked(!liked);
-    },
+    }
   });
 
   function handleLikeClick() {
     handleLike(postWithUser);
+    if (liked) {
+      setNumber(likeNumber - 1);
+    } else {
+      setNumber(likeNumber + 1);      
+    }
+    setLiked(!liked);
   }
 
 
@@ -256,8 +207,10 @@ bgColor={'te_dark_bg.7'} textColor={'te_dark_text.1'} rounded={'2xl'}  shadow='l
     <Button flex='1 'className='shrink' variant='ghost' textColor={'gray.300'}  gridGap={2} 
     disabled={true} _hover={{}} pointerEvents={'none'}>
         <div>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" 
+        viewBox="0 0 24 24" strokeWidth="1.5"
+         stroke="currentColor" className="w-6 h-6">
+  <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
 </svg>
 
      </div>
@@ -273,8 +226,9 @@ bgColor={'te_dark_bg.7'} textColor={'te_dark_text.1'} rounded={'2xl'}  shadow='l
 
 export const FeedThread = (postData: FeedProps) => {
   const {t} = useTranslation();
+  const {posts, likedByUser} = postData.posts;
 
-  if (!postData.posts || postData.posts.length === 0) {
+  if (!posts || posts.length === 0) {
     return (
       <div className='text-center text-slate-200'>{t('no_data_found')}</div>
     )
@@ -283,8 +237,8 @@ export const FeedThread = (postData: FeedProps) => {
   return (
 
     <div>
-      {postData.posts?.map((p) => (
-        <SingleFeed key={p.id} postWithUser={p}/>
+      {posts.map((p) => (
+        <SingleFeed key={p.id} postWithUser={p} likedByUser={likedByUser}/>
       ))}
     </div>
   );
