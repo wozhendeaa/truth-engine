@@ -127,11 +127,8 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
   _hover={{
     bgGradient: 'linear(to-tr, gray.700, violet.800)',
   }}
-  _active={{
-    bgGradient: 'linear(to-bl, gray.700, violet.800)',
-  }}
 
-bgColor={'te_dark_bg.7'} textColor={'te_dark_text.1'} rounded={'2xl'}  shadow='lg' pb='0' > 
+bgColor={'te_dark_ui_bg'} textColor={'white'} rounded={'2xl'}  shadow='lg' pb='0' > 
   <CardHeader>
     <Flex alignItems={'top'}>
       <Flex flex='1' gap='4' alignItems='center' flexWrap='wrap'>
