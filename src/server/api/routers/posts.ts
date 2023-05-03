@@ -61,8 +61,30 @@ async function checkForPostReactions  (ctx: Prisma.PrismaClient,
   return [];
 }
 
+let cursor = "";
 
 export const postsRouter = createTRPCRouter({
+  getCommentsForPost: publicProcedure.input(z.object({id: z.string(), limit:  z.number()}))
+  .query(async ({ctx, input}) => {
+     const comments = await ctx.prisma.comment.findMany({
+      where:{
+        replyToPostId: input.id,
+      },
+      include: {
+        author: true
+      },
+      orderBy:[
+        {pinned: "asc",},
+        {likes: "desc",},
+        {createdAt: "desc",}
+      ],
+      take: input.limit
+    })
+
+    return comments;
+  }),
+
+
   getPostById: publicProcedure.input(z.object({id: z.string()}))
   .query(async ({ctx, input}) => {
    const post = await ctx.prisma.post.findUnique({

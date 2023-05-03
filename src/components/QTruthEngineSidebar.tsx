@@ -84,7 +84,7 @@ export default function TruthEngineSideBar() {
                     <span className="sr-only">Your profile</span>
                     <img
                       className="h-8 w-8 rounded-full bg-gray-800"
-                      src={user?.profileImageUrl ?? "/images/default-profile.png"}
+                      src={user?.profileImageUrl ?? "/images/default_avatar.png"}
                       alt=""
                     />
                   </a>

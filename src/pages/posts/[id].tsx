@@ -2,7 +2,6 @@ import { GetServerSideProps, GetStaticPaths, GetStaticProps, GetStaticPropsConte
 import Head from "next/head";
 import Image from 'next/image';
 import { useRouter } from "next/router";
-import { LoadingPage } from "src/components/loading";
 import Postview from "components/PostView";
 import { PageLayout } from "components/layout";
 import { prisma } from "server/db";
@@ -15,7 +14,6 @@ export const getStaticProps : GetStaticProps = async (context: GetStaticPropsCon
   const ssg =  generateSSGHelper();
   const locale = "zh-CN";
   const id = context.params?.id as string;
-  console.log("context:", context);
   if (typeof id !== 'string') throw new Error('没有id')
   await ssg.posts.getPostById.prefetch({id});
   
@@ -41,7 +39,6 @@ export const getStaticPaths: GetStaticPaths  = async () => {
         id: post.id,
       },
     })),
-    // https://nextjs.org/docs/api-reference/data-fetching/get-static-paths#fallback-blocking
     fallback: 'blocking',
   };
 }

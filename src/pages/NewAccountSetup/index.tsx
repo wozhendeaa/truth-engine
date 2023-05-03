@@ -25,7 +25,7 @@ export const accountSetupSchema = z.object({
 
   userId:z.string(),
 
-  profileImageUrl: z.string().default("/images/default_profile.png"),
+  profileImageUrl: z.string().default("/images/default_avatar.png"),
 
   displayName: z.string()
   .min(2,"displayname_error_length")

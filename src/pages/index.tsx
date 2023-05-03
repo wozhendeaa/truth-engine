@@ -1,14 +1,12 @@
-import { SignIn, SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
-import Image from"next/image"
-import { LoadingPage, LoadingSpinner } from "src/components/loading";
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { RouterOutputs, api } from "utils/api";
-import { SyntheticEvent, useEffect, useState } from "react";
+import {  api } from "utils/api";
+import {  useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { PageLayout } from "components/layout";
 import { PostCreator as PostBox } from "components/posting/PostBox";
-import { Box, Flex, SkeletonCircle, SkeletonText, useColorModeValue } from "@chakra-ui/react";
+import { Box,  SkeletonCircle, SkeletonText } from "@chakra-ui/react";
 
 import TruthEngineSideBar from "components/QTruthEngineSidebar";
 import FeedThread from "components/FeedThread"
@@ -30,9 +28,6 @@ const Home: NextPage = () => {
   const {isLoaded: userLoaded, isSignedIn} = useUser();
 
   const {data,  isLoading} = api.posts.getAllWithReactionsDataForUser.useQuery();
-
-  
-
   let isVerified = api.user.isCurrentUserVerifiedEngine.useQuery().data;
   
   const { t, i18n } = useTranslation(['common', 'footer'], { bindI18n: 'languageChanged loaded' })
@@ -52,9 +47,6 @@ const Home: NextPage = () => {
           
           </div>
           <TruthEngineSideBar />
-
-          {/* {!!isSignedIn && <PostCreator />} */}
-     
          <div className="col-span-4 lg:col-span-2"> 
 
          { isVerified &&<PostBox />}
@@ -66,12 +58,11 @@ const Home: NextPage = () => {
            //@ts-ignore 
           <FeedThread posts={data?.props} />}
 
-
          </div>
 
           <div className="col-span-1 hidden lg:inline ">
-
           </div>
+
        </PageLayout>
      
     </>

@@ -50,6 +50,13 @@
     "private_engine" : "私人引擎",
     "server_error" : "天有不测风云，服务器出错了",
     "no_data_found" : "居然找不到任何信息。",
-
+    "fold" : "收起",
+    "no_comments_found" : "目前没有任何评论，快枪沙发！",
+    "make_simple_comment" : "随便点评一下...",
+    "comment_too_long":"评论太长了，言简意赅，不要超过200字",
+    "see_all_comments":"看所有评论",
+    "replay":"回复",
+    "login_before_like":"登录后才能点赞",
+    
     "empty":""
    }

@@ -65,7 +65,7 @@ export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"
                         className="rounded-full"
                         width={40}
                         height={40}
-                        src={user?.profileImageUrl ?? "/images/default-profile.png"}
+                        src={user?.profileImageUrl ?? "/images/default_avatar.png"}
                         alt=""
                       />
                     </Menu.Button>
@@ -213,11 +213,12 @@ export default function MainNavBar() {
   return (
     <>
 
-    <Disclosure as="nav" className="bg-white dark:bg-gray-800 shadow-xl text-4xl
+    <Disclosure as="nav" className="bg-white dark:bg-te_dark_ui shadow-xl text-4xl 
+  bg-blur
     border-b-4 border-b-gray-800 sticky top-0 font-chinese z-50"  >
       {({ open }) => (
         <>
-          <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8" >
+          <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8 "  >
             <div className="flex h-16 justify-between">
               <div className="flex px-2 lg:px-0">
                 <div className="flex flex-shrink-0 items-center">

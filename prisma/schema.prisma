@@ -27,7 +27,7 @@ model Post {
   ViewCount   Int         @default(0)
   repost      Int         @default(0)
   reported    Int         @default(0)
-  commentCount    Int?         @default(0)
+  commentCount    Int     @default(0)
   MarkAsDelete Boolean @default(false)
   comments    Comment[]
   hashtags    PostHashtag[]
@@ -65,6 +65,8 @@ model PostHashtag {
   @@index([postId])
   @@index([hashtagId])
 }
+
+
 model Category {
   id    Int    @id @default(autoincrement())
   name  String

@@ -26,7 +26,7 @@ interface UploadProgress {
   
   //create react hook validation schema for post
 export const postSchema = z.object({
-  content: z.string().min(4, {message: "post_too_short"}),
+  content: z.string().min(1, {message: "post_too_short"}),
   media: z.string().optional()
 });
 type postFormSchema = z.infer<typeof postSchema>;
@@ -34,7 +34,7 @@ type postFormSchema = z.infer<typeof postSchema>;
   
   
 export const PostCreator = () => {
-    const {register, setValue , watch, setError,control,formState: {errors}} = useForm<postFormSchema>({
+    const {register, setValue , watch, setError,handleSubmit,formState: {errors}} = useForm<postFormSchema>({
       resolver: zodResolver(postSchema)
     });
     const {mutate, isLoading: isPosting} = api.posts.createPost.useMutation({
@@ -113,8 +113,7 @@ export const PostCreator = () => {
     }
 
 
-    async function handleSubmit(e: ChangeEvent<HTMLFormElement>) {
-          e.preventDefault();
+    async function onSubmit(e: postFormSchema) {
 
           try{
               const keys = await uploadToS3();
@@ -148,7 +147,7 @@ export const PostCreator = () => {
                       className="flex-none rounded-full " />
                 </div>     
                 <div className="w-full pr-6 grow  ">
-                <form className="relative mr-[62px] w-full grow" onSubmit={handleSubmit}>
+                <form className="relative mr-[62px] w-full grow" onSubmit={handleSubmit(onSubmit)}>
                     <div className="overflow-hidden flex flex-1 rounded-lg pb-12 grow mr-[62px] text-4xl
                     shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600">
                       <label htmlFor="content" className="sr-only">

@@ -64,8 +64,6 @@ export default function Post(props: {
 
 			<Flex direction='column'>
 				<Image src={image} minW={{ sm: '270px' }} h='auto' borderRadius='16px' mb='30px' />
-				<Image src={image} minW={{ sm: '270px' }} h='auto' borderRadius='16px' mb='30px' />
-				<Image src={image} minW={{ sm: '270px' }} h='auto' borderRadius='16px' mb='30px' />
 				<Box px={{ md: '20px' }}>
 					<Flex justify='space-between' align='center' mb='30px'>
 						<Flex align='center' color={textColor}>

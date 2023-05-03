@@ -15,9 +15,11 @@ import React from "react";
 import { Provider } from "react-redux";
 import { store } from "Redux/ReduxStore";
 import { IntlProvider } from 'react-intl';
+import nextI18NextConfig from 'next-i18next.config'
 
 const MyApp: AppType = ({ Component, pageProps }) => {
-  const {locale} = useRouter();
+  const {locale} = useRouter() ?? "ch-ZH";
+
   const {t} = useTranslation();
 
   if (!locale) {
@@ -51,4 +53,4 @@ const MyApp: AppType = ({ Component, pageProps }) => {
   );
 };
 
-export default api.withTRPC(appWithTranslation(MyApp));
+export default api.withTRPC(appWithTranslation(MyApp, nextI18NextConfig));

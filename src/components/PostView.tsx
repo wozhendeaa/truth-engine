@@ -12,7 +12,7 @@ export const Postview = (props: PostWithUser) => {
     return(
         <div key={props.id} className="flex gap-3 border-b border-slate-400 p-8 font-chinese">
           <Image 
-          src={props.author.profileImageUrl ?? "/images/default_Profile.png"}
+          src={props.author.profileImageUrl ?? "/images/default_avatar.png"}
           className="w-12 h-12 rounded-full" alt="头像"
           width="56"
           height="56" />          

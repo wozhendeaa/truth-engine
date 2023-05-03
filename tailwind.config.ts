@@ -21,12 +21,13 @@ export default {
         te_dark_font: ' #363457',
         te_dark_bg: '#0a1537',
         te_dark_ui: '#1f294f',
+        te_dark_darker: '#1b244a',
         te_dark_ui_bg: '#111d45',
         te_dark_action: '#7451fe',
         te_dark_green: '#00b474',
         te_dark_green_bg: '#263d56',
         te_dark_red: '#e45a50',
-        te_dark_red_bg: '#363457',
+        te_dark_red_bg: '#363457'
       },
     },
    
