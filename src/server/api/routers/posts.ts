@@ -193,6 +193,12 @@ export const postsRouter = createTRPCRouter({
     const posts = await ctx.prisma.post.findMany({
         take:100,   
         orderBy: [{createdAt: "desc"}],
+        where: {
+          author:{
+            role: {in: ['ADMIN_VERYFIED_ENGINE','VERYFIED_ENGINE']}
+          },
+          MarkAsDelete: false
+        } ,       
         include: {
           author: true
         }

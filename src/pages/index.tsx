@@ -1,8 +1,7 @@
 import { useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import {  api } from "utils/api";
-import {  useEffect } from "react";
+import {  useContext, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { PageLayout } from "components/layout";
 import { PostCreator as PostBox } from "components/posting/PostBox";
@@ -10,6 +9,7 @@ import { Box,  SkeletonCircle, SkeletonText } from "@chakra-ui/react";
 
 import TruthEngineSideBar from "components/QTruthEngineSidebar";
 import FeedThread from "components/FeedThread"
+import { api } from "utils/api";
 
 function getSekleton (number: number) {
   const boxes = [];
@@ -25,8 +25,6 @@ function getSekleton (number: number) {
 }
 
 const Home: NextPage = () => {
-  const {isLoaded: userLoaded, isSignedIn} = useUser();
-
   const {data,  isLoading} = api.posts.getAllWithReactionsDataForUser.useQuery();
   let isVerified = api.user.isCurrentUserVerifiedEngine.useQuery().data;
   
@@ -37,8 +35,6 @@ const Home: NextPage = () => {
      void i18n.reloadResources(i18n.resolvedLanguage, ['common', 'footer'])
   }, [])
 
-  //return empty div if nothing is loaded
-  if (!userLoaded ) return <div></div>;
 
   return (
     <>
@@ -69,11 +65,14 @@ const Home: NextPage = () => {
   );
 };
 
-export const getStaticProps = async ({locale}: {locale: string} ) => ({
+
+export const getServerSideProps = async ({locale}: {locale: string} ) => ({
   props: {
     ...await serverSideTranslations(locale, ['common', 'footer']),
   },
 })
+
+
 
 export default Home;
 

@@ -146,10 +146,9 @@ export default function TEComment(props: {
 	);
 }
 
-export const getStaticProps = async ({locale}: {locale: string} ) => ({
-	props: {
-	  ...await serverSideTranslations(locale, ['common', 'footer']),
-	},
-  })
-  
-  
+export const getServerSideProps = async ({locale}: {locale: string} ) => ({
+  props: {
+    ...await serverSideTranslations(locale, ['common', 'footer']),
+  },
+})
+

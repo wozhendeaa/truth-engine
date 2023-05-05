@@ -7,8 +7,6 @@ import { prisma } from 'server/db';
 export default async function handler(req:  NextApiRequest, res: NextApiResponse) {
   
   const { userId } = getAuth(req);
-  console.log("user", userId);
-
   if (!userId) throw new Error("用户没有登录");
   
   const user = await prisma.user.findUnique({

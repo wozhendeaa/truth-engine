@@ -42,6 +42,7 @@ import TEComment from "./dataDisplay/TE_Comment";
 import { parseErrorMsg } from "server/helpers/serverErrorMessage";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import CommentThread from "./CommentFeed";
+import { useUser } from "@clerk/nextjs";
 
 type PostsWithUserData = RouterOutputs["posts"]["getAll"][number];
 interface SingleFeedProps {
@@ -116,9 +117,8 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
   const [liked, setLiked] = useState(hasReaction);
   const [likeNumber, setNumber] = useState(postWithUser.likes);
   const [showComments, setShowComments] = useState(false);
-  const ctx = api.useContext();
-
-  
+  const ctx = api.useContext();  
+  const {isSignedIn} = useUser();
 
   const commentMutation = api.comment.createPostComment.useMutation({
     onSuccess: (data) => {
@@ -147,6 +147,10 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
   });
 
   function handleLikeClick() {
+    if (!isSignedIn) {
+      toast('login_before_like');
+      return;
+    }
     handleLike(postWithUser);
     if (liked) {
       setNumber(likeNumber - 1);
@@ -165,6 +169,10 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
   }
 
   function makeComment() {
+    if (!isSignedIn) {
+      toast('login_before_comment');
+      return;
+    }
 
     commentMutation.mutate({
       content: comment,
@@ -175,7 +183,7 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
   
 
   const handleLike = (post: PostsWithUserData) => {
-    // setTweets(tweets.map(tweet => tweet.tweetId === tweetId ? { ...tweet, likes: tweet.likes + 1 } : tweet));
+    
     likePostMutation.mutate({ postId: post.id });
     SetComment("");
     
@@ -447,8 +455,7 @@ export const FeedThread = (postData: FeedProps) => {
 
 export default FeedThread;
 
-
-export const getStaticProps = async ({locale}: {locale: string} ) => ({
+export const getServerSideProps = async ({locale}: {locale: string} ) => ({
   props: {
     ...await serverSideTranslations(locale, ['common', 'footer']),
   },

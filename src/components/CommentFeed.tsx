@@ -65,7 +65,6 @@ export const CommentThread = (props: {postId: string, topCommentsOnly: boolean})
   .useQuery({postId: props.postId, limit: limit});
   const comments = data?.props.comments;
   const reactions = data?.props.reactions;
-  console.log(reactions);
   
   if (isLoading) {
     return <div className="flex justify-center mb p-6"> 
@@ -110,7 +109,7 @@ export const CommentThread = (props: {postId: string, topCommentsOnly: boolean})
 export default CommentThread;
 
 
-export const getStaticProps = async ({locale}: {locale: string} ) => ({
+export const getServerSideProps = async ({locale}: {locale: string} ) => ({
   props: {
     ...await serverSideTranslations(locale, ['common', 'footer']),
   },

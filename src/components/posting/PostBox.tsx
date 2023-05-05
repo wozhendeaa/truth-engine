@@ -13,6 +13,7 @@ import Image from "next/image"
 import { watch } from "fs";
 import S3 from "aws-sdk/clients/s3";
 import Content from 'components/sidebar/components/Content';
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 //@ts-ignore
 function classNames(...classes) {
@@ -126,7 +127,6 @@ export const PostCreator = () => {
               void ctx.posts.getAll.invalidate();
               
           } catch(cause){
-                console.log(cause);
                 setError('content', {type: "custom", message: "媒体文件上传失败"});
           }
 
@@ -228,4 +228,9 @@ export const PostCreator = () => {
 
   }
   
-  
+export const getServerSideProps = async ({locale}: {locale: string} ) => ({
+  props: {
+    ...await serverSideTranslations(locale, ['common', 'footer']),
+  },
+})
+

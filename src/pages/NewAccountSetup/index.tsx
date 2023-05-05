@@ -238,7 +238,7 @@ const PrepareNewUser: NextPage = () => {
   );
 };
 
-//write a getInitialprops function
+
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const {res, req, locale } = ctx;
   const {user} = getAuth(req);

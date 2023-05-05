@@ -22,7 +22,7 @@ export const userRouter = createTRPCRouter({
   }),
 
   isCurrentUserVerifiedEngine: publicProcedure.query(async ({ctx}) => {
-    if (ctx.userId == null) {
+    if (!ctx.userId) {
       return false;
     }
 
@@ -36,7 +36,7 @@ export const userRouter = createTRPCRouter({
       }
     })
 
-    return user != null;
+    return user !== null || user !== undefined;
   
   }),
 
