@@ -1,17 +1,27 @@
 import { type AppType } from "next/app";
-import { api } from "~/utils/api";
-import "~/styles/globals.css";
+import { api } from "utils/api";
+import "styles/globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { useRouter } from "next/router";
 import { TRPCClientError } from "@trpc/client";
 import { appWithTranslation, useTranslation } from 'next-i18next'
 import { Toaster } from "react-hot-toast";
 import Head from "next/head";
-import { Link } from "react-router-dom";
+import { Link, Router,Navigate, Routes, Route, BrowserRouter } from "react-router-dom";
 import { ChakraProvider } from '@chakra-ui/react'
+import theme from "theme/theme";
+import { extendTheme } from '@chakra-ui/react'
+import React from "react";
+import { Provider } from "react-redux";
+import { store } from "Redux/ReduxStore";
+import { IntlProvider } from 'react-intl';
+import nextI18NextConfig from 'next-i18next.config'
+import { Location } from 'react-router-dom';
+import AdminPage from "./admin";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
-  const {locale} = useRouter();
+  const {locale} = useRouter() ?? "ch-ZH";
+
   const {t} = useTranslation();
 
   if (!locale) {
@@ -19,7 +29,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
   }
 
   return (    
-    <ChakraProvider>
+    <ChakraProvider  theme={theme }>
       <ClerkProvider {...pageProps}>
         <Toaster position="bottom-center" />
            <Head>
@@ -29,11 +39,21 @@ const MyApp: AppType = ({ Component, pageProps }) => {
             <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500&display=swap" rel="stylesheet" />
             <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500&display=swap" rel="stylesheet" />
           </Head>
-        <Component {...pageProps} />
+          <div className="dark">
+          <IntlProvider locale={locale} >
+              <React.StrictMode>
+                <Provider store={store} >
+                  <BrowserRouter>
+                    <Component {...pageProps} />
+                  </BrowserRouter>
+                </Provider>
+            </React.StrictMode>
+          </IntlProvider>
+        </div>
       </ClerkProvider>
       </ChakraProvider>
 
   );
 };
 
-export default api.withTRPC(appWithTranslation(MyApp));
+export default api.withTRPC(appWithTranslation(MyApp, nextI18NextConfig));

@@ -6,7 +6,6 @@
 
 !process.env.SKIP_ENV_VALIDATION && (await import("./src/env.mjs"));
 
-const { i18n } = await import('./next-i18next.config.js');
 
 /** @type {import("next").NextConfig} */
 const config = {
@@ -20,7 +19,7 @@ const config = {
    */
 
   images:{
-    domains: ["images.clerk.dev"],
+    domains: ["images.clerk.dev", "images.unsplash.com", "truth-engine-image.s3.us-west-1.amazonaws.com"] ,
   },
   i18n: {
     // These are all the locales you want to support in
@@ -38,6 +37,7 @@ const config = {
     config.resolve.fallback = { fs: false };
     return config;
   },
+  
 
   typescript:{
     ignoreBuildErrors:true,
@@ -49,5 +49,5 @@ const config = {
 
 
 };
-export default config;
 
+export default config;

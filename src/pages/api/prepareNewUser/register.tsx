@@ -1,12 +1,12 @@
 // pages/prepare-new-user.tsx
-import { api } from '~/utils/api';
+import { api } from 'utils/api';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getAuth } from '@clerk/nextjs/server';
-import { prisma } from '~/server/db';
-import { apiRouter, appRouter } from '~/server/api/root';
+import { prisma } from 'server/db';
+import { apiRouter, appRouter } from 'server/api/root';
 import { createContext } from 'react';
-import { createTRPCContext, } from '~/server/api/trpc';
-import { trpcCaller } from '~/server/helpers/trpcCallerHelper';
+import { createTRPCContext, } from 'server/api/trpc';
+import { trpcCaller } from 'server/helpers/trpcCallerHelper';
 import { getHTTPStatusCodeFromError } from '@trpc/server/http';
 import { TRPCError } from '@trpc/server';
 

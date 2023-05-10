@@ -2,18 +2,17 @@ import Image from"next/image"
 import Link from "next/link";
 import dayjs from "dayjs"
 import relativetTime from "dayjs/plugin/relativeTime"
-import { type RouterOutputs } from "~/utils/api";
+import { type RouterOutputs } from "utils/api";
 dayjs.extend(relativetTime);
 
 type PostWithUser = RouterOutputs["posts"]["getAll"][number]
 export const Postview = (props: PostWithUser) => {
-    const {post, author} = props;
-    const username = String(author.username).toString();
+    const username = String(props.author.username).toString();
 
     return(
-        <div key={post.id} className="flex gap-3 border-b border-slate-400 p-8 font-chinese">
+        <div key={props.id} className="flex gap-3 border-b border-slate-400 p-8 font-chinese">
           <Image 
-          src={author.profileImageUrl}
+          src={props.author.profileImageUrl ?? "/images/default_avatar.png"}
           className="w-12 h-12 rounded-full" alt="头像"
           width="56"
           height="56" />          
@@ -22,13 +21,13 @@ export const Postview = (props: PostWithUser) => {
             <div className="flex text-slate-300">              
               <Link href={`/user/${username}`}><span>{`@${username}`}</span> </Link>
               <span className="mx-1">·</span>
-              <Link href={`/posts/[id]`} as={`/posts/${post.id}`} >
-                <span className="font-thin">{dayjs(post.createdAt).fromNow()}</span>
+              <Link href={`/posts/[id]`} as={`/posts/${props.author.id}`} >
+                <span className="font-thin">{dayjs(props.createdAt).fromNow()}</span>
               </Link>
             </div>
 
 
-          <span>{post.content} </span>       
+          <span>{props.content} </span>       
 
           </div>
           

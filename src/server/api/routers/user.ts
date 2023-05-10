@@ -1,11 +1,44 @@
 import { Schema, z } from "zod";
-import { createTRPCRouter, privateProcedure, publicProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, privateProcedure, publicProcedure } from "server/api/trpc";
 import { prisma } from '../../db';
-import {accountSetupSchema} from '~/pages/NewAccountSetup'
-import { Prisma } from "@prisma/client";
+import {accountSetupSchema} from 'pages/NewAccountSetup'
+import { Prisma, Role } from "@prisma/client";
 
 
 export const userRouter = createTRPCRouter({
+  getCurrentLoggedInUser: publicProcedure.query(async ({ctx}) => {
+    
+    if (ctx.userId == null) {
+      return null;
+    }
+
+    const user = await prisma.user.findFirst({
+      where: {
+        id: ctx.userId
+      }
+    })
+    return user;
+  
+  }),
+
+  isCurrentUserVerifiedEngine: publicProcedure.query(async ({ctx}) => {
+    if (!ctx.userId) {
+      return false;
+    }
+
+    const user = await prisma.user.findFirst({
+      where: {
+        id: ctx.userId,
+        OR: [
+          { role: Role.VERYFIED_ENGINE  },
+          { role: Role.ADMIN_VERYFIED_ENGINE },
+        ],
+      }
+    })
+
+    return user !== null || user !== undefined;
+  
+  }),
 
  doesUserExist: publicProcedure.input(z.object({
   userId: z.string().nullable().nullish()
@@ -42,6 +75,19 @@ export const userRouter = createTRPCRouter({
      })
      return user != null && user.id == ctx.userId
    }),
+  
+   getAuthorizedUsers: publicProcedure.query(async ({ctx}) => {
+    const users = await prisma.user.findMany({
+      where: {
+        OR: [
+          { role: Role.VERYFIED_ENGINE  },
+          { role: Role.ADMIN_VERYFIED_ENGINE },
+        ],
+      }
+   })
+
+   return users;
+   }),
 
    isUsernameTaken: publicProcedure.input(z.object({username: z.string()}))
    .query(async ({ctx, input}) => {
@@ -60,12 +106,12 @@ export const userRouter = createTRPCRouter({
     registerInMyDatabase: privateProcedure
     .input(accountSetupSchema)
     .mutation(async ({ctx, input}) => {
-
       const user = {
         username: input.username,
         email: input.email,
         displayname: input.displayName,
         id: input.userId,
+        profileImageUrl: input.profileImageUrl,
       }
 
       await prisma.user.create({

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { api } from "./utils/api";
 
-const publicPaths = ['/', '/sign-in*', '/sign-up*']
+const publicPaths = ['/', '/sign-in*', '/sign-up*', '/api/trpc*', '.*\\.(png|jpg|jpeg|gif|svg|ico)'];
 
 const isPublic = (path: string) => {
   return publicPaths.find(x =>
@@ -20,8 +20,8 @@ export default withClerkMiddleware((request: NextRequest) => {
 
   if (!userId) {
     // redirect the users to /pages/sign-in/[[...index]].ts
-    const signInUrl = new URL('/sign-in', request.url)
-    signInUrl.searchParams.set('redirect_url', request.url)
+    const signInUrl = new URL('/sign-in', process.env.NEXT_PUBLIC_BASE_URL)
+    signInUrl.searchParams.set('redirect_url', process.env.NEXT_PUBLIC_BASE_URL!)
     return NextResponse.redirect(signInUrl)
   }
 
