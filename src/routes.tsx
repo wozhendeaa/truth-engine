@@ -3,15 +3,7 @@ import { MdDashboard, MdHome, MdLock, MdOutlineShoppingCart } from 'react-icons/
 
 // Admin Imports
 import DashboardsDefault from 'views/admin/dashboards/default';
-import DashboardsRTLDefault from 'views/admin/dashboards/rtl';
-import DashboardsCarInterface from 'views/admin/dashboards/carInterface';
-import DashboardsSmartHome from 'views/admin/dashboards/smartHome';
 
-// // NFT Imports
-import NFTMarketplace from 'views/admin/nfts/marketplace';
-import NFTPage from 'views/admin/nfts/page';
-import NFTCollection from 'views/admin/nfts/collection';
-import NFTProfile from 'views/admin/nfts/profile';
 
 // Main Imports
 import AccountBilling from 'views/admin/main/account/billing';
@@ -31,15 +23,6 @@ import ProfileNewsfeed from 'views/admin/main/profile/newsfeed';
 
 import ApplicationsDataTables from 'views/admin/main/applications/dataTables';
 import ApplicationsCalendar from 'views/admin/main/applications/calendar';
-
-import EcommerceNewProduct from 'views/admin/main/ecommerce/newProduct';
-import EcommerceProductOverview from 'views/admin/main/ecommerce/overviewProduct';
-import EcommerceProductSettings from 'views/admin/main/ecommerce/settingsProduct';
-import EcommerceProductPage from 'views/admin/main/ecommerce/pageProduct';
-import EcommerceOrderList from 'views/admin/main/ecommerce/orderList';
-import EcommerceOrderDetails from 'views/admin/main/ecommerce/orderDetails';
-import EcommerceReferrals from 'views/admin/main/ecommerce/referrals';
-
 // Others
 import OthersNotifications from 'views/admin/main/others/notifications';
 import OthersPricing from 'views/admin/main/others/pricing';
@@ -72,24 +55,7 @@ const routes = [
 				path: '/dashboards/default',
 				component: DashboardsDefault
 			},
-			{
-				name: 'Car Interface',
-				layout: '/admin',
-				path: '/dashboards/car-interface',
-				component: DashboardsCarInterface
-			},
-			{
-				name: 'Smart Home',
-				layout: '/admin',
-				path: '/dashboards/smart-home',
-				component: DashboardsSmartHome
-			},
-			{
-				name: 'RTL',
-				layout: '/rtl',
-				path: '/dashboards/rtl',
-				component: DashboardsRTLDefault
-			}
+		
 		]
 	},
 	
@@ -110,43 +76,43 @@ const routes = [
 						layout: '/admin',
 						path: '/main/account/billing',
 						exact: false,
-						component: AccountBilling
-					},
+				component: DashboardsDefault
+			},
 					{
 						name: 'Application',
 						layout: '/admin',
 						path: '/main/account/application',
 						exact: false,
-						component: AccountApplications
-					},
+				component: DashboardsDefault
+			},
 					{
 						name: 'Invoice',
 						layout: '/admin',
 						path: '/main/account/invoice',
 						exact: false,
-						component: AccountInvoice
-					},
+				component: DashboardsDefault
+			},
 					{
 						name: 'Settings',
 						layout: '/admin',
 						path: '/main/account/settings',
 						exact: false,
-						component: AccountSettings
-					},
+				component: DashboardsDefault
+			},
 					{
 						name: 'All Courses',
 						layout: '/admin',
 						path: '/main/account/all-courses',
 						exact: false,
-						component: AccountAllCourses
-					},
+				component: DashboardsDefault
+			},
 					{
 						name: 'Course Page',
 						layout: '/admin',
 						path: '/main/account/course-page',
 						exact: false,
-						component: AccountCoursePage
-					}
+				component: DashboardsDefault
+			}
 				]
 			},
 	
@@ -160,22 +126,22 @@ const routes = [
 						layout: '/admin',
 						path: '/main/users/new-user',
 						exact: false,
-						component: UserNew
-					},
+				component: DashboardsDefault
+			},
 					{
 						name: 'Users Overview',
 						layout: '/admin',
 						path: '/main/users/users-overview',
 						exact: false,
-						component: UsersOverview
-					},
+				component: DashboardsDefault
+			},
 					{
 						name: 'Users Reports',
 						layout: '/admin',
 						path: '/main/users/users-reports',
 						exact: false,
-						component: UsersReports
-					}
+				component: DashboardsDefault
+			}
 				]
 			},
 			{
@@ -189,15 +155,15 @@ const routes = [
 						layout: '/admin',
 						path: '/main/applications/data-tables',
 						exact: false,
-						component: ApplicationsDataTables
-					},
+				component: DashboardsDefault
+			},
 					{
 						name: 'Calendar',
 						layout: '/admin',
 						path: '/main/applications/calendar',
 						exact: false,
-						component: ApplicationsCalendar
-					}
+				component: DashboardsDefault
+			}
 				]
 			},
 			{
@@ -210,22 +176,21 @@ const routes = [
 						layout: '/admin',
 						path: '/main/profile/overview',
 						exact: false,
-						component: ProfileOverview
-					},
+				component: DashboardsDefault
+			},
 					{
 						name: 'Profile Settings',
 						layout: '/admin',
 						path: '/main/profile/settings',
 						exact: false,
-						component: ProfileSettings
 					},
 					{
 						name: 'News Feed',
 						layout: '/admin',
 						path: '/main/profile/newsfeed',
 						exact: false,
-						component: ProfileNewsfeed
-					}
+				component: DashboardsDefault
+			}
 				]
 			},
 			{
@@ -238,29 +203,29 @@ const routes = [
 						layout: '/admin',
 						path: '/main/others/notifications',
 						exact: false,
-						component: OthersNotifications
-					},
+				component: DashboardsDefault
+			},
 					{
 						name: 'Pricing',
 						layout: '/auth',
 						path: '/main/others/pricing',
 						exact: false,
-						component: OthersPricing
-					},
+				component: DashboardsDefault
+			},
 					{
 						name: '404',
 						layout: '/admin',
 						path: '/main/others/404',
 						exact: false,
-						component: OthersError
-					},
+				component: DashboardsDefault
+			},
 					{
 						name: 'Messages',
 						layout: '/admin',
 						path: '/main/others/messages',
 						exact: false,
-						component: Messages
-					}
+				component: DashboardsDefault
+			}
 				]
 			}
 		]
@@ -282,13 +247,11 @@ const routes = [
 						name: 'Default',
 						layout: '/auth',
 						path: '/sign-in/default',
-						component: SignInDefault
 					},
 					{
 						name: 'Centered',
 						layout: '/auth',
 						path: '/sign-in/centered',
-						component: SignInCentered
 					}
 				]
 			},
@@ -302,14 +265,14 @@ const routes = [
 						name: 'Default',
 						layout: '/auth',
 						path: '/sign-up/default',
-						component: SignUpDefault
+						componet: SignUpDefault
 					},
 					{
 						name: 'Centered',
 						layout: '/auth',
 						path: '/sign-up/centered',
-						component: SignUpCentered
-					}
+				component: DashboardsDefault
+			}
 				]
 			},
 			// --- Verification ---
@@ -322,14 +285,14 @@ const routes = [
 						name: 'Default',
 						layout: '/auth',
 						path: '/verification/default',
-						component: VerificationDefault
-					},
+				component: DashboardsDefault
+			},
 					{
 						name: 'Centered',
 						layout: '/auth',
 						path: '/verification/centered',
-						component: VerificationCentered
-					}
+				component: DashboardsDefault
+			}
 				]
 			},
 			// --- Lock ---
@@ -342,14 +305,14 @@ const routes = [
 						name: 'Default',
 						layout: '/auth',
 						path: '/lock/default',
-						component: LockDefault
-					},
+				component: DashboardsDefault
+			},
 					{
 						name: 'Centered',
 						layout: '/auth',
 						path: '/lock/centered',
-						component: LockCentered
-					}
+				component: DashboardsDefault
+			}
 				]
 			},
 			// --- Forgot Password ---
@@ -362,14 +325,14 @@ const routes = [
 						name: 'Default',
 						layout: '/auth',
 						path: '/forgot-password/default',
-						component: ForgotPasswordDefault
-					},
+				component: DashboardsDefault
+			},
 					{
 						name: 'Centered',
 						layout: '/auth',
 						path: '/forgot-password/centered',
-						component: ForgotPasswordCentered
-					}
+				component: DashboardsDefault
+			}
 				]
 			}
 		]

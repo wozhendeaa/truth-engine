@@ -1,19 +1,17 @@
 import { useUser } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { ChangeEvent, FormEvent, Fragment, SyntheticEvent, useState } from "react";
-import { Controller, FieldValues, UseFormRegister, UseFormSetError, useForm, FieldErrors } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { setErrorMap, z } from "zod";
+import {  z } from "zod";
 import { api } from "utils/api";
 import { useFilePicker } from 'use-file-picker';
-import { Show } from "@chakra-ui/react";
 import Image from "next/image"
-import { watch } from "fs";
 import S3 from "aws-sdk/clients/s3";
-import Content from 'components/sidebar/components/Content';
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+//@ts-ignore
+import {i18n} from 'next-i18next.config'
 
 //@ts-ignore
 function classNames(...classes) {
@@ -230,7 +228,7 @@ export const PostCreator = () => {
   
 export const getServerSideProps = async ({locale}: {locale: string} ) => ({
   props: {
-    ...await serverSideTranslations(locale, ['common', 'footer']),
+    ...await serverSideTranslations(locale, ['common', 'footer'], i18n),
   },
 })
 

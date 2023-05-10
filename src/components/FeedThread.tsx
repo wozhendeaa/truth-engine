@@ -26,6 +26,8 @@ import { RouterOutputs, api } from "utils/api";
 import { Post, Reaction, User } from "@prisma/client";
 import relativetTime from "dayjs/plugin/relativeTime";
 import dayjs from "dayjs";
+//@ts-ignore
+import {i18n} from 'next-i18next.config'
 
 require('dayjs/locale/zh-cn')
 dayjs.locale('zh-cn')
@@ -457,7 +459,7 @@ export default FeedThread;
 
 export const getServerSideProps = async ({locale}: {locale: string} ) => ({
   props: {
-    ...await serverSideTranslations(locale, ['common', 'footer']),
+    ...await serverSideTranslations(locale, ['common', 'footer'], i18n),
   },
 })
 
