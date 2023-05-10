@@ -7,7 +7,6 @@ import { TRPCClientError } from "@trpc/client";
 import { appWithTranslation, useTranslation } from 'next-i18next'
 import { Toaster } from "react-hot-toast";
 import Head from "next/head";
-import { Link, Router,Navigate, Routes, Route, BrowserRouter } from "react-router-dom";
 import { ChakraProvider } from '@chakra-ui/react'
 import theme from "theme/theme";
 import { extendTheme } from '@chakra-ui/react'
@@ -15,9 +14,7 @@ import React from "react";
 import { Provider } from "react-redux";
 import { store } from "Redux/ReduxStore";
 import { IntlProvider } from 'react-intl';
-import nextI18NextConfig from 'next-i18next.config'
-import { Location } from 'react-router-dom';
-import AdminPage from "./admin";
+
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   const {locale} = useRouter() ?? "ch-ZH";
@@ -43,9 +40,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
           <IntlProvider locale={locale} >
               <React.StrictMode>
                 <Provider store={store} >
-                  <BrowserRouter>
                     <Component {...pageProps} />
-                  </BrowserRouter>
                 </Provider>
             </React.StrictMode>
           </IntlProvider>
@@ -56,4 +51,4 @@ const MyApp: AppType = ({ Component, pageProps }) => {
   );
 };
 
-export default api.withTRPC(appWithTranslation(MyApp, nextI18NextConfig));
+export default api.withTRPC(appWithTranslation(MyApp));

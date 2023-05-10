@@ -6,6 +6,7 @@ import { PageLayout } from "components/layout";
 import { api } from "utils/api";
 import Sidebar from "../../components/sidebar/Sidebar"
 import appRoutes from "routes"
+import { Route, Routes } from "react-router-dom";
 
 const AdminPage: NextPage = () => {
   const {data,  isLoading} = api.posts.getAllWithReactionsDataForUser.useQuery();
@@ -21,9 +22,8 @@ const AdminPage: NextPage = () => {
   return (
     <>
         <PageLayout>
-
-        <Sidebar routes={appRoutes} logoText={"DASHBOARD"} variant="opaque"  />
-
+     
+          {/* <Sidebar routes={appRoutes} logoText={"DASHBOARD"} variant="opaque"  /> */}
        </PageLayout>
      
     </>

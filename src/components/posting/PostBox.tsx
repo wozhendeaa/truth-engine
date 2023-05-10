@@ -10,8 +10,6 @@ import { useFilePicker } from 'use-file-picker';
 import Image from "next/image"
 import S3 from "aws-sdk/clients/s3";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-//@ts-ignore
-import {i18n} from 'next-i18next.config'
 
 //@ts-ignore
 function classNames(...classes) {
@@ -72,8 +70,7 @@ export const PostCreator = () => {
 
 
     if(!user) return null;
-  
-   
+
 
     // setError('file_upload', {type:"custom", message: t('upload_image_too_big') + maxImageSize + 'mb'}) ;
     // setError('file_upload', {type:"custom", message: t('upload_video_too_big') + maxVideoSize + 'mb'}) ;
@@ -113,7 +110,6 @@ export const PostCreator = () => {
 
 
     async function onSubmit(e: postFormSchema) {
-
           try{
               const keys = await uploadToS3();
               mutate({
@@ -127,10 +123,8 @@ export const PostCreator = () => {
           } catch(cause){
                 setError('content', {type: "custom", message: "媒体文件上传失败"});
           }
-
           return "";
       }
-    
 
     return <>
        <div>
@@ -228,7 +222,7 @@ export const PostCreator = () => {
   
 export const getServerSideProps = async ({locale}: {locale: string} ) => ({
   props: {
-    ...await serverSideTranslations(locale, ['common', 'footer'], i18n),
+    ...await serverSideTranslations(locale, ['common', 'footer']),
   },
 })
 

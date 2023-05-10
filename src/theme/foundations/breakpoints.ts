@@ -1,4 +1,5 @@
-export const breakpoints = ({
+
+export const breakpoints = {
   sm: "320px",
   "2sm": "380px",
   md: "768px",
@@ -6,4 +7,4 @@ export const breakpoints = ({
   xl: "1200px",
   "2xl": "1600px",
   "3xl": "1920px",
-});
+};

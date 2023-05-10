@@ -24,11 +24,11 @@
 import { Flex, Grid, useColorModeValue } from '@chakra-ui/react';
 // Custom components
 import Balance from 'views/admin/dashboards/default/components/Balance';
-// import DailyTraffic from 'views/admin/dashboards/default/components/DailyTraffic';
+import DailyTraffic from 'views/admin/dashboards/default/components/DailyTraffic';
 import MostVisitedTable from 'views/admin/dashboards/default/components/MostVisitedTable';
 import { VSeparator } from 'components/separator/Separator';
 import OverallRevenue from 'views/admin/dashboards/default/components/OverallRevenue';
-// import ProfitEstimation from 'views/admin/dashboards/default/components/ProfitEstimation';
+import ProfitEstimation from 'views/admin/dashboards/default/components/ProfitEstimation';
 import ProjectStatus from 'views/admin/dashboards/default/components/ProjectStatus';
 import YourCard from 'views/admin/dashboards/default/components/YourCard';
 import YourTransfers from 'views/admin/dashboards/default/components/YourTransfers';
@@ -46,7 +46,7 @@ export default function Default() {
 					gap='20px'
 					display={{ base: 'block', lg: 'grid' }}>
 					<Flex gridArea={{ base: '1 / 1 / 2 / 3', '2xl': '1 / 1 / 2 / 2' }}>
-						<OverallRevenue />
+						{/* <OverallRevenue /> */}
 					</Flex>
 					<Flex gridArea={{ base: '2 / 1 / 3 / 3', '2xl': '1 / 2 / 2 / 3' }}>
 						{/* <Balance /> */}
@@ -81,6 +81,7 @@ export default function Default() {
 						<YourTransfers />
 					</Flex>
 					<Flex gridArea={{ base: '2 / 1 / 3 / 3', '2xl': '1 / 2 / 2 / 3' }}>
+						<MostVisitedTable tableData={tableDataMostVisited} />
 					</Flex>
 				</Grid>
 			</Flex>

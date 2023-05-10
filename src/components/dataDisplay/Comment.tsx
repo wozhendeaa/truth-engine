@@ -1,8 +1,4 @@
 import { Avatar, Button, Flex, Link, Text, useColorModeValue } from '@chakra-ui/react';
-import dayjs from 'dayjs';
-import relativetTime from "dayjs/plugin/relativeTime";
-require('dayjs/locale/zh-cn')
-dayjs.locale('zh-cn')
 
 // Custom components
 
@@ -16,7 +12,7 @@ export default function Comment(props: {
 }) {
 	const { avatar, name, text, tags, time, ...rest } = props;
 	// Chakra Color Mode
-	const textColor = useColorModeValue( 'white','secondaryGray.900');
+	const textColor = useColorModeValue('secondaryGray.900', 'white');
 	const textColorSecondary = useColorModeValue('secondaryGray.600', 'white');
 	const textGray = useColorModeValue('#68769F', 'secondaryGray.600');
 	return (
@@ -28,9 +24,6 @@ export default function Comment(props: {
 						{name}
 					</Text>{' '}
 					{text}
-					<Text fontSize='md' color={textColorSecondary} fontWeight='500'>
-						{time}
-					</Text>
 				</Text>
 				<Flex>
 					{tags ? (
@@ -50,9 +43,11 @@ export default function Comment(props: {
 					) : null}
 				</Flex>
 				<Flex align='center'>
-					
+					<Text fontSize='md' color={textColorSecondary} fontWeight='500'>
+						{time}
+					</Text>
 					<Button color={textGray} variant='no-hover' fontWeight='500' boxShadow='none' w='max-content'>
-						Reply111
+						Reply
 					</Button>
 				</Flex>
 			</Flex>

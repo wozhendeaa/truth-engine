@@ -1,8 +1,6 @@
 // Chakra imports
 import { Box, Flex, Text, Badge, LightMode } from '@chakra-ui/react';
-import LineChart from 'components/charts/LineChart';
 // Custom components
-import { lineChartDataSidebar, lineChartOptionsSidebar } from 'variables/charts';
 export default function SidebarDocs() {
 	const bgColor = 'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)';
 

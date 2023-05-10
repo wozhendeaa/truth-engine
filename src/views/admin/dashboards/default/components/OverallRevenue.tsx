@@ -4,10 +4,10 @@ import LineChart from 'components/charts/LineChart';
 
 // Custom components
 import Card from 'components/card/Card';
+import { lineChartDataOverallRevenue, lineChartOptionsOverallRevenue } from 'variables/charts';
 
 // Assets
 import { RiArrowUpSFill } from 'react-icons/ri';
-import dynamic from 'next/dynamic';
 
 export default function OverallRevenue(props: { [x: string]: any }) {
 	const { ...rest } = props;
@@ -46,7 +46,7 @@ export default function OverallRevenue(props: { [x: string]: any }) {
 				</Select>
 			</Flex>
 			<Box minH='260px' mt='auto' w='100%'>
-				{/* <LineChart chartData={lineChartDataOverallRevenue} chartOptions={lineChartOptionsOverallRevenue} /> */}
+				<LineChart chartData={lineChartDataOverallRevenue} chartOptions={lineChartOptionsOverallRevenue} />
 			</Box>
 		</Card>
 	);

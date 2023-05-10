@@ -1,3 +1,4 @@
+
 module.exports = {
   // debug: true,
   i18n: {
@@ -5,6 +6,7 @@ module.exports = {
     // This is the default locale you want to be used when visiting
     // a non-locale prefixed path e.g. `/hello`
     defaultLocale: 'zh-CN',
+    localeDetection: false,
   },
   react: { useSuspense: false },//this line
 }

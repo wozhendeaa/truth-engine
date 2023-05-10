@@ -69,6 +69,7 @@ export function SidebarResponsive(props: { routes: RoutesType[] }) {
 	const btnRef = React.useRef();
 
 	const { routes } = props;
+	// let isWindows = navigator.platform.startsWith("Win");
 	//  BRAND
 
 	return (

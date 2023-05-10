@@ -88,6 +88,58 @@ export const commentRouter = createTRPCRouter({
   }
 ),
 
+getCommentsForComment: publicProcedure.input(z.object({commentId: z.string(),
+  limit: z.number().default(50),}))
+  .query(async ({ctx, input}) => {
+   let comments = await ctx.prisma.comment.findMany({
+        where:{
+          replyToCommentId: input.commentId
+        },
+        take: input.limit,
+        include: {
+          author: {
+            select : {
+              id: true,
+              username: true,
+              profileImageUrl:true,
+              premiumStatus:true,
+              role:true,
+              displayname:true,
+            },
+          }
+        },
+        orderBy: [{
+          likes:'desc'
+        },
+        {
+          createdAt: "desc"
+        }
+      ]
+
+    })
+
+    let reactions:Reaction[] = [];
+    if (ctx.userId) {
+      reactions = await ctx.prisma.reaction.findMany({
+        where:{
+          userId: ctx.userId,
+          commentID :{
+            in: comments.map(cmt => cmt.id ?? "")
+          }
+        }
+      })
+    }
+    if (!comments) comments = [];
+    
+    return {
+      props: {
+        comments: comments,
+        reactions: reactions
+      }
+    };
+  }
+),
+
 
  likeComment: privateProcedure.input(z.object({commentId: z.string()}))
     .mutation(async ({ctx, input}) => {
@@ -177,7 +229,7 @@ export const commentRouter = createTRPCRouter({
 
     await ctx.prisma.post.update({
       data:{
-        likes: {
+        commentCount: {
           increment: 1,
         }
       },
@@ -188,4 +240,35 @@ export const commentRouter = createTRPCRouter({
 
     return comment;
   }),
+
+createCommentReply: privateProcedure.input(z.object({replyToCommentId: z.string(),
+    content: z.string().min(1, {message: "post_too_short"}).max(200, {message: "comment_too_long"})
+}))
+.mutation(async ({ctx, input}) => {
+  const authorId = ctx.curretnUserId;
+  const {success} = await ratelimitPost.limit(authorId);
+  if (!success) throw new TRPCError({code: "TOO_MANY_REQUESTS", message: "TOO_MANY_REQUESTS"});
+
+  const comment = await ctx.prisma.comment.create({
+      data:{
+          content: input.content,
+          replyToCommentId: input.replyToCommentId,
+          authorId: authorId,
+      }
+  });
+
+  await ctx.prisma.comment.update({
+    data:{
+      commentCount: {
+        increment: 1,
+      }
+    },
+    where: {
+      id: input.replyToCommentId
+    }
+  })
+
+  return comment;
+}),
+
 });

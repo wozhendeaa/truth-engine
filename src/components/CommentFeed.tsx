@@ -1,48 +1,23 @@
 import {
-  Avatar,
   Box,
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
   Flex,
-  Heading,
-  IconButton,
-  Text,
-  Image,
-  useColorMode,
-  Input,
-  Icon,
-  Skeleton,
   SkeletonCircle,
   SkeletonText,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
-import {
-  BsThreeDotsVertical,
-} from "react-icons/bs";
 
 import { RouterOutputs, api } from "utils/api";
-import { Post, Reaction, User } from "@prisma/client";
+import {  Reaction, User } from "@prisma/client";
 import relativetTime from "dayjs/plugin/relativeTime";
 import dayjs from "dayjs";
 
 dayjs.extend(relativetTime);
 
-import ImageModal from "./ImageModal";
 import { useTranslation } from "react-i18next";
-import toast from "react-hot-toast";
-import {
-  MdImage,
-  MdOutlineAttachment,
-  MdOutlineTagFaces,
-} from "react-icons/md";
 import { HSeparator } from "./separator/Separator";
 import TEComment from "./dataDisplay/TE_Comment";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { LoadingSpinner } from "./loading";
 
 
 type CommentsWithUserData = RouterOutputs["comment"]["getCommentsForPost"];
@@ -93,6 +68,7 @@ export const CommentThread = (props: {postId: string, topCommentsOnly: boolean})
         text={c.content}
         time={dayjs(c.createdAt).fromNow()}
         likes={c.likes}
+        commentNum={c.commentCount}
         likedByUser={reactions ?? []}          
         />
       ))}

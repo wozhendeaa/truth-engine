@@ -17,7 +17,7 @@ import {
   InputRightElement,
   Textarea,
 } from "@chakra-ui/react";
-import React, { ChangeEvent, useReducer, useRef, useState } from "react";
+import React, { ChangeEvent,  useState } from "react";
 import {
   BsThreeDotsVertical,
 } from "react-icons/bs";
@@ -26,8 +26,7 @@ import { RouterOutputs, api } from "utils/api";
 import { Post, Reaction, User } from "@prisma/client";
 import relativetTime from "dayjs/plugin/relativeTime";
 import dayjs from "dayjs";
-//@ts-ignore
-import {i18n} from 'next-i18next.config'
+import {i18n} from 'next-i18next'
 
 require('dayjs/locale/zh-cn')
 dayjs.locale('zh-cn')
@@ -98,8 +97,7 @@ function renderImages(type: string, url: string, index: any) {
           {open && (
             //@ts-ignore
             <ImageModal url={url} open={open} close={closeModal} />
-          )}
-        </div>
+          )}        </div>
       </li>
     );
   } else {
@@ -176,10 +174,14 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
       return;
     }
 
+    if (commentMutation.isLoading) return;
+
     commentMutation.mutate({
       content: comment,
       replyToPostId: postWithUser.id,
     });
+    
+    SetComment("");
   }
   
   
@@ -187,7 +189,7 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
   const handleLike = (post: PostsWithUserData) => {
     
     likePostMutation.mutate({ postId: post.id });
-    SetComment("");
+  
     
   };
 
@@ -303,6 +305,7 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
             variant="ghost"
             _hover={{ bg: "gray.600" }}
             onClick={() => showCommentClick()}
+            
           >
             <div className="flex items-center justify-center space-x-3">
             <svg
@@ -392,7 +395,7 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
                     variant="no-hover"
                     bg="transparent"
                   >
-                    <Icon
+                <Icon
                    onClick={makeComment}
                       as={MdSend}
                     _hover={{ color:"te_dark_green" }}
@@ -459,7 +462,7 @@ export default FeedThread;
 
 export const getServerSideProps = async ({locale}: {locale: string} ) => ({
   props: {
-    ...await serverSideTranslations(locale, ['common', 'footer'], i18n),
+    ...await serverSideTranslations(locale, ['common', 'footer']),
   },
-})
+}) 
 
