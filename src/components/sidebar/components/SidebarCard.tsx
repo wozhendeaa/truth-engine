@@ -34,7 +34,7 @@ export default function SidebarDocs() {
 					</Badge>
 				</LightMode>
 				<Box h='160px'>
-					<LineChart chartData={lineChartDataSidebar} chartOptions={lineChartOptionsSidebar} />
+					{/* <LineChart chartData={lineChartDataSidebar} chartOptions={lineChartOptionsSidebar} /> */}
 				</Box>
 			</Flex>
 		</Flex>

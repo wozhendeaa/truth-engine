@@ -24,11 +24,11 @@
 import { Flex, Grid, useColorModeValue } from '@chakra-ui/react';
 // Custom components
 import Balance from 'views/admin/dashboards/default/components/Balance';
-import DailyTraffic from 'views/admin/dashboards/default/components/DailyTraffic';
+// import DailyTraffic from 'views/admin/dashboards/default/components/DailyTraffic';
 import MostVisitedTable from 'views/admin/dashboards/default/components/MostVisitedTable';
 import { VSeparator } from 'components/separator/Separator';
 import OverallRevenue from 'views/admin/dashboards/default/components/OverallRevenue';
-import ProfitEstimation from 'views/admin/dashboards/default/components/ProfitEstimation';
+// import ProfitEstimation from 'views/admin/dashboards/default/components/ProfitEstimation';
 import ProjectStatus from 'views/admin/dashboards/default/components/ProjectStatus';
 import YourCard from 'views/admin/dashboards/default/components/YourCard';
 import YourTransfers from 'views/admin/dashboards/default/components/YourTransfers';
@@ -49,7 +49,7 @@ export default function Default() {
 						<OverallRevenue />
 					</Flex>
 					<Flex gridArea={{ base: '2 / 1 / 3 / 3', '2xl': '1 / 2 / 2 / 3' }}>
-						<Balance />
+						{/* <Balance /> */}
 					</Flex>
 				</Grid>
 				<Grid
@@ -64,13 +64,13 @@ export default function Default() {
 					}}
 					mb='20px'>
 					<Flex gridArea={{ md: '1 / 1 / 2 / 2', '2xl': '1 / 1 / 2 / 2' }}>
-						<DailyTraffic />
+						{/* <DailyTraffic /> */}
 					</Flex>
 					<Flex gridArea={{ md: '1 / 2 / 2 / 3', '2xl': '1 / 2 / 2 / 3' }}>
-						<ProjectStatus />
+						{/* <ProjectStatus /> */}
 					</Flex>
 					<Flex gridArea={{ md: ' 2 / 1 / 3 / 3', '2xl': '1 / 3 / 2 / 4' }}>
-						<ProfitEstimation />
+						{/* <ProfitEstimation /> */}
 					</Flex>
 				</Grid>
 				<Grid
@@ -81,7 +81,6 @@ export default function Default() {
 						<YourTransfers />
 					</Flex>
 					<Flex gridArea={{ base: '2 / 1 / 3 / 3', '2xl': '1 / 2 / 2 / 3' }}>
-						<MostVisitedTable tableData={tableDataMostVisited} />
 					</Flex>
 				</Grid>
 			</Flex>
