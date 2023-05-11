@@ -29,8 +29,9 @@ export default function TEComment(props: {
   time: string;
   likes: number;
   commentNum: number;
-  likedByUser: Reaction[];
-  [x: string]: any;
+  likedByUser: Reaction[];//韭菜点赞了哪些评论
+  isFirstLevel: boolean;//是不是最顶级的回复
+  onPostPage: boolean;  //看是不是在帖子专门的页面显示的回复。如果是浏览页面，回复的时候就显示modal回复框，如果不是就直接在评论区显示回复框
 }) {
   const {
     avatar,
@@ -42,8 +43,11 @@ export default function TEComment(props: {
 	commentNum,
     commentId,
     likedByUser,
+	isFirstLevel,
+	onPostPage,
     ...rest
   } = props;
+  
   // Chakra Color Mode
   const textColor = useColorModeValue("white", "secondaryGray.900");
   const textColorSecondary = useColorModeValue("secondaryGray.600", "white");
@@ -101,8 +105,8 @@ export default function TEComment(props: {
   }
 
   return (
-    <Flex mb="30px" {...rest} direction={"column"}>
-      <Flex>
+    <Flex mb={isFirstLevel? "10px" : "0px"} {...rest} direction={"column"} >
+      <Flex mt={isFirstLevel ? 0 : 2}>
         <Avatar src={avatar} w="30px" h="30px" me="15px" />
         <Text color={textColor} fontWeight="700" fontSize="md">
           {name}
@@ -142,8 +146,10 @@ export default function TEComment(props: {
             : null}
         </Flex>
 
-        <Flex align="left" direction={"column"}>
-          <Flex mt={2} fontSize={"lg"}>
+        <Flex align="left" direction={"column"}
+		 rounded={"xl"} bgColor={ isFirstLevel? '' : 'te_dark_ui'}>
+          <Flex mt={2} px={isFirstLevel? 0 : 3} fontSize={"md"}
+		   borderLeft={'te_dark_ui_bg'} borderLeftWidth={isFirstLevel? 0 : 2} >
             {props.text}
           </Flex>
           {/* 点赞按钮 */}
@@ -168,9 +174,9 @@ export default function TEComment(props: {
                 />
               </svg>
               <span className="ml-1">{likeNumber > 0 ? likeNumber : ""}</span>
-              <Flex>
+              <Flex >
 				{
-					commentNum > 0 &&
+				  isFirstLevel && commentNum > 0 &&
 						(<Button
 						color={textGray}
 						variant="no-hover"
@@ -186,7 +192,7 @@ export default function TEComment(props: {
 				}
 				{disc.isOpen && <CommentModal disc={disc} 
 				replyToCommentId={commentId} />}
-				
+
 				<Button
                   color={textGray}
                   variant="no-hover"
@@ -203,7 +209,7 @@ export default function TEComment(props: {
               </Flex>
             </Flex>
           </Flex>
-		  <Flex width={'90%'} direction="column" ml={10} mt={3}>
+		  <Flex width={'90%'} direction="column" ml={10} mt={isFirstLevel? 3 : -1}>
 		  {replies?.comments?.map((c) => (
 
 			<TEComment avatar={c.author.profileImageUrl ?? "images/default_avatar.png"} 
@@ -215,7 +221,9 @@ export default function TEComment(props: {
 				text={c.content}
 				time={dayjs(c.createdAt).fromNow()}
 				likes={c.likes}
-				likedByUser={replies?.reactions ?? []}          
+				likedByUser={c.reactions}    
+				isFirstLevel={false}      
+				onPostPage={onPostPage}
 				/>
 			))}
 		  </Flex>

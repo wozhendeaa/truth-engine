@@ -49,14 +49,12 @@ type PostsWithUserData = RouterOutputs["posts"]["getAll"][number];
 interface SingleFeedProps {
   currentUser: User;
   postWithUser: PostsWithUserData;
-  likedByUser: Reaction[];
 }
 
 interface FeedProps {
   posts: {
     posts: PostsWithUserData[];
-    likedByUser: Reaction[];
-  };
+  }
 }
 
 function renderImages(type: string, url: string, index: any) {
@@ -107,11 +105,10 @@ function renderImages(type: string, url: string, index: any) {
 
 const SingleFeed = (singlePostData: SingleFeedProps) => {
   const postWithUser = singlePostData.postWithUser;
-  const likedByUser = singlePostData.likedByUser;
   const mediaStr = singlePostData.postWithUser.media;
   let media = mediaStr ? Array.from(JSON.parse(mediaStr)) : [];
 
-  const hasReaction = likedByUser.some(
+  const hasReaction = postWithUser.reactions.some(
     (reaction) => reaction.postId === postWithUser.id
   );
   const [liked, setLiked] = useState(hasReaction);
@@ -180,16 +177,14 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
       content: comment,
       replyToPostId: postWithUser.id,
     });
-    
+
     SetComment("");
   }
   
   
 
   const handleLike = (post: PostsWithUserData) => {
-    
     likePostMutation.mutate({ postId: post.id });
-  
     
   };
 
@@ -365,6 +360,7 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
               <CommentThread
                 postId={postWithUser.id}
                 topCommentsOnly={true}
+                onPostPage={false}
               />
             </Box>
 
@@ -435,9 +431,8 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
 
 export const FeedThread = (postData: FeedProps) => {
   const { t } = useTranslation();
-  const { posts, likedByUser } = postData.posts;
+  const posts  = postData.posts.posts;
   const { data: currentUser } = api.user.getCurrentLoggedInUser.useQuery();
-
   if (!posts || posts.length === 0) {
     return (
       <div className="text-center text-slate-200">{t("no_data_found")}</div>
@@ -450,7 +445,6 @@ export const FeedThread = (postData: FeedProps) => {
         <SingleFeed
           key={p.id}
           postWithUser={p}
-          likedByUser={likedByUser}
           currentUser={currentUser!}
         />
       ))}

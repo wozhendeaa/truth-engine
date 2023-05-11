@@ -52,7 +52,7 @@ const Home: NextPage = () => {
           getSekleton(5)
           :
            //@ts-ignore 
-          <FeedThread posts={data?.props} />}
+          <FeedThread posts={data} />}
 
          </div>
 

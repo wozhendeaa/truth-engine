@@ -41,26 +41,6 @@ function classifyMedia(filename: string): "image" | "video" | undefined {
 }
 
 type postAuthorType = (Prisma.Post & {author: Prisma.User})[]
-
-async function checkForPostReactions  (ctx: Prisma.PrismaClient,
-   userId:string | null, posts: postAuthorType) : Promise<Prisma.Reaction[]>  {
-
-  if (userId) {
-    const reactions = await ctx.reaction.findMany({
-      where:{
-        userId: userId,
-        postId : {
-          in:  posts.map(post => post.id)
-        }
-      }
-    })
-
-    return reactions;
-  }
-
-  return [];
-}
-
 let cursor = "";
 
 export const postsRouter = createTRPCRouter({
@@ -200,17 +180,17 @@ export const postsRouter = createTRPCRouter({
           MarkAsDelete: false
         } ,       
         include: {
-          author: true
-        }
+          author: true,     
+          reactions: {
+            where: {
+              userId: ctx.userId ?? "",
+            }
+          }     
+        },
     });
 
-    const likedByUser = await checkForPostReactions(ctx.prisma, ctx.userId, posts);
-
     return {
-      props: {
-        posts: posts,
-        likedByUser: likedByUser,
-      }
+        posts,
     };
  
   }),
@@ -220,7 +200,12 @@ export const postsRouter = createTRPCRouter({
         take:100,   
         orderBy: [{createdAt: "desc"}],
         include: {
-          author: true
+          author: true,
+          reactions: {
+            where: {
+              userId: ctx.userId ?? "",
+            }
+          }     
         }
     });
 

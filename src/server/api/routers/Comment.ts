@@ -5,10 +5,6 @@ import { createTRPCRouter, privateProcedure, publicProcedure } from "server/api/
 
 import { Ratelimit } from "@upstash/ratelimit"; // for deno: see above
 import { Redis } from "@upstash/redis";
-import { postSchema } from "components/posting/PostBox";
-import { RouterOutputs } from "utils/api";
-import { createTRPCContext } from '../trpc';
-import type Prisma  from "@prisma/client";
 import { Reaction, ReactionType } from "@prisma/client";
 
 
@@ -44,8 +40,13 @@ export const commentRouter = createTRPCRouter({
               premiumStatus:true,
               role:true,
               displayname:true,
-            },
-          }
+            },          
+          },
+          reactions: {
+            where: {
+              userId: ctx.userId ?? "",
+            }
+          }     
         },
         orderBy: [{
           likes:'desc'
@@ -56,33 +57,11 @@ export const commentRouter = createTRPCRouter({
       ]
 
     })
-
-    let reactions:Reaction[] = [];
-    if (ctx.userId) {
-      reactions = await ctx.prisma.reaction.findMany({
-        where:{
-          userId: ctx.userId,
-          OR: [
-            {
-              postId: {
-                in: comments.map(cmt => cmt.replyToPostId ?? "")
-              }
-            },
-            {
-              commentID :{
-                in: comments.map(cmt => cmt.id ?? "")
-              }
-            }
-          ]
-        }
-      })
-    }
     if (!comments) comments = [];
     
     return {
       props: {
         comments: comments,
-        reactions: reactions
       }
     };
   }
@@ -106,7 +85,12 @@ getCommentsForComment: publicProcedure.input(z.object({commentId: z.string(),
               role:true,
               displayname:true,
             },
-          }
+          },
+          reactions: {
+            where: {
+              userId: ctx.userId ?? "",
+            }
+          }     
         },
         orderBy: [{
           likes:'desc'
@@ -118,23 +102,11 @@ getCommentsForComment: publicProcedure.input(z.object({commentId: z.string(),
 
     })
 
-    let reactions:Reaction[] = [];
-    if (ctx.userId) {
-      reactions = await ctx.prisma.reaction.findMany({
-        where:{
-          userId: ctx.userId,
-          commentID :{
-            in: comments.map(cmt => cmt.id ?? "")
-          }
-        }
-      })
-    }
     if (!comments) comments = [];
     
     return {
       props: {
         comments: comments,
-        reactions: reactions
       }
     };
   }
@@ -249,12 +221,28 @@ createCommentReply: privateProcedure.input(z.object({replyToCommentId: z.string(
   const {success} = await ratelimitPost.limit(authorId);
   if (!success) throw new TRPCError({code: "TOO_MANY_REQUESTS", message: "TOO_MANY_REQUESTS"});
 
-  const comment = await ctx.prisma.comment.create({
-      data:{
-          content: input.content,
-          replyToCommentId: input.replyToCommentId,
-          authorId: authorId,
-      }
+  const commentToReply = await ctx.prisma.comment.findUnique({
+    where :{
+       id: input.replyToCommentId
+    }
+  });
+
+  if (!commentToReply) throw new TRPCError({code: "TOO_MANY_REQUESTS", message: "回复评论时找不到要回复的评论id "});
+
+  let commentData = {
+    content: input.content,   
+    replyToCommentId: input.replyToCommentId,
+    authorId: authorId,
+  };
+  
+  //如果评论是回复另外一个评论，看回复的评论是不是一级评论
+  //如果不是的话那就把要回复的评论的id改成一级评论的id
+  if (!commentToReply.replyToPostId) {
+    commentData.replyToCommentId  = commentToReply.id;
+  }
+
+  const newComment = await ctx.prisma.comment.create({
+      data: commentData
   });
 
   await ctx.prisma.comment.update({
@@ -264,11 +252,11 @@ createCommentReply: privateProcedure.input(z.object({replyToCommentId: z.string(
       }
     },
     where: {
-      id: input.replyToCommentId
+      id: commentData.replyToCommentId
     }
   })
 
-  return comment;
+  return newComment;
 }),
 
 });
