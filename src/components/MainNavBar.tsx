@@ -42,7 +42,8 @@ export const UnLoggedInUserSection = ({t} :{ t: TFunction<"translation">}) => {
 }
 
 export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"translation">}) => {
-  const {user} = useContext(UserContext);
+  const user = useContext(UserContext);
+
   return <>
     <div className="hidden md:ml-4 md:flex md:items-center  shadow-xl ">
                 <button

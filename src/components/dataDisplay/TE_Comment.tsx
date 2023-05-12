@@ -19,6 +19,7 @@ import { api } from "utils/api";
 import CommentModal from 'components/CommenModal';
 import TransparentMenu from "components/menu/TransparentMenu";
 import { IoEllipsisHorizontal } from "react-icons/io5";
+import TransparentCommentMenu from "components/menu/TransparentCommentMenu";
 
 // Custom components
 
@@ -128,8 +129,10 @@ export default function TEComment(props: {
             {time}
           </Text>
         </Flex>
-					<TransparentMenu icon={<Icon as={IoEllipsisHorizontal} 
-          w='24px' h='24px' color={"gray.800"} />} />
+        <Flex ml={'auto'} >
+					<TransparentCommentMenu icon={<Icon as={IoEllipsisHorizontal} 
+          w='24px' h='24px' color={"te_dark_fonts"} />} />
+          </Flex>
       </Flex>
       <Flex direction="column">
         <Flex>
@@ -153,8 +156,7 @@ export default function TEComment(props: {
 
         <Flex align="left" direction={"column"}
 		 rounded={"xl"} bgColor={ isFirstLevel? '' : 'te_dark_ui'}>
-          <Flex mt={2} px={isFirstLevel? 0 : 3} fontSize={"md"}
-		   borderLeft={'te_dark_ui_bg'} borderLeftWidth={isFirstLevel? 0 : 2} >
+          <Flex mt={2} px={isFirstLevel? 0 : 3} fontSize={"md"} >
             {props.text}
           </Flex>
           {/* 点赞按钮 */}

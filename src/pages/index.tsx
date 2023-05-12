@@ -29,7 +29,7 @@ function getSekleton (number: number) {
 
 const Home: NextPage = () => {
   const {data,  isLoading} = api.posts.getAllWithReactionsDataForUser.useQuery();
-  const {user} = useContext(UserContext);
+  const user = useContext(UserContext);
   const isVerified = isUserVerified(user);
 
   const { t, i18n } = useTranslation(['common', 'footer'], { bindI18n: 'languageChanged loaded' })

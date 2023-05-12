@@ -20,11 +20,8 @@ import UserContext from "./helpers/userContext";
 const MyApp: AppType = ({ Component, pageProps }) => {
   const {locale} = useRouter() ?? "ch-ZH";
   const {t} = useTranslation();
-  const { data: dbuser } = api.user.getCurrentLoggedInUser.useQuery();
-  const [user, setUser] = useState(dbuser);
-  console.log(user)
-
-
+  const { data } = api.user.getCurrentLoggedInUser.useQuery();
+  
   if (!locale) {
     throw new TRPCClientError("local undefined");
   }
@@ -43,7 +40,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
           <div className="dark">
           <IntlProvider locale={locale} >
               <React.StrictMode>
-              <UserContext.Provider value={{user, setUser}}>
+              <UserContext.Provider value={data}>
                     <Component {...pageProps} />
               </UserContext.Provider>
             </React.StrictMode>
