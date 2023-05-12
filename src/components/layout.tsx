@@ -1,9 +1,21 @@
-import type { PropsWithChildren } from "react";
+import { PropsWithChildren, useEffect } from "react";
 import MainNavBar from "./MainNavBar";
-import { BrowserRouter as Router, Routes, Route  } from "react-router-dom";
-import AdminPage from "pages/admin";
+import { useUser } from "@clerk/nextjs";
+import { useAppDispatch } from "Redux/hooks";
+import { api } from "utils/api";
+import { setUser } from "Redux/userSlice";
 
 export const PageLayout = (props: PropsWithChildren) => {
+  const {isSignedIn} = useUser();
+  const { data: currentUser } = api.user.getCurrentLoggedInUser.useQuery();
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    if (isSignedIn) {
+      dispatch(setUser(currentUser!));
+    }
+  }, [isSignedIn, currentUser, dispatch]);
+  
     return (
       <>
         <MainNavBar />

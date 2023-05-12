@@ -4,13 +4,12 @@ import {  useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { PageLayout } from "components/layout";
 import { api } from "utils/api";
-import Sidebar from "../../components/sidebar/Sidebar"
-import appRoutes from "routes"
-import { Route, Routes } from "react-router-dom";
+import { isUserVerified } from "pages/helpers/userHelper";
 
 const AdminPage: NextPage = () => {
   const {data,  isLoading} = api.posts.getAllWithReactionsDataForUser.useQuery();
-  let isVerified = api.user.isCurrentUserVerifiedEngine.useQuery().data;
+
+  let isVerified = isUserVerified(null);
   
   const { t, i18n } = useTranslation(['common', 'footer'], { bindI18n: 'languageChanged loaded' })
   // bindI18n: loaded is needed because of the reloadResources call

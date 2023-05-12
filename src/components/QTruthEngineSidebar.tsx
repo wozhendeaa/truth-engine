@@ -13,6 +13,7 @@ import {
 import { useUser } from '@clerk/nextjs'
 import { useTranslation } from 'react-i18next'
 import { api } from 'utils/api'
+import { useAppSelector } from 'Redux/hooks'
 
 const navigation = [
   { name: 'professor_videos', href: '#', icon: HomeIcon, current: true },
@@ -33,7 +34,8 @@ function classNames(...classes) {
 
 export default function TruthEngineSideBar() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const user =  api.user.getCurrentLoggedInUser.useQuery().data;
+  const user = useAppSelector((state) => state.user.user);
+
   const {t} = useTranslation();
 
   return (<>

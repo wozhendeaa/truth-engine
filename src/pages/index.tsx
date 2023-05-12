@@ -10,6 +10,8 @@ import { Box,  SkeletonCircle, SkeletonText } from "@chakra-ui/react";
 import TruthEngineSideBar from "components/QTruthEngineSidebar";
 import FeedThread from "components/FeedThread"
 import { api } from "utils/api";
+import {isUserVerified} from "pages/helpers/userHelper"
+import { useAppSelector } from "Redux/hooks";
 
 function getSekleton (number: number) {
   const boxes = [];
@@ -26,8 +28,9 @@ function getSekleton (number: number) {
 
 const Home: NextPage = () => {
   const {data,  isLoading} = api.posts.getAllWithReactionsDataForUser.useQuery();
-  let isVerified = api.user.isCurrentUserVerifiedEngine.useQuery().data;
-  
+   const user = useAppSelector((state) => state.user.user);
+  const isVerified = isUserVerified(user);
+
   const { t, i18n } = useTranslation(['common', 'footer'], { bindI18n: 'languageChanged loaded' })
   // bindI18n: loaded is needed because of the reloadResources call
   // if all pages use the reloadResources mechanism, the bindI18n option can also be defined in next-i18next.config.js

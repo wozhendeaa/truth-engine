@@ -9,27 +9,18 @@ import dayjs from "dayjs";
 dayjs.extend(relativetTime);
 
 import { useTranslation } from "react-i18next";
-import { HSeparator } from "./separator/Separator";
 import TEComment from "./dataDisplay/TE_Comment";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 type CommentsWithUserData = RouterOutputs["comment"]["getCommentsForPost"];
 
-interface SingleCommentProps {
-  currentUser: User;
-  commentData: CommentsWithUserData;
-}
-
-interface CommentProps {
-  comments: CommentsWithUserData[];
-  likedByUser: Reaction[];
-}
 
 export const CommentThread = (props: {
   postId: string;
   topCommentsOnly: boolean;
   onPostPage: boolean;
+  
 }) => {
   const { t } = useTranslation();
   let limit = props.topCommentsOnly ? 3 : 50;

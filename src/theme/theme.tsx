@@ -21,6 +21,7 @@ const config: ThemeConfig = {
 }
 
 const theme = extendTheme({
+	initialColorMode: 'dark',
 	colors: {
 	...tailwindColors,
 		te_dark_font: ' #363457',

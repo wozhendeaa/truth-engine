@@ -39,6 +39,9 @@ export default {
         te_dark_red_bg: '#363457',
        
       },
+      backgroundColor: {
+        transparent: "transparent"
+      }
     },
    
   },

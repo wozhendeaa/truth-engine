@@ -9,16 +9,14 @@ import { Toaster } from "react-hot-toast";
 import Head from "next/head";
 import { ChakraProvider } from '@chakra-ui/react'
 import theme from "theme/theme";
-import { extendTheme } from '@chakra-ui/react'
 import React from "react";
-import { Provider } from "react-redux";
+import { Provider, useDispatch} from "react-redux";
 import { store } from "Redux/ReduxStore";
 import { IntlProvider } from 'react-intl';
 
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   const {locale} = useRouter() ?? "ch-ZH";
-
   const {t} = useTranslation();
 
   if (!locale) {

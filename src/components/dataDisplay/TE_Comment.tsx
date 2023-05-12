@@ -2,6 +2,7 @@ import {
   Avatar,
   Button,
   Flex,
+  Icon,
   Link,
   Text,
   useColorModeValue,
@@ -16,6 +17,8 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { api } from "utils/api";
 import CommentModal from 'components/CommenModal';
+import TransparentMenu from "components/menu/TransparentMenu";
+import { IoEllipsisHorizontal } from "react-icons/io5";
 
 // Custom components
 
@@ -106,13 +109,13 @@ export default function TEComment(props: {
 
   return (
     <Flex mb={isFirstLevel? "10px" : "0px"} {...rest} direction={"column"} >
-      <Flex mt={isFirstLevel ? 0 : 2}>
+      <Flex mt={isFirstLevel ? 0 : 2} className="overflow-ellipsis overflow-hidden">
         <Avatar src={avatar} w="30px" h="30px" me="15px" />
-        <Text color={textColor} fontWeight="700" fontSize="md">
+        <Text color={textColor} fontWeight="700" fontSize="md" >
           {name}
         </Text>
-        <Flex>
-          <Flex color={textColorSecondary} className="ml-2">
+        <Flex	className="overflow-ellipsis overflow-hidden">
+          <Flex color={textColorSecondary} className="ml-2 overflow-ellipsis overflow-hidden">
             {"@" + props.username}
           </Flex>
           <Text
@@ -120,11 +123,13 @@ export default function TEComment(props: {
             mt={0.2}
             color={textColorSecondary}
             fontWeight="500"
-            className="ml-2"
+			className="ml-2 overflow-ellipsis overflow-hidden"
           >
             {time}
           </Text>
         </Flex>
+					<TransparentMenu icon={<Icon as={IoEllipsisHorizontal} 
+          w='24px' h='24px' color={"gray.800"} />} />
       </Flex>
       <Flex direction="column">
         <Flex>

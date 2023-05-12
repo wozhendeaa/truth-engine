@@ -17,7 +17,8 @@ export const userRouter = createTRPCRouter({
         id: ctx.userId
       }
     })
-    return user;
+
+    return user ?? null;
   
   }),
 

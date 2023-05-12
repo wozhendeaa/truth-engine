@@ -14,14 +14,14 @@
 */
 import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useTranslation } from "react-i18next";
 import Image from "next/image"
 import { useEffect, useState } from 'react'
 import { SignIn, SignInButton, SignOutButton,  useUser } from '@clerk/nextjs';
 import { TFunction } from 'i18next';
-import { api } from 'utils/api';
+import { useAppSelector } from 'Redux/hooks';
+
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -43,7 +43,7 @@ export const UnLoggedInUserSection = ({t} :{ t: TFunction<"translation">}) => {
 }
 
 export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"translation">}) => {
-  const user =  api.user.getCurrentLoggedInUser.useQuery().data;
+  const user = useAppSelector((state) => state.user.user);
 
   return <>
     <div className="hidden md:ml-4 md:flex md:items-center  shadow-xl ">

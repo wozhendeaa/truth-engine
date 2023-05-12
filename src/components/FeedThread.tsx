@@ -18,9 +18,6 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import React, { ChangeEvent,  useState } from "react";
-import {
-  BsThreeDotsVertical,
-} from "react-icons/bs";
 
 import { RouterOutputs, api } from "utils/api";
 import { Post, Reaction, User } from "@prisma/client";
@@ -39,11 +36,15 @@ import {
   MdSend,
 } from "react-icons/md";
 import { HSeparator } from "./separator/Separator";
-import TEComment from "./dataDisplay/TE_Comment";
 import { parseErrorMsg } from "server/helpers/serverErrorMessage";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import CommentThread from "./CommentFeed";
 import { useUser } from "@clerk/nextjs";
+import { IoEllipsisHorizontal } from "react-icons/io5";
+import TransparentFeedThreadMenu from "./menu/TransparentFeedThreadMenu";
+import { useInView } from 'react-intersection-observer';
+import { useAppSelector } from "Redux/hooks";
+
 
 type PostsWithUserData = RouterOutputs["posts"]["getAll"][number];
 interface SingleFeedProps {
@@ -180,8 +181,6 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
 
     SetComment("");
   }
-  
-  
 
   const handleLike = (post: PostsWithUserData) => {
     likePostMutation.mutate({ postId: post.id });
@@ -223,13 +222,14 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
                 {dayjs(postWithUser.createdAt).fromNow()}
               </Text>
             </Flex>
-            <IconButton
+            {/* <IconButton
               variant="ghost"
               colorScheme="gray"
               aria-label="See menu"
               _hover={{ bg: "gray.600" }}
               icon={<BsThreeDotsVertical />}
-            />
+            /> */}
+					<TransparentFeedThreadMenu canDelete={true} icon={<Icon as={IoEllipsisHorizontal} w='24px' h='24px' />} />
           </Flex>
         </CardHeader>
         <CardBody pb={{ base: "6", sm: "6", md: "0" }} pt="0">
@@ -363,7 +363,6 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
                 onPostPage={false}
               />
             </Box>
-
             
             {singlePostData.currentUser &&
            ( <Flex align="center" position="relative" p={0}>
@@ -432,7 +431,9 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
 export const FeedThread = (postData: FeedProps) => {
   const { t } = useTranslation();
   const posts  = postData.posts.posts;
-  const { data: currentUser } = api.user.getCurrentLoggedInUser.useQuery();
+  const currentUser = useAppSelector((state) => state.user.user);
+  const { ref, inView, entry } = useInView({threshold: 1});
+
   if (!posts || posts.length === 0) {
     return (
       <div className="text-center text-slate-200">{t("no_data_found")}</div>
@@ -448,6 +449,7 @@ export const FeedThread = (postData: FeedProps) => {
           currentUser={currentUser!}
         />
       ))}
+      <div ref={ref} id="end_of_thread"></div>
     </div>
   );
 };

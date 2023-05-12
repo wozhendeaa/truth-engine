@@ -19,7 +19,7 @@ export default function Banner(props: { icon: JSX.Element | string; [x: string]:
 	const { isOpen: isOpen1, onOpen: onOpen1, onClose: onClose1 } = useDisclosure();
 
 	// Chakra color mode
-	const textColor = useColorModeValue('white', 'secondaryGray.900');
+	const textColor = useColorModeValue('secondaryGray.500', 'white');
 	const textHover = useColorModeValue(
 		{ color: 'secondaryGray.900', bg: 'unset' },
 		{ color: 'secondaryGray.500', bg: 'unset' }
