@@ -3,17 +3,14 @@ import { Dialog, Transition } from '@headlessui/react'
 import {
   Bars3Icon,
   CalendarIcon,
-  ChartPieIcon,
-  DocumentDuplicateIcon,
   FolderIcon,
   HomeIcon,
   UsersIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
-import { useUser } from '@clerk/nextjs'
 import { useTranslation } from 'react-i18next'
-import { api } from 'utils/api'
 import { useAppSelector } from 'Redux/hooks'
+import { getMyUser } from 'pages/helpers/userHelper'
 
 const navigation = [
   { name: 'professor_videos', href: '#', icon: HomeIcon, current: true },
@@ -34,7 +31,7 @@ function classNames(...classes) {
 
 export default function TruthEngineSideBar() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const user = useAppSelector((state) => state.user.user);
+  const user = getMyUser();
 
   const {t} = useTranslation();
 

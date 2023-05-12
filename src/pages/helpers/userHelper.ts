@@ -2,7 +2,7 @@
 import { User } from '@prisma/client';
 import { useAppSelector } from 'Redux/hooks';
 
-export function isUserVerified(user: User | null) {
+export function isUserVerified(user: User | null | undefined) {
   if(!user) {
     return false;
   };
@@ -13,8 +13,17 @@ export function isUserVerified(user: User | null) {
   return isVerified;
 }
 
-//不要用这个
-// export function getMyUser() {
-//   const user = useAppSelector((state) => state.user.user);
-//   return user;
-// }
+export function getMyUser() {
+  if (typeof window === 'undefined') return;    
+  const userStr = localStorage.getItem('user');
+  if (!userStr || userStr === 'undefined') return null;
+
+  return JSON.parse(userStr) as User;
+}
+
+
+export function setMyUser(user: User | null | undefined) {
+  if (typeof window === 'undefined') return;    
+  if (!user) return;
+  localStorage.setItem('user', JSON.stringify(user));
+}

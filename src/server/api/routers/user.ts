@@ -1,4 +1,4 @@
-import { Schema, z } from "zod";
+import { Schema, boolean, z } from "zod";
 import { createTRPCRouter, privateProcedure, publicProcedure } from "server/api/trpc";
 import { prisma } from '../../db';
 import {accountSetupSchema} from 'pages/NewAccountSetup'

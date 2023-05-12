@@ -44,6 +44,7 @@ import { IoEllipsisHorizontal } from "react-icons/io5";
 import TransparentFeedThreadMenu from "./menu/TransparentFeedThreadMenu";
 import { useInView } from 'react-intersection-observer';
 import { useAppSelector } from "Redux/hooks";
+import { getMyUser } from "pages/helpers/userHelper";
 
 
 type PostsWithUserData = RouterOutputs["posts"]["getAll"][number];
@@ -431,7 +432,7 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
 export const FeedThread = (postData: FeedProps) => {
   const { t } = useTranslation();
   const posts  = postData.posts.posts;
-  const currentUser = useAppSelector((state) => state.user.user);
+  const currentUser = getMyUser();
   const { ref, inView, entry } = useInView({threshold: 1});
 
   if (!posts || posts.length === 0) {

@@ -12,7 +12,7 @@
   }
   ```
 */
-import { Fragment } from 'react'
+import { Fragment, useContext } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useTranslation } from "react-i18next";
@@ -20,13 +20,12 @@ import Image from "next/image"
 import { useEffect, useState } from 'react'
 import { SignIn, SignInButton, SignOutButton,  useUser } from '@clerk/nextjs';
 import { TFunction } from 'i18next';
-import { useAppSelector } from 'Redux/hooks';
+import UserContext from 'pages/helpers/userContext';
 
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
-
 
 export const UnLoggedInUserSection = ({t} :{ t: TFunction<"translation">}) => {
     return <>
@@ -43,8 +42,7 @@ export const UnLoggedInUserSection = ({t} :{ t: TFunction<"translation">}) => {
 }
 
 export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"translation">}) => {
-  const user = useAppSelector((state) => state.user.user);
-
+  const {user} = useContext(UserContext);
   return <>
     <div className="hidden md:ml-4 md:flex md:items-center  shadow-xl ">
                 <button
@@ -202,7 +200,7 @@ export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"
 export default function MainNavBar() {
     const [isSSR, setIsSSR] = useState(true);
     const {isLoaded: userLoaded, isSignedIn} = useUser();
-
+    
     useEffect(() => {
         setIsSSR(false);
     }, []);

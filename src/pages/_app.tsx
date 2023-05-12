@@ -9,15 +9,21 @@ import { Toaster } from "react-hot-toast";
 import Head from "next/head";
 import { ChakraProvider } from '@chakra-ui/react'
 import theme from "theme/theme";
-import React from "react";
+import React, { createContext, useState } from "react";
 import { Provider, useDispatch} from "react-redux";
 import { store } from "Redux/ReduxStore";
 import { IntlProvider } from 'react-intl';
-
+import { setUser } from "Redux/userSlice";
+import { getMyUser, setMyUser } from "pages/helpers/userHelper";
+import UserContext from "./helpers/userContext";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   const {locale} = useRouter() ?? "ch-ZH";
   const {t} = useTranslation();
+  const { data: dbuser } = api.user.getCurrentLoggedInUser.useQuery();
+  const [user, setUser] = useState(dbuser);
+  console.log(user)
+
 
   if (!locale) {
     throw new TRPCClientError("local undefined");
@@ -37,9 +43,9 @@ const MyApp: AppType = ({ Component, pageProps }) => {
           <div className="dark">
           <IntlProvider locale={locale} >
               <React.StrictMode>
-                <Provider store={store} >
+              <UserContext.Provider value={{user, setUser}}>
                     <Component {...pageProps} />
-                </Provider>
+              </UserContext.Provider>
             </React.StrictMode>
           </IntlProvider>
         </div>

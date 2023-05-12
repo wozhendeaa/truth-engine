@@ -10,8 +10,9 @@ import { Box,  SkeletonCircle, SkeletonText } from "@chakra-ui/react";
 import TruthEngineSideBar from "components/QTruthEngineSidebar";
 import FeedThread from "components/FeedThread"
 import { api } from "utils/api";
-import {isUserVerified} from "pages/helpers/userHelper"
+import {getMyUser, isUserVerified} from "pages/helpers/userHelper"
 import { useAppSelector } from "Redux/hooks";
+import UserContext from "./helpers/userContext";
 
 function getSekleton (number: number) {
   const boxes = [];
@@ -28,7 +29,7 @@ function getSekleton (number: number) {
 
 const Home: NextPage = () => {
   const {data,  isLoading} = api.posts.getAllWithReactionsDataForUser.useQuery();
-   const user = useAppSelector((state) => state.user.user);
+  const {user} = useContext(UserContext);
   const isVerified = isUserVerified(user);
 
   const { t, i18n } = useTranslation(['common', 'footer'], { bindI18n: 'languageChanged loaded' })
