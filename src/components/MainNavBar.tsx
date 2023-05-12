@@ -21,6 +21,8 @@ import { useEffect, useState } from 'react'
 import { SignIn, SignInButton, SignOutButton,  useUser } from '@clerk/nextjs';
 import { TFunction } from 'i18next';
 import UserContext from 'pages/helpers/userContext';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 
 function classNames(...classes: string[]) {
@@ -121,7 +123,7 @@ export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"
                 href="#"
                 className="block border-l-4 border-indigo-500 bg-indigo-50 py-2 pl-3 pr-4 text-base font-medium text-indigo-700"
               >
-                {!isSSR && t('professor_videos')}
+                {!isSSR && "t('professor_videos')"}
 
               </Disclosure.Button>
               <Disclosure.Button
@@ -198,9 +200,19 @@ export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"
   </>
 }
 
+
 export default function MainNavBar() {
     const [isSSR, setIsSSR] = useState(true);
     const {isLoaded: userLoaded, isSignedIn} = useUser();
+    const location = useRouter();
+
+    function isActive(path:string) {
+      if (path === '/') {
+        return location.pathname === '/';
+      }
+
+      return location.pathname.includes(path);
+    }
     
     useEffect(() => {
         setIsSSR(false);
@@ -238,30 +250,46 @@ export default function MainNavBar() {
                 </div>
                 <div className="hidden md:ml-6 md:flex md:space-x-8 dark: text-slate-300 text-xl ">
                   {/* Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" */}
-                  <a
-                    href="#"
-                    className="inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1  dark:text-slate-100 dark:hover:text-purple-300 text-gray-900 font-Noto+Sans+TC hover:border-gray-300 "
+                  <Link
+                    href="/"
+                    className={`inline-flex items-center px-1 pt-1  dark:hover:text-purple-300 text-gray-900 font-Noto+Sans+TC hover:border-gray-300 ${
+                      isActive('/') ? 'border-b-2 border-indigo-500 dark:text-purple-300' :  'dark:text-slate-100 '
+                    }`}
                   >
-                    { !isSSR && t('professor_videos')}
-                  </a>
-                  <a
+                    {!isSSR && t('index')}
+                  </Link>
+                  <Link
                     href="#"
-                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1  dark:text-slate-100 text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-purple-300"
+                    className={`inline-flex items-center px-1 pt-1  dark:hover:text-purple-300 text-gray-900 font-Noto+Sans+TC hover:border-gray-300 ${
+                      isActive('/professor-videos') ? 'border-b-2 border-indigo-500 dark:text-purple-300' :  'dark:text-slate-100 '
+                    }`}
+                  >
+                    {!isSSR && t('professor_videos')}
+                  </Link>
+                  <Link
+                    href="/natural-healing"
+                    className={`inline-flex items-center px-1 pt-1  dark:hover:text-purple-300 text-gray-900 font-Noto+Sans+TC hover:border-gray-300 ${
+                      isActive('/natural-healing') ? 'border-b-2 border-indigo-500 dark:text-purple-300' :  'dark:text-slate-100 '
+                    }`}
                   >
                    {!isSSR && t('natural_healing')}
-                  </a>
-                  <a
-                    href="#"
-                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1  dark:text-slate-100 dark:hover:text-purple-300 text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                  </Link>
+                  <Link
+                    href="/red-pill-academy"
+                    className={`inline-flex items-center px-1 pt-1  dark:hover:text-purple-300 text-gray-900 font-Noto+Sans+TC hover:border-gray-300 ${
+                      isActive('/red-pill-academy') ? 'border-b-2 border-indigo-500 dark:text-purple-300' :  'dark:text-slate-100 '
+                    }`}
                   >
                     {!isSSR && t('redpill_academy')}
-                  </a>
-                  <a
-                    href="#"
-                    className="inline-flex items-center  border-b-2 border-transparent px-1 pt-1  dark:text-slate-100 dark:hover:text-purple-300 text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                  </Link>
+                  <Link
+                    href="/faq"
+                    className={`inline-flex items-center px-1 pt-1  dark:hover:text-purple-300 text-gray-900 font-Noto+Sans+TC hover:border-gray-300 ${
+                      isActive('/faq') ? 'border-b-2 border-indigo-500 dark:text-purple-300' :  'dark:text-slate-100 '
+                    }`}
                   >
-                 {!isSSR && t('discussion')}
-                  </a>
+                 {!isSSR && t('FAQ')}
+                  </Link>
                 </div>
               </div>
               {/* {search} */}

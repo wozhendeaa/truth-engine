@@ -13,7 +13,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 export const getStaticProps : GetStaticProps = async (context: GetStaticPropsContext) => {
   const ssg =  generateSSGHelper();
   const locale = "zh-CN";
-  const id = context.params?.id as string;
+  const  id = context.params?.id as string;
   if (typeof id !== 'string') throw new Error('没有id')
   await ssg.posts.getPostById.prefetch({id});
   

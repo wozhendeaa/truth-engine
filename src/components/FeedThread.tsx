@@ -45,6 +45,7 @@ import TransparentFeedThreadMenu from "./menu/TransparentFeedThreadMenu";
 import { useInView } from 'react-intersection-observer';
 import { useAppSelector } from "Redux/hooks";
 import { getMyUser } from "pages/helpers/userHelper";
+import { useInfiniteScroll } from "pages/helpers/InfiniteScroll";
 
 
 type PostsWithUserData = RouterOutputs["posts"]["getAll"][number];
@@ -110,7 +111,7 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
   const mediaStr = singlePostData.postWithUser.media;
   let media = mediaStr ? Array.from(JSON.parse(mediaStr)) : [];
 
-  const hasReaction = postWithUser.reactions.some(
+  const hasReaction = postWithUser.reactions?.some(
     (reaction) => reaction.postId === postWithUser.id
   );
   const [liked, setLiked] = useState(hasReaction);
@@ -433,7 +434,11 @@ export const FeedThread = (postData: FeedProps) => {
   const { t } = useTranslation();
   const posts  = postData.posts.posts;
   const currentUser = getMyUser();
-  const { ref, inView, entry } = useInView({threshold: 1});
+  const copyPosts = {...posts};
+  const [changePosts, setChangePosts] = useState(posts);
+  const observerRef = useInfiniteScroll(() => {
+    setChangePosts(posts);    
+  });
 
   if (!posts || posts.length === 0) {
     return (
@@ -443,14 +448,17 @@ export const FeedThread = (postData: FeedProps) => {
 
   return (
     <div>
-      {posts.map((p) => (
+      {changePosts.map((p) => (
         <SingleFeed
           key={p.id}
           postWithUser={p}
           currentUser={currentUser!}
         />
       ))}
-      <div ref={ref} id="end_of_thread"></div>
+      <div ref={observerRef} id="end_of_thread" 
+       className="text-slate-200"> 
+        <span></span>
+        </div>
     </div>
   );
 };

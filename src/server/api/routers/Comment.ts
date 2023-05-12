@@ -238,7 +238,7 @@ createCommentReply: privateProcedure.input(z.object({replyToCommentId: z.string(
   //如果评论是回复另外一个评论，看回复的评论是不是一级评论
   //如果不是的话那就把要回复的评论的id改成一级评论的id
   if (!commentToReply.replyToPostId) {
-    commentData.replyToCommentId  = commentToReply.id;
+    commentData.replyToCommentId  = commentToReply.replyToCommentId!;
   }
 
   const newComment = await ctx.prisma.comment.create({

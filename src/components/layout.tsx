@@ -1,8 +1,6 @@
 import { PropsWithChildren, useEffect } from "react";
 import MainNavBar from "./MainNavBar";
-import { api } from "utils/api";
-import { setUser } from "Redux/userSlice";
-import { getMyUser, setMyUser } from "pages/helpers/userHelper";
+
 
 export const PageLayout = (props: PropsWithChildren) => {
 

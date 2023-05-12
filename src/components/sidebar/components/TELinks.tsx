@@ -151,7 +151,7 @@ export function SidebarLinks(props: {
         );
       } else {
         return (
-          <Link to={route.layout + route.path} key={key}>
+          <Link href={route.path} key={key} >
             {route.icon ? (
               <Flex
                 align='center'
@@ -215,7 +215,7 @@ export function SidebarLinks(props: {
 	) => {
     return routes.map((route:RoutesType, key:number) => {
       return (
-        <Link to={route.layout + route.path} key={key}>
+        <Link href={route.path} key={key}>
           <ListItem
             ms='28px'
             display='flex'

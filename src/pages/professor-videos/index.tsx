@@ -9,11 +9,7 @@ import Sidebar from "components/sidebar/Sidebar";
 import appRoutes from 'routes';
 import TESidebar from "components/sidebar/TESidebar";
 
-const AdminPage: NextPage = () => {
-  const {data,  isLoading} = api.posts.getAllWithReactionsDataForUser.useQuery();
-
-  let isVerified = isUserVerified(null);
-  
+const RedPillAcademy: NextPage = () => {
   const { t, i18n } = useTranslation(['common', 'footer'], { bindI18n: 'languageChanged loaded' })
   // bindI18n: loaded is needed because of the reloadResources call
   // if all pages use the reloadResources mechanism, the bindI18n option can also be defined in next-i18next.config.js
@@ -24,8 +20,7 @@ const AdminPage: NextPage = () => {
   return (
     <>
         <PageLayout>
-     
-          <TESidebar routes={appRoutes} logoText={"DASHBOARD"} variant="opaque"  />
+        <span className="text-slate-100">小明教授视频</span>
        </PageLayout>
      
     </>
@@ -39,7 +34,5 @@ export const getServerSideProps = async ({locale}: {locale: string} ) => ({
   },
 })
 
-
-
-export default AdminPage;
+export default RedPillAcademy;
 

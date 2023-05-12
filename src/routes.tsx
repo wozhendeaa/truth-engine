@@ -52,7 +52,7 @@ const routes = [
 			{
 				name: 'Main Dashboard',
 				layout: '/admin',
-				path: '/dashboards/default',
+				path: '/admin',
 				component: DashboardsDefault
 			},
 		
