@@ -1,22 +1,25 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useContext, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import {
   Bars3Icon,
-  CalendarIcon,
-  FolderIcon,
+  Cog6ToothIcon,
+  QuestionMarkCircleIcon,
+  PuzzlePieceIcon,
   HomeIcon,
-  UsersIcon,
+  VideoCameraIcon,
   XMarkIcon,
+  AcademicCapIcon,
 } from '@heroicons/react/24/outline'
 import { useTranslation } from 'react-i18next'
-import { useAppSelector } from 'Redux/hooks'
-import { getMyUser } from 'pages/helpers/userHelper'
+import UserContext from 'pages/helpers/userContext'
+import { useRouter } from 'next/router'
 
 const navigation = [
-  { name: 'professor_videos', href: '#', icon: HomeIcon, current: true },
-  { name: 'natural_healing', href: '#', icon: UsersIcon, current: false },
-  { name: 'redpill_academy', href: '#', icon: FolderIcon, current: false },
-  { name: 'discussion', href: '#', icon: CalendarIcon, current: false },
+  { name: 'index', href: '/', icon: Cog6ToothIcon },
+  { name: 'professor_videos', href: '/professor-videos', icon: VideoCameraIcon },
+  { name: 'natural_healing', href: '/natural-healing', icon: PuzzlePieceIcon },
+  { name: 'redpill_academy', href: '/red-pill-academy', icon: AcademicCapIcon },
+  { name: 'faq', href: '/faq', icon: QuestionMarkCircleIcon },
 ]
 const teams = [
   { id: 1, name: '感兴趣的话题', href: '#', initial: 'H', current: false },
@@ -31,10 +34,18 @@ function classNames(...classes) {
 
 export default function TruthEngineSideBar() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const user = getMyUser();
+  const user = useContext(UserContext);
+  const location = useRouter();
 
   const {t} = useTranslation();
 
+  function isActive(path:string) {
+    if (path === '/') {
+      return location.pathname === '/';
+    }
+
+    return location.pathname.includes(path);
+  }
   return (<>
         <Transition.Root show={sidebarOpen} as={Fragment}>
           <Dialog as="div" className="relative z-50 lg:hidden col-span-2 " onClose={setSidebarOpen}>
@@ -96,7 +107,7 @@ export default function TruthEngineSideBar() {
                                 <a
                                   href={item.href}
                                   className={classNames(
-                                    item.current
+                                    isActive(item.href)
                                       ? 'bg-gray-800 text-indigo-400 text-lg' 
                                       : 'text-gray-200 hover:text-white text-lg hover:bg-gray-800',
                                     'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
