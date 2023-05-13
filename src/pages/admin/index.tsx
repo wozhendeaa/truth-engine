@@ -24,8 +24,7 @@ const AdminPage: NextPage = () => {
   return (
     <>
         <PageLayout>
-     
-          <TESidebar routes={appRoutes} logoText={"DASHBOARD"} variant="opaque"  />
+          {/* <TESidebar routes={appRoutes} logoText={"DASHBOARD"} variant="opaque"  /> */}
        </PageLayout>
      
     </>

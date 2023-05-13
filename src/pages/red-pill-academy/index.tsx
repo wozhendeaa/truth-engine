@@ -9,7 +9,7 @@ import Sidebar from "components/sidebar/Sidebar";
 import appRoutes from 'routes';
 import TESidebar from "components/sidebar/TESidebar";
 
-const NaturalHealing: NextPage = () => {
+const RedPillAcademy: NextPage = () => {
   const { t, i18n } = useTranslation(['common', 'footer'], { bindI18n: 'languageChanged loaded' })
   // bindI18n: loaded is needed because of the reloadResources call
   // if all pages use the reloadResources mechanism, the bindI18n option can also be defined in next-i18next.config.js
@@ -34,5 +34,5 @@ export const getServerSideProps = async ({locale}: {locale: string} ) => ({
   },
 })
 
-export default NaturalHealing;
+export default RedPillAcademy;
 

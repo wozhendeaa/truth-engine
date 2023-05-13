@@ -90,7 +90,7 @@ model User {
   premiumStatus   Boolean   @default(false)
   reactions       Reaction[]
   comments        Comment[]
-  notifications   Notification[]
+  notifications   Notification[] 
   @@index([id])
   @@index([username])
 }
@@ -130,6 +130,8 @@ model Reaction {
   @@index([userId])
   @@index([postId])
   @@index([commentID])
+  @@unique([userId, postId])
+  @@unique([userId, commentID])
 }
 
 model Comment {
@@ -179,11 +181,19 @@ model Report {
 
 model Notification{
   id          String    @id @default(cuid())
-  senderId    String
-  sender      User      @relation(fields: [senderId], references: [id])
-  conent     String 
+  recieverId  String 
+  reciever    User      @relation(fields: [recieverId], references: [id])
+  conent      String 
+  createdAt   DateTime   @default(now())
+  notificationType NotificationType 
+  @@index([recieverId])
+}
 
-  @@index([senderId])
+enum NotificationType {
+  PUBLIC_ANNOUNCEMENT
+  COMMENT
+  LIKE
+  UPDATE_NOTIFICATION
 }
 
 enum ReactionType {

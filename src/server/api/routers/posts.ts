@@ -6,9 +6,6 @@ import { createTRPCRouter, privateProcedure, publicProcedure } from "server/api/
 import { Ratelimit } from "@upstash/ratelimit"; // for deno: see above
 import { Redis } from "@upstash/redis";
 import { postSchema } from "components/posting/PostBox";
-import { RouterOutputs } from "utils/api";
-import { createTRPCContext } from '../trpc';
-import type Prisma  from "@prisma/client";
 import { ReactionType } from "@prisma/client";
 
 
@@ -40,9 +37,6 @@ function classifyMedia(filename: string): "image" | "video" | undefined {
   }
 }
 
-type postAuthorType = (Prisma.Post & {author: Prisma.User})[]
-let cursor = "";
-
 export const postsRouter = createTRPCRouter({
   getCommentsForPost: publicProcedure.input(z.object({id: z.string(), limit:  z.number()}))
   .query(async ({ctx, input}) => {
@@ -67,6 +61,7 @@ export const postsRouter = createTRPCRouter({
 
   getPostById: publicProcedure.input(z.object({id: z.string()}))
   .query(async ({ctx, input}) => {
+    
    const post = await ctx.prisma.post.findUnique({
         where:{
             id: input.id
@@ -75,13 +70,17 @@ export const postsRouter = createTRPCRouter({
           author: true,
           reactions: {
             where:{
-                userId: ctx.userId ?? ""
+                userId: ctx.user?.id
+            },
+            select: {
+              userId: true
             }
           }
         }
     })
 
     if (!post) throw new TRPCError({code: "NOT_FOUND", message: "没有找到文章"});
+    if (post.MarkAsDelete) throw new TRPCError({code: "NOT_FOUND", message: "post_deleted"});
     return post;
   }
   ),
@@ -183,7 +182,10 @@ export const postsRouter = createTRPCRouter({
           author: true,     
           reactions: {
             where: {
-              userId: ctx.userId ?? "",
+              userId: ctx.user?.id,              
+            },
+            select:{
+              userId: true
             }
           }     
         },
@@ -199,11 +201,17 @@ export const postsRouter = createTRPCRouter({
     const posts = await ctx.prisma.post.findMany({
         take:100,   
         orderBy: [{createdAt: "desc"}],
+        where:{
+          MarkAsDelete: false
+        },
         include: {
           author: true,
           reactions: {
             where: {
-              userId: ctx.userId ?? "",
+              userId: ctx.user?.id,
+            },
+            select: {
+              userId: true
             }
           }     
         }
@@ -216,7 +224,7 @@ export const postsRouter = createTRPCRouter({
   //a public trpc procedure that gets all posts by author id(user id)
   getPostsByUserId: publicProcedure
   .input(z.object({userId: z.string()}))
-  .query(({ctx, input}) => 
+  .query(({ctx, input}) => {
     ctx.prisma.post.findMany({
         take:100,   
         where:{
@@ -225,9 +233,17 @@ export const postsRouter = createTRPCRouter({
         orderBy: [{createdAt: "desc"}],
         include: {
           author:true,
-        }
+          reactions: {
+            where: {
+              userId: ctx.user?.id,
+            },
+            select: {
+              userId: true
+            }
+          }     
+        }        
     })
-    )
+  })
     ,
 
 

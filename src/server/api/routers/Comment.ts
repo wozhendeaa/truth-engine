@@ -44,7 +44,7 @@ export const commentRouter = createTRPCRouter({
           },
           reactions: {
             where: {
-              userId: ctx.userId ?? "",
+              userId: ctx.user?.id,
             }
           }     
         },
@@ -88,7 +88,7 @@ getCommentsForComment: publicProcedure.input(z.object({commentId: z.string(),
           },
           reactions: {
             where: {
-              userId: ctx.userId ?? "",
+              userId: ctx.user?.id,
             }
           }     
         },
@@ -128,7 +128,7 @@ getCommentsForComment: publicProcedure.input(z.object({commentId: z.string(),
           include: {
             reactions: {
               where :{
-                 userId: userId,
+                 userId: ctx.user?.id,
                  commentID: input.commentId
               }
             }

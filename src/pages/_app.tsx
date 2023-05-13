@@ -9,19 +9,17 @@ import { Toaster } from "react-hot-toast";
 import Head from "next/head";
 import { ChakraProvider } from '@chakra-ui/react'
 import theme from "theme/theme";
-import React, { createContext, useState } from "react";
-import { Provider, useDispatch} from "react-redux";
-import { store } from "Redux/ReduxStore";
+import React, { createContext, useEffect, useState } from "react";
 import { IntlProvider } from 'react-intl';
-import { setUser } from "Redux/userSlice";
-import { getMyUser, setMyUser } from "pages/helpers/userHelper";
 import UserContext from "./helpers/userContext";
+import { User } from "@prisma/client";
+import i18n from "next-i18next.config"
 
-const MyApp: AppType = ({ Component, pageProps }) => {
+const QTruthEngine: AppType = ({ Component, pageProps }) => {
   const {locale} = useRouter() ?? "ch-ZH";
   const {t} = useTranslation();
-  const { data } = api.user.getCurrentLoggedInUser.useQuery();
-  
+  const {data} =  api.user.getCurrentLoggedInUser.useQuery();
+
   if (!locale) {
     throw new TRPCClientError("local undefined");
   }
@@ -38,7 +36,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
             <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500&display=swap" rel="stylesheet" />
           </Head>
           <div className="dark">
-          <IntlProvider locale={locale} >
+          <IntlProvider locale={locale}  >
               <React.StrictMode>
               <UserContext.Provider value={data}>
                     <Component {...pageProps} />
@@ -52,4 +50,4 @@ const MyApp: AppType = ({ Component, pageProps }) => {
   );
 };
 
-export default api.withTRPC(appWithTranslation(MyApp));
+export default api.withTRPC(appWithTranslation(QTruthEngine, i18n));

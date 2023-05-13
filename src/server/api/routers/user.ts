@@ -8,18 +8,11 @@ import { Prisma, Role } from "@prisma/client";
 export const userRouter = createTRPCRouter({
   getCurrentLoggedInUser: publicProcedure.query(async ({ctx}) => {
     
-    if (ctx.userId == null) {
-      return null;
+    if (ctx.user != null) {
+        return ctx.user;
     }
 
-    const user = await prisma.user.findFirst({
-      where: {
-        id: ctx.userId
-      }
-    })
-
-    return user ?? null;
-  
+    return null;
   }),
 
   isCurrentUserVerifiedEngine: publicProcedure.query(async ({ctx}) => {

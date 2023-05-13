@@ -64,6 +64,7 @@ export default function TEComment(props: {
   );
 
   const [liked, setLiked] = useState(hasReaction);
+  
   const [likeNumber, setNumber] = useState(likes);
   const [showReplies, setShowReplies] = useState(false);
 
@@ -80,8 +81,11 @@ export default function TEComment(props: {
     },
   });
 
-  const replies = api.comment.getCommentsForComment
+  let replies = null;
+  if (!isFirstLevel && commentNum > 0) {
+    replies = api.comment.getCommentsForComment
   .useQuery({commentId: commentId}).data?.props;
+  }
 
   function handleLikeClick() {
     if (userId == null) {
@@ -193,8 +197,9 @@ export default function TEComment(props: {
 						w="max-content"
 						_hover={{ color: 'white' }}
 						_active={{ color: 'gray.300' }}
+            onClick={()=> setShowReplies(!showReplies)}
 					  >
-						{t("show_replies") + "(" + commentNum+ ")"}
+						{t(showReplies ? "hide_replies" : "show_replies") + "(" + commentNum + ")"}
 					  </Button>)
 				}
 				{disc.isOpen && <CommentModal disc={disc} 
@@ -217,8 +222,9 @@ export default function TEComment(props: {
             </Flex>
           </Flex>
 		  <Flex width={'90%'} direction="column" ml={10} mt={isFirstLevel? 3 : -1}>
-		  {replies?.comments?.map((c) => (
-
+		  {
+      showReplies && 
+      replies?.comments?.map((c) => (
 			<TEComment avatar={c.author.profileImageUrl ?? "images/default_avatar.png"} 
 				key={c.id}
 				commentId={c.id}

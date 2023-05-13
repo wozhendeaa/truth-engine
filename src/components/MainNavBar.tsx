@@ -1,20 +1,6 @@
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
 import { Fragment, useContext } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { BellIcon } from '@heroicons/react/24/outline'
 import { useTranslation } from "react-i18next";
 import Image from "next/image"
 import { useEffect, useState } from 'react'
@@ -55,7 +41,6 @@ export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"
                   <span className="sr-only"> {!isSSR && t('view_notifications')}</span>
                   <BellIcon className="h-6 w-6" aria-hidden="true" />
                 </button>
-
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-4 flex-shrink-0">
                   <div>
@@ -116,39 +101,6 @@ export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"
                 </Menu>
               </div>
               <Disclosure.Panel className="lg:hidden">
-            <div className="space-y-1 pb-3 pt-2 ">
-              {/* Current: "bg-indigo-50 border-indigo-500 text-indigo-700", Default: "border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800" */}
-              <Disclosure.Button
-                as="a"
-                href="#"
-                className="block border-l-4 border-indigo-500 bg-indigo-50 py-2 pl-3 pr-4 text-base font-medium text-indigo-700"
-              >
-                {!isSSR && "t('professor_videos')"}
-
-              </Disclosure.Button>
-              <Disclosure.Button
-                as="a"
-                href="#"
-                className="block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800"
-              >
-                {!isSSR && t('natural_healing')}
-
-              </Disclosure.Button>
-              <Disclosure.Button
-                as="a"
-                href="#"
-                className="block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800"
-              >
-               {!isSSR && t('redpill_academy')}
-              </Disclosure.Button>
-              <Disclosure.Button
-                as="a"
-                href="#"
-                className="block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800"
-              >
-             {!isSSR && t('discussion')}
-              </Disclosure.Button>
-            </div>
             <div className="border-t border-gray-200 pb-3 pt-4 ">
               <div className="flex items-center px-4">
                 <div className="flex-shrink-0">
@@ -166,7 +118,8 @@ export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"
                 </div>
                 <button
                   type="button"
-                  className="ml-auto flex-shrink-0 rounded-full bg-white p-1 dark:bg-gray-800 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  className="ml-auto flex-shrink-0 rounded-full bg-white p-1 dark:bg-gray-800 text-gray-400
+                   hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
                   <span className="sr-only"> {!isSSR && t('view_notifications')}</span>
                   <BellIcon className="h-6 w-6" aria-hidden="true" />
@@ -203,7 +156,7 @@ export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"
 
 export default function MainNavBar() {
     const [isSSR, setIsSSR] = useState(true);
-    const {isLoaded: userLoaded, isSignedIn} = useUser();
+    const {isSignedIn} = useUser();
     const location = useRouter();
 
     function isActive(path:string) {
@@ -219,8 +172,7 @@ export default function MainNavBar() {
     }, []);
   const {t} = useTranslation();
 
-    //return empty div if nothing is loaded
-  if (!userLoaded ) return <div></div>;
+
   return (
     <>
 
@@ -247,10 +199,10 @@ export default function MainNavBar() {
                     height={60}
                     alt="Q真相引擎"
                   />
-                </div>
-                <div className="hidden md:ml-6 md:flex md:space-x-8 dark: text-slate-300 text-xl ">
+                </div>                <div className="hidden md:ml-6 md:flex md:space-x-8 dark: text-slate-300 text-xl ">
                   {/* Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" */}
                   <Link
+                  
                     href="/"
                     className={`inline-flex items-center px-1 pt-1  dark:hover:text-purple-300 text-gray-900 font-Noto+Sans+TC hover:border-gray-300 ${
                       isActive('/') ? 'border-b-2 border-indigo-500 dark:text-purple-300' :  'dark:text-slate-100 '

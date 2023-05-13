@@ -21,7 +21,7 @@ export const Postview = (props: PostWithUser) => {
             <div className="flex text-slate-300">              
               <Link href={`/user/${username}`}><span>{`@${username}`}</span> </Link>
               <span className="mx-1">·</span>
-              <Link href={`/posts/[id]`} as={`/posts/${props.author.id}`} >
+              <Link href={`/post/[id]`} as={`/post/${props.author.id}`} >
                 <span className="font-thin">{dayjs(props.createdAt).fromNow()}</span>
               </Link>
             </div>

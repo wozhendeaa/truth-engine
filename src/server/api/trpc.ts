@@ -49,7 +49,11 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 
   const _session = getAuth(req);
   const userId = _session.userId
-  const user = userId? await clerkClient.users.getUser(userId) : null;
+  const user = userId? await prisma.user.findUnique({
+    where :{
+      id: userId
+    }
+  }) : null;
 
   return {
       req: req as NextApiRequest | null,

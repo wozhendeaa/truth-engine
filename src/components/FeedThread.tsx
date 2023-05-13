@@ -15,15 +15,14 @@ import {
   Icon,
   InputGroup,
   InputRightElement,
-  Textarea,
+  Spinner,
 } from "@chakra-ui/react";
-import React, { ChangeEvent,  useState } from "react";
+import React, { ChangeEvent,  useContext,  useEffect,  useState } from "react";
 
 import { RouterOutputs, api } from "utils/api";
-import { Post, Reaction, User } from "@prisma/client";
+import { Post, User } from "@prisma/client";
 import relativetTime from "dayjs/plugin/relativeTime";
 import dayjs from "dayjs";
-import {i18n} from 'next-i18next'
 
 require('dayjs/locale/zh-cn')
 dayjs.locale('zh-cn')
@@ -42,16 +41,20 @@ import CommentThread from "./CommentFeed";
 import { useUser } from "@clerk/nextjs";
 import { IoEllipsisHorizontal } from "react-icons/io5";
 import TransparentFeedThreadMenu from "./menu/TransparentFeedThreadMenu";
-import { useInView } from 'react-intersection-observer';
-import { useAppSelector } from "Redux/hooks";
-import { getMyUser } from "pages/helpers/userHelper";
 import { useInfiniteScroll } from "pages/helpers/InfiniteScroll";
+import Link from "next/link"
+import UserContext from "pages/helpers/userContext";
 
+type PostsWithUserData = (Post & {
+  reactions: {
+      userId: string;
+  }[];
+  author: User;
+});
 
-type PostsWithUserData = RouterOutputs["posts"]["getAll"][number];
 interface SingleFeedProps {
-  currentUser: User;
   postWithUser: PostsWithUserData;
+  onPostPage: boolean;
 }
 
 interface FeedProps {
@@ -106,19 +109,22 @@ function renderImages(type: string, url: string, index: any) {
   }
 }
 
-const SingleFeed = (singlePostData: SingleFeedProps) => {
+export function SingleFeed(singlePostData: SingleFeedProps){
   const postWithUser = singlePostData.postWithUser;
   const mediaStr = singlePostData.postWithUser.media;
+  const onPostPage = singlePostData.onPostPage;
+  const user = useContext(UserContext);  
   let media = mediaStr ? Array.from(JSON.parse(mediaStr)) : [];
 
-  const hasReaction = postWithUser.reactions?.some(
-    (reaction) => reaction.postId === postWithUser.id
-  );
+  if (!user) return <Spinner />
+  const hasReaction = postWithUser.reactions.length > 0;
+
   const [liked, setLiked] = useState(hasReaction);
   const [likeNumber, setNumber] = useState(postWithUser.likes);
-  const [showComments, setShowComments] = useState(false);
+  const [showComments, setShowComments] = useState(onPostPage);
   const ctx = api.useContext();  
   const {isSignedIn} = useUser();
+
 
   const commentMutation = api.comment.createPostComment.useMutation({
     onSuccess: (data) => {
@@ -158,6 +164,7 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
       setNumber(likeNumber + 1);
     }
     setLiked(!liked);
+
   }
 
   function showCommentClick() {
@@ -191,21 +198,19 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
 
   return (
     <>
-      <Card
+     <Card
         size={"md"}
-        className="mx-5 my-1 flex-grow font-chinese "
-        cursor="pointer"
-        _hover={{
-          bgColor: "te_dark_darker",
-        }}
+        className="mx-5 my-1 flex-grow font-chinese"
         boxShadow={"lg"}
         bgColor={"te_dark_ui_bg"}
         textColor={"white"}
         rounded={"2xl"}
         shadow="lg"
+        height={'auto'}
         pb="0"
       >
-        <CardHeader>
+        <div className="group">
+        <CardHeader className="cursor-pointer">
           <Flex alignItems={"top"}>
             <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
               <Avatar
@@ -234,7 +239,9 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
 					<TransparentFeedThreadMenu canDelete={true} icon={<Icon as={IoEllipsisHorizontal} w='24px' h='24px' />} />
           </Flex>
         </CardHeader>
-        <CardBody pb={{ base: "6", sm: "6", md: "0" }} pt="0">
+        <CardBody pb={{ base: "6", sm: "6", md: "0" }} pt="0"  >
+        <Link href={"/post/" + postWithUser.id}>     
+
           <span className="font-chinese text-xl font-bold text-slate-100 shadow-none ">
             {postWithUser.content}
           </span>
@@ -253,8 +260,9 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
               </ul>
             </div>
           </div>
+      </Link>
         </CardBody>
-
+        </div>
         <CardFooter
           p="0"
           justify="space-between"
@@ -284,7 +292,7 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
                 stroke={liked ? "grey" : "white"}
                 className={
                   "h-6 w-full hover:animate-ping " +
-                  (liked ? " text-lime-300" : "")
+                  (liked ? " text-lime-200" : "")
                 }
               >
                 <path
@@ -301,8 +309,8 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
             className="shrink"
             variant="ghost"
             _hover={{ bg: "gray.600" }}
+            disabled={onPostPage}
             onClick={() => showCommentClick()}
-            
           >
             <div className="flex items-center justify-center space-x-3">
             <svg
@@ -366,7 +374,7 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
               />
             </Box>
             
-            {singlePostData.currentUser &&
+            {user &&
            ( <Flex align="center" position="relative" p={0}>
               <Avatar
                 display={{ base: "none", md: "unset" }}
@@ -433,8 +441,6 @@ const SingleFeed = (singlePostData: SingleFeedProps) => {
 export const FeedThread = (postData: FeedProps) => {
   const { t } = useTranslation();
   const posts  = postData.posts.posts;
-  const currentUser = getMyUser();
-  const copyPosts = {...posts};
   const [changePosts, setChangePosts] = useState(posts);
   const observerRef = useInfiniteScroll(() => {
     setChangePosts(posts);    
@@ -452,7 +458,7 @@ export const FeedThread = (postData: FeedProps) => {
         <SingleFeed
           key={p.id}
           postWithUser={p}
-          currentUser={currentUser!}
+          onPostPage={false}
         />
       ))}
       <div ref={observerRef} id="end_of_thread" 
