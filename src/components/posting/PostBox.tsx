@@ -10,6 +10,8 @@ import { useFilePicker } from 'use-file-picker';
 import Image from "next/image"
 import S3 from "aws-sdk/clients/s3";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import React, { useState } from 'react'
+import { SlateCommentEditor } from "components/ContentCreation/SlateEditor";
 
 //@ts-ignore
 function classNames(...classes) {
@@ -68,14 +70,7 @@ export const PostCreator = () => {
           },
     });
 
-
     if(!user) return null;
-
-
-    // setError('file_upload', {type:"custom", message: t('upload_image_too_big') + maxImageSize + 'mb'}) ;
-    // setError('file_upload', {type:"custom", message: t('upload_video_too_big') + maxVideoSize + 'mb'}) ;
-    // setError('file_upload', {type:"custom", message: t('upload_videos_too_big') + maxVideoSize + 'mb'}) ;
-
 
     async function uploadToS3() {
         let keys = [];
@@ -129,35 +124,23 @@ export const PostCreator = () => {
     return <>
        <div>
         <div className="grid w-full grow h-auto rounded bg-primary text-primary-content place-content-cente">
-            <div className="flex pl-5 pt-5 space-x-3 grow lg:text-xl">
-                <div className="h-auto">
+            <div className="flex pl-5 pt-5 space-x-3 grow lg:text-lg">
+                <div className="h-auto shrink-0">
                     <Image
                       src={user.profileImageUrl ?? "/images/default_profile.png"} 
                       alt=""
                       width={60}
                       height={60}
-                      className="flex-none rounded-full " />
+                      className="flex-none rounded-full shrink-0" />
                 </div>     
-                <div className="w-full pr-6 grow  ">
-                <form className="relative mr-[62px] w-full grow" onSubmit={handleSubmit(onSubmit)}>
-                    <div className="overflow-hidden flex flex-1 rounded-lg pb-12 grow mr-[62px] text-4xl
+                <div className=" pr-6">
+                <form className="relative mr-[62px]" onSubmit={handleSubmit(onSubmit)}>
+                    <div className="flex flex-1 rounded-lg pb-12 mr-[62px] text-slate-200
                     shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600">
                       <label htmlFor="content" className="sr-only">
                         {t('Add_your_comment')}
                       </label>
-                        <textarea
-                          {...register('content')}
-                          rows={4}
-                          disabled={isPosting}
-                          name="content"
-                          id="content"
-                          className="block border-0  w-full
-                          lg: text-xl
-                           grow font-chinese dark:text-slate-200
-                            antialiased bg-transparent py-1.5 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6 min-h-[100px] "
-                          placeholder={t('Add_your_comment').toString()}
-                          defaultValue={''}
-                        />
+                       <SlateCommentEditor />
                     </div>
         
                     <div className="absolute inset-x-0 bottom-0 flex justify-between py-2 pl-3 pr-2">

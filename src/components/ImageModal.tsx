@@ -22,9 +22,8 @@ export default function ImageModal(props:  {url: string, open: boolean, close: (
             src={url}
             height={1080}
             width={1920}
-            blurDataURL='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
             alt=''   
-            loading='lazy'          
+            loading='eager'          
           />
           </ModalBody>
         </ModalContent>
