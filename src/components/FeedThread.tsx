@@ -63,69 +63,20 @@ interface FeedProps {
   }
 }
 
-function renderImages(type: string, url: string, index: any) {
-  const [open, setOpen] = useState(false);
-
-  const showModal = () => {
-    setOpen(true);
-  };
-
-  const closeModal = () => {
-    setOpen(false);
-  };
-
-  if (type === "image") {
-    return (
-      <li key={index} className="relative">
-        <div
-          className="group block w-full flex-grow  rounded-lg
-     bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2
-      focus-within:ring-offset-gray-100"
-        >
-          <Image
-            objectFit="cover"
-            src={url}
-            alt=""
-            className="pointer-events-none max-h-full object-cover group-hover:opacity-75"
-          />
-          <button
-            type="button"
-            className="absolute inset-0 focus:outline-none"
-            onClick={() => {
-              showModal();
-            }}
-          >
-            <span className="sr-only"> </span>
-          </button>
-
-          {open && (
-            //@ts-ignore
-            <ImageModal url={url} open={open} close={closeModal} />
-          )}        </div>
-      </li>
-    );
-  } else {
-    return null;
-  }
-}
-
 export function SingleFeed(singlePostData: SingleFeedProps){
   const postWithUser = singlePostData.postWithUser;
   const mediaStr = singlePostData.postWithUser.media;
   const onPostPage = singlePostData.onPostPage;
   const user = useContext(UserContext);  
-  let media = mediaStr ? Array.from(JSON.parse(mediaStr)) : [];
-
-  if (!user) return <Spinner />
+  const [comment, SetComment] = useState("");
+  const [open, setOpen] = useState(false);
+  const ctx = api.useContext();  
+  const {isSignedIn} = useUser();
+  const {t} = useTranslation();
   const hasReaction = postWithUser.reactions.length > 0;
-
   const [liked, setLiked] = useState(hasReaction);
   const [likeNumber, setNumber] = useState(postWithUser.likes);
   const [showComments, setShowComments] = useState(onPostPage);
-  const ctx = api.useContext();  
-  const {isSignedIn} = useUser();
-
-
   const commentMutation = api.comment.createPostComment.useMutation({
     onSuccess: (data) => {
       void ctx.posts.getCommentsForPost.invalidate();
@@ -135,9 +86,6 @@ export function SingleFeed(singlePostData: SingleFeedProps){
         toast.error(t(err));
     }
   });
-
-  const [comment, SetComment] = useState("");
-  const {t} = useTranslation();
 
   const likePostMutation = api.posts.likePost.useMutation({
     onSuccess: () => {},
@@ -151,6 +99,9 @@ export function SingleFeed(singlePostData: SingleFeedProps){
       setLiked(!liked);
     },
   });
+
+  let media = mediaStr ? Array.from(JSON.parse(mediaStr)) : [];
+  if (!user) return <Spinner />
 
   function handleLikeClick() {
     if (!isSignedIn) {
@@ -190,11 +141,56 @@ export function SingleFeed(singlePostData: SingleFeedProps){
 
     SetComment("");
   }
-
   const handleLike = (post: PostsWithUserData) => {
     likePostMutation.mutate({ postId: post.id });
     
   };
+
+  
+function RenderImage(type: string, url: string, index: any) {
+
+  const showModal = () => {
+    setOpen(true);
+  };
+
+  const closeModal = () => {
+    setOpen(false);
+  };
+
+  if (type === "image") {
+    return (
+      <li key={crypto.randomUUID()} className="relative">
+        <div
+          className="group block w-full flex-grow  rounded-lg
+     bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2
+      focus-within:ring-offset-gray-100"
+        >
+          <Image
+            objectFit="cover"
+            src={url}
+            alt=""
+            className="pointer-events-none max-h-full object-cover group-hover:opacity-75"
+          />
+          <button
+            type="button"
+            className="absolute inset-0 focus:outline-none"
+            onClick={() => {
+              showModal();
+            }}
+          >
+            <span className="sr-only"> </span>
+          </button>
+
+          {open && (
+            //@ts-ignore
+            <ImageModal url={url} open={open} close={closeModal} />
+          )}        </div>
+      </li>
+    );
+  } else {
+    return null;
+  }
+}
 
   return (
     <>
@@ -255,7 +251,7 @@ export function SingleFeed(singlePostData: SingleFeedProps){
               >
                 {media.map((file, index) => {
                   //@ts-ignore
-                  return renderImages(file.type, file.url, index);
+                  return RenderImage(file.type, file.url, index.index)
                 })}
               </ul>
             </div>
@@ -292,7 +288,7 @@ export function SingleFeed(singlePostData: SingleFeedProps){
                 stroke={liked ? "grey" : "white"}
                 className={
                   "h-6 w-full hover:animate-ping " +
-                  (liked ? " text-lime-200" : "")
+                  (liked ? " te_dark_liked" : "")
                 }
               >
                 <path
@@ -412,7 +408,7 @@ export function SingleFeed(singlePostData: SingleFeedProps){
               </InputRightElement>
               </InputGroup>
             </Flex>)}
-            <Flex justify={'center'} mt='10px' mb='-15px' className="animate-bounce" >
+           { !onPostPage && <Flex justify={'center'} mt='10px' mb='-15px' className="animate-bounce" >
              <div onClick={() => setShowComments(!showComments)} className="flex gap-x-2 hover:text-te_dark_action">
               <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -430,7 +426,7 @@ export function SingleFeed(singlePostData: SingleFeedProps){
                   </svg>
                   {t('fold')}
              </div>
-            </Flex>
+            </Flex>}
           </Flex>
         )}
       </Card>

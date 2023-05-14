@@ -2,13 +2,12 @@ import { GetStaticPaths, GetStaticProps, GetStaticPropsContext, InferGetStaticPr
 import { generateSSGHelper } from "server/helpers/ssgHelper";
 import { api } from "utils/api";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useContext } from "react";
-import UserContext from "pages/helpers/userContext";
 import { PageLayout } from 'components/layout';
-import { Flex } from "@chakra-ui/react";
+import { Box, Flex, Link } from "@chakra-ui/react";
 import { getSekleton } from "pages/helpers/UIHelper";
 import React from "react";
 import { SingleFeed } from "components/FeedThread";
+import { ArrowBackIcon } from "@chakra-ui/icons";
 
 export const getStaticProps : GetStaticProps = async (context: GetStaticPropsContext) => {
   const ssg =  generateSSGHelper();
@@ -36,15 +35,17 @@ export const getStaticPaths: GetStaticPaths  = async () => {
 
 const SinglePostPage: NextPage = ( props: InferGetStaticPropsType<typeof getStaticProps>) => {
   const {data, isLoading, isError} = api.posts.getPostById.useQuery({id: props.id})
-  const user = useContext(UserContext);
   if (!data) return  getSekleton(1)
-
-  console.log("test",data)
 
   return (
     <>
       <PageLayout>
           <Flex className="col-span-4 w-full justify-center">
+            <Box alignSelf={'flex-start'}>
+                <Link href="..">
+                <ArrowBackIcon color={'whatsapp.200'} />
+                </Link>
+            </Box>
             <Flex className="w-3/4">
               <React.Suspense fallback={getSekleton(1)}>
                     <SingleFeed

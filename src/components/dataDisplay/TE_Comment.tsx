@@ -15,11 +15,15 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { api } from "utils/api";
+import { RouterOutputs, api } from "utils/api";
 import CommentModal from 'components/CommenModal';
-import TransparentMenu from "components/menu/TransparentMenu";
 import { IoEllipsisHorizontal } from "react-icons/io5";
 import TransparentCommentMenu from "components/menu/TransparentCommentMenu";
+import axios from "axios";
+import React from "react";
+import { getSekleton } from "pages/helpers/UIHelper";
+import { LoadingSpinner } from "components/loading";
+import { HSeparator } from "components/separator/Separator";
 
 // Custom components
 
@@ -67,6 +71,29 @@ export default function TEComment(props: {
   
   const [likeNumber, setNumber] = useState(likes);
   const [showReplies, setShowReplies] = useState(false);
+  type replyType = RouterOutputs["comment"]["getCommentsForComment"]["props"]["comments"];
+  const [replies, setReplies] = useState<replyType>([]);
+  const [loadingReplies, setLoadingReplies] = useState(false);
+
+  async function getRepliesForComment(){
+    setLoadingReplies(true);
+    await axios.post('/api/PostComment?commentId=' + commentId)
+    .then(response => {
+      const data: replyType = response.data.props.comments;
+      if (data) {
+        setReplies(data);
+        setShowReplies(!showReplies);
+      } 
+    })
+    .catch(error => {
+      // Handle error
+      console.error(error);
+    })
+    .finally(() => {
+      // Request is complete
+      setLoadingReplies(false);
+    });
+  }
 
   const likeCommentMutation = api.comment.likeComment.useMutation({
     onSuccess: () => {},
@@ -81,11 +108,7 @@ export default function TEComment(props: {
     },
   });
 
-  let replies = null;
-  if (!isFirstLevel && commentNum > 0) {
-    replies = api.comment.getCommentsForComment
-  .useQuery({commentId: commentId}).data?.props;
-  }
+
 
   function handleLikeClick() {
     if (userId == null) {
@@ -113,7 +136,10 @@ export default function TEComment(props: {
   }
 
   return (
-    <Flex mb={isFirstLevel? "10px" : "0px"} {...rest} direction={"column"} >
+    <Flex mb={isFirstLevel? 0 : .5} {...rest} direction={"column"}
+    rounded={"xl"}
+    p={2}
+     bgColor={ isFirstLevel? '' : 'te_dark_ui'}>
       <Flex mt={isFirstLevel ? 0 : 2} className="overflow-ellipsis overflow-hidden">
         <Avatar src={avatar} w="30px" h="30px" me="15px" />
         <Text color={textColor} fontWeight="700" fontSize="md" >
@@ -159,7 +185,7 @@ export default function TEComment(props: {
         </Flex>
 
         <Flex align="left" direction={"column"}
-		 rounded={"xl"} bgColor={ isFirstLevel? '' : 'te_dark_ui'}>
+		  >
           <Flex mt={2} px={isFirstLevel? 0 : 3} fontSize={"md"} >
             {props.text}
           </Flex>
@@ -175,7 +201,7 @@ export default function TEComment(props: {
                 onClick={() => handleLikeClick()}
                 className={
                   "h-6 w-full hover:animate-ping " +
-                  (liked ? " text-lime-300" : "")
+                  (liked ? "te_dark_ui" : "")
                 }
               >
                 <path
@@ -197,7 +223,7 @@ export default function TEComment(props: {
 						w="max-content"
 						_hover={{ color: 'white' }}
 						_active={{ color: 'gray.300' }}
-            onClick={()=> setShowReplies(!showReplies)}
+            onClick={async ()=> await getRepliesForComment()}
 					  >
 						{t(showReplies ? "hide_replies" : "show_replies") + "(" + commentNum + ")"}
 					  </Button>)
@@ -222,26 +248,28 @@ export default function TEComment(props: {
             </Flex>
           </Flex>
 		  <Flex width={'90%'} direction="column" ml={10} mt={isFirstLevel? 3 : -1}>
-		  {
-      showReplies && 
-      replies?.comments?.map((c) => (
-			<TEComment avatar={c.author.profileImageUrl ?? "images/default_avatar.png"} 
-				key={c.id}
-				commentId={c.id}
-				commentNum={commentNum}
-				username={c.author.username!}
-				name={c.author.displayname!}
-				text={c.content}
-				time={dayjs(c.createdAt).fromNow()}
-				likes={c.likes}
-				likedByUser={c.reactions}    
-				isFirstLevel={false}      
-				onPostPage={onPostPage}
-				/>
-			))}
+        {loadingReplies && <Flex><LoadingSpinner /></Flex>}
+          {
+          showReplies && 
+          replies?.map((c) => (
+          <TEComment avatar={c.author.profileImageUrl ?? "images/default_avatar.png"} 
+            key={c.id}
+            commentId={c.id}
+            commentNum={commentNum}
+            username={c.author.username!}
+            name={c.author.displayname!}
+            text={c.content}
+            time={dayjs(c.createdAt).fromNow()}
+            likes={c.likes}
+            likedByUser={c.reactions}    
+            isFirstLevel={false}      
+            onPostPage={onPostPage}
+            />
+          ))}
 		  </Flex>
         </Flex>
       </Flex>
+    {isFirstLevel && <HSeparator />}
     </Flex>
   );
 }

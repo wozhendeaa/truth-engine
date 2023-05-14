@@ -41,7 +41,7 @@
     "**/*.mjs",
     "next-i18next.config.js",
     ".next/types/**/*.ts"
-  ],
+, "src/pages/api/user/getLoggedInUser", "src/pages/api/PostComment"  ],
   "exclude": [
     "node_modules"
   ]

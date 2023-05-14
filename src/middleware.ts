@@ -3,12 +3,16 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { api } from "./utils/api";
 
-const publicPaths = ['/', '/sign-in*', '/sign-up*', '/api/trpc*', 
+const publicPaths = ['/', '/sign-in*', '/sign-up*', 
+'/api/trpc*', 
+'/api/PostComment*',
+'/api/User*',
 '/natural-healing*',
 '/professor_videos*',
 '/red-pill-academy*',
 '/faq*',
 '/post*',
+
 '.*\\.(png|jpg|jpeg|gif|svg|ico)'];
 
 const isPublic = (path: string) => {

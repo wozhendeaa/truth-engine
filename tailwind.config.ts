@@ -37,7 +37,7 @@ export default {
         te_dark_green_bg: '#263d56',
         te_dark_red: '#e45a50',
         te_dark_red_bg: '#363457',
-       
+        te_dark_liked: '#c095e4',
       },
       backgroundColor: {
         transparent: "transparent"
