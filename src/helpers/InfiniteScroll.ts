@@ -14,3 +14,5 @@ export const useInfiniteScroll = (callback: () => void) => {
 
   return ref;
 };
+
+export default useInfiniteScroll

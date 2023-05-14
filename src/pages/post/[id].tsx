@@ -10,7 +10,7 @@ import { api } from "utils/api";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { PageLayout } from "components/layout";
 import { Box, Flex, Link } from "@chakra-ui/react";
-import { getSekleton } from "pages/helpers/UIHelper";
+import { GetSekleton } from "helpers/UIHelper";
 import React from "react";
 import { SingleFeed } from "components/FeedThread";
 import { ArrowBackIcon } from "@chakra-ui/icons";
@@ -47,7 +47,7 @@ const SinglePostPage: NextPage = (
   const { data, isLoading, isError } = api.posts.getPostById.useQuery({
     id: props.id,
   });
-  if (!data) return getSekleton(1);
+  if (!data) return <GetSekleton number={1} />
 
   return (
     <>
@@ -60,7 +60,7 @@ const SinglePostPage: NextPage = (
           </Box>
           <Flex className="w-3/4">
             {isLoading ? (
-              getSekleton(5)
+             <GetSekleton number={1} />
             ) : (
               <SingleFeed key={data.id} postWithUser={data} onPostPage={true} />
             )}

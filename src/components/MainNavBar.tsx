@@ -6,7 +6,7 @@ import Image from "next/image"
 import { useEffect, useState } from 'react'
 import { SignIn, SignInButton, SignOutButton,  useUser } from '@clerk/nextjs';
 import { TFunction } from 'i18next';
-import UserContext from 'pages/helpers/userContext';
+import UserContext from 'helpers/userContext';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 

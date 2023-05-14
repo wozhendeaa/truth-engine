@@ -4,7 +4,6 @@ import {  useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { PageLayout } from "components/layout";
 import { api } from "utils/api";
-import { isUserVerified } from "pages/helpers/userHelper";
 import Sidebar from "components/sidebar/Sidebar";
 import appRoutes from 'routes';
 import TESidebar from "components/sidebar/TESidebar";
@@ -12,7 +11,7 @@ import TESidebar from "components/sidebar/TESidebar";
 const AdminPage: NextPage = () => {
   const {data,  isLoading} = api.posts.getAllWithReactionsDataForUser.useQuery();
 
-  let isVerified = isUserVerified(null);
+  // let isVerified = isUserVerified(null);
   
   const { t, i18n } = useTranslation(['common', 'footer'], { bindI18n: 'languageChanged loaded' })
   // bindI18n: loaded is needed because of the reloadResources call

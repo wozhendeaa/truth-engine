@@ -1,8 +1,8 @@
 import { Box, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
 
-export function getSekleton (number: number) {
+export function GetSekleton (props: {number: number}) {
     const boxes = [];
-    for (let i = 0; i < number; i++) {
+    for (let i = 0; i < props.number; i++) {
       //@ts-ignore
       boxes.push(
         
@@ -14,3 +14,4 @@ export function getSekleton (number: number) {
     return <div className="flex flex-col items-center w-full">{boxes}</div>;
   }
   
+export default  GetSekleton

@@ -11,7 +11,7 @@ import {
   AcademicCapIcon,
 } from '@heroicons/react/24/outline'
 import { useTranslation } from 'react-i18next'
-import UserContext from 'pages/helpers/userContext'
+import UserContext from 'helpers/userContext'
 import { useRouter } from 'next/router'
 
 const navigation = [

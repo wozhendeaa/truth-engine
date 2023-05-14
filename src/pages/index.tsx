@@ -9,9 +9,9 @@ import { Box,  SkeletonCircle, SkeletonText } from "@chakra-ui/react";
 
 import FeedThread from "components/FeedThread"
 import { api } from "utils/api";
-import {getMyUser, isUserVerified} from "pages/helpers/userHelper"
-import UserContext from "./helpers/userContext";
-import { getSekleton } from "./helpers/UIHelper";
+import UserContext from "../helpers/userContext";
+import { GetSekleton } from "../helpers/UIHelper";
+import {isUserVerified} from 'helpers/userHelper';
 
 
 const Home: NextPage = () => {
@@ -41,7 +41,7 @@ const Home: NextPage = () => {
             
         { 
         isLoading ?
-          getSekleton(5)
+          <GetSekleton number={5} />
           :
            //@ts-ignore 
           <FeedThread posts={data} />}

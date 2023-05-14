@@ -11,17 +11,12 @@ import { ChakraProvider } from '@chakra-ui/react'
 import theme from "theme/theme";
 import React, { createContext, useEffect, useState } from "react";
 import { IntlProvider } from 'react-intl';
-import UserContext from "./helpers/userContext";
+import UserContext from "../helpers/userContext";
 import { User } from "@prisma/client";
-import '/node_modules/react-quill/dist/quill.snow.css';
 const i18n = require('next-i18next.config');
 
-var Backend = require('i18next-sync-fs-backend');
-
-
-
 const QTruthEngine: AppType  = ({ Component, pageProps }) => {
-  const {locale} = useRouter() ?? "ch-ZH";
+  const locale = useRouter().locale ?? "ch-ZH";
   const {t} = useTranslation();
   const {data} =  api.user.getCurrentLoggedInUser.useQuery();
 

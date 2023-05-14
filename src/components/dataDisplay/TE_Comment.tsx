@@ -21,7 +21,7 @@ import { IoEllipsisHorizontal } from "react-icons/io5";
 import TransparentCommentMenu from "components/menu/TransparentCommentMenu";
 import axios from "axios";
 import React from "react";
-import { getSekleton } from "pages/helpers/UIHelper";
+import { GetSekleton } from "helpers/UIHelper";
 import { LoadingSpinner } from "components/loading";
 import { HSeparator } from "components/separator/Separator";
 

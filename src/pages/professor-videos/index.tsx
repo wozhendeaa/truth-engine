@@ -4,7 +4,7 @@ import {  useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { PageLayout } from "components/layout";
 import { api } from "utils/api";
-import { isUserVerified } from "pages/helpers/userHelper";
+import { isUserVerified } from "helpers/userHelper";
 import Sidebar from "components/sidebar/Sidebar";
 import appRoutes from 'routes';
 import TESidebar from "components/sidebar/TESidebar";

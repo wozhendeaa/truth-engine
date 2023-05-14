@@ -39,9 +39,9 @@ import CommentThread from "./CommentFeed";
 import { useUser } from "@clerk/nextjs";
 import { IoEllipsisHorizontal } from "react-icons/io5";
 import TransparentFeedThreadMenu from "./menu/TransparentFeedThreadMenu";
-import { useInfiniteScroll } from "pages/helpers/InfiniteScroll";
+import { useInfiniteScroll } from "helpers/InfiniteScroll";
 import Link from "next/link";
-import UserContext from "pages/helpers/userContext";
+import UserContext from "helpers/userContext";
 import { useRouter } from "next/router";
 import { LoadingSpinner } from "./loading";
 const {i18n} = require('next-i18next.config')
