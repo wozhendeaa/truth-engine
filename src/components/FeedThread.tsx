@@ -44,6 +44,7 @@ import Link from "next/link";
 import UserContext from "pages/helpers/userContext";
 import { useRouter } from "next/router";
 import { LoadingSpinner } from "./loading";
+const {i18n} = require('next-i18next.config')
 
 type PostsWithUserData = Post & {
   reactions: {
@@ -508,6 +509,6 @@ export default FeedThread;
 
 export const getServerSideProps = async ({ locale }: { locale: string }) => ({
   props: {
-    ...(await serverSideTranslations(locale, ["common", "footer"])),
+    ...(await serverSideTranslations(locale, ['common', 'footer'], i18n)),
   },
 });

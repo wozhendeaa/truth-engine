@@ -9,4 +9,5 @@ module.exports = {
     localeDetection: false,
   },
   react: { useSuspense: false },//this line
+  
 }

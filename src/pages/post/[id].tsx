@@ -14,6 +14,7 @@ import { getSekleton } from "pages/helpers/UIHelper";
 import React from "react";
 import { SingleFeed } from "components/FeedThread";
 import { ArrowBackIcon } from "@chakra-ui/icons";
+const i18n = require('next-i18next.config');
 
 export const getStaticProps: GetStaticProps = async (
   context: GetStaticPropsContext
@@ -28,7 +29,7 @@ export const getStaticProps: GetStaticProps = async (
     props: {
       trpcState: ssg.dehydrate(),
       id,
-      ...(await serverSideTranslations(locale, ["common", "footer"])),
+      ...(await serverSideTranslations(locale, ["common", "footer"], i18n)),
     },
   };
 };

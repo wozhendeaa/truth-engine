@@ -11,7 +11,8 @@ import Image from "next/image"
 import S3 from "aws-sdk/clients/s3";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import React, { useState } from 'react'
-import { SlateCommentEditor } from "components/ContentCreation/SlateEditor";
+import { CommentEditor } from "components/ContentCreation/QuillEditor";
+const i18n = require('next-i18next.config');
 
 //@ts-ignore
 function classNames(...classes) {
@@ -53,7 +54,6 @@ export const PostCreator = () => {
     const user =  api.user.getCurrentLoggedInUser.useQuery().data;
     const ctx = api.useContext();
     const {t} = useTranslation();
-
 
     const [openFileSelector, { filesContent, loading ,errors:pickerError, clear  }] = useFilePicker({
           readAs: 'DataURL',
@@ -120,7 +120,6 @@ export const PostCreator = () => {
           }
           return "";
       }
-
     return <>
        <div>
         <div className="grid w-full grow h-auto rounded bg-primary text-primary-content place-content-cente">
@@ -133,16 +132,14 @@ export const PostCreator = () => {
                       height={60}
                       className="flex-none rounded-full shrink-0" />
                 </div>     
-                <div className=" pr-6">
-                <form className="relative mr-[62px]" onSubmit={handleSubmit(onSubmit)}>
-                    <div className="flex flex-1 rounded-lg pb-12 mr-[62px] text-slate-200
-                    shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600">
+                <div className="w-full pr-6 ">
+                <form className="relative mr-[52px]" onSubmit={handleSubmit(onSubmit)}>
+                <div className="flex flex-1 w-full rounded-lg pb-12  text-slate-200 bg-te_dark_ui shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600 justify-end">
                       <label htmlFor="content" className="sr-only">
                         {t('Add_your_comment')}
                       </label>
-                       <SlateCommentEditor />
+                      <CommentEditor />
                     </div>
-        
                     <div className="absolute inset-x-0 bottom-0 flex justify-between py-2 pl-3 pr-2">
                       <div className="flex items-center space-x-5">
                         <div className="flex items-center">
@@ -169,7 +166,8 @@ export const PostCreator = () => {
                 <button
                   type="submit"
                   disabled={isPosting}
-                  className="rounded-md bg-white px-2.5 py-1.5 text-md mr-[62px]  font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                  className="rounded-md bg-white px-2.5
+                   py-1.5 text-md  font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                   {t('post')}
                 </button>
               </div>
@@ -203,9 +201,9 @@ export const PostCreator = () => {
 
   }
   
-export const getServerSideProps = async ({locale}: {locale: string} ) => ({
-  props: {
-    ...await serverSideTranslations(locale, ['common', 'footer']),
-  },
-})
-
+  export const getServerSideProps = async ({ locale }: { locale: string }) => ({
+    props: {
+      ...(await serverSideTranslations(locale, ['common', 'footer'], i18n)),
+    },
+  });
+  

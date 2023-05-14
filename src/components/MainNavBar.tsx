@@ -191,6 +191,7 @@ export default function MainNavBar() {
                     width={60}
                     height={60}
                     alt="Q真相引擎"
+                    priority
                   />
                   <Image
                     className="hidden h-8 w-auto lg:block"
@@ -198,6 +199,7 @@ export default function MainNavBar() {
                     width={60}
                     height={60}
                     alt="Q真相引擎"
+                    priority
                   />
                 </div>                <div className="hidden md:ml-6 md:flex md:space-x-8 dark: text-slate-300 text-xl ">
                   {/* Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" */}

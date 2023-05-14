@@ -32,8 +32,12 @@ const config = {
     // should handle (these are only required when setting up domain routing)
     // Note: subdomains must be included in the domain value to be matched e.g. "fr.example.com".
   },
-  webpack: (config) => {
+  webpack: (config,{ isServer }) => {
     config.resolve.fallback = { fs: false };
+    if (isServer) {
+      config.stats = config.stats || {};
+      config.stats.warningsFilter = [/Critical dependency: the request of a dependency is an expression/];
+    }
     return config;
   },
   

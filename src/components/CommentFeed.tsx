@@ -92,8 +92,9 @@ export const CommentThread = (props: {
 
 export default CommentThread;
 
+const i18n = require('next-i18next.config');
 export const getServerSideProps = async ({ locale }: { locale: string }) => ({
   props: {
-    ...(await serverSideTranslations(locale, ["common", "footer"])),
+    ...(await serverSideTranslations(locale, ['common', 'footer'], i18n)),
   },
 });
