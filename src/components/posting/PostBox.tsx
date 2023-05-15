@@ -10,7 +10,7 @@ import { useFilePicker } from 'use-file-picker';
 import Image from "next/image"
 import S3 from "aws-sdk/clients/s3";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { CommentEditor } from "components/ContentCreation/QuillEditor";
 const i18n = require('next-i18next.config');
 
@@ -53,7 +53,12 @@ export const PostCreator = () => {
 
     const user =  api.user.getCurrentLoggedInUser.useQuery().data;
     const ctx = api.useContext();
-    const {t} = useTranslation();
+    const { t, i18n } = useTranslation(['common', 'footer'], { bindI18n: 'languageChanged loaded' })
+    // bindI18n: loaded is needed because of the reloadResources call
+    // if all pages use the reloadResources mechanism, the bindI18n option can also be defined in next-i18next.config.js
+    useEffect(() => {
+       void i18n.reloadResources(i18n.resolvedLanguage, ['common', 'footer'])
+    }, [])
 
     const [openFileSelector, { filesContent, loading ,errors:pickerError, clear  }] = useFilePicker({
           readAs: 'DataURL',
@@ -166,8 +171,9 @@ export const PostCreator = () => {
                 <button
                   type="submit"
                   disabled={isPosting}
-                  className="rounded-md bg-white px-2.5
-                   py-1.5 text-md  font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                  className="rounded-md bg-white px-2.5  align-middle
+                   pt-2 text-md  font-semibold text-gray-900 shadow-sm ring-1
+                    ring-inset ring-gray-300 hover:bg-gray-300">
                   {t('post')}
                 </button>
               </div>

@@ -19,7 +19,7 @@ import {
 } from "@chakra-ui/react";
 import React, { ChangeEvent, useContext, useEffect, useState } from "react";
 
-import { RouterOutputs, api } from "utils/api";
+import { api } from "utils/api";
 import { Post, User } from "@prisma/client";
 import relativetTime from "dayjs/plugin/relativeTime";
 import dayjs from "dayjs";
@@ -119,12 +119,17 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   const [comment, SetComment] = useState("");
   const ctx = api.useContext();
   const { isSignedIn } = useUser();
-  const { t } = useTranslation();
   const hasReaction = postWithUser.reactions.length > 0;
   const [liked, setLiked] = useState(hasReaction);
   const [likeNumber, setNumber] = useState(postWithUser.likes);
   const [showComments, setShowComments] = useState(onPostPage);
   const router = useRouter();
+  const { t, i18n } = useTranslation(['common', 'footer'], { bindI18n: 'languageChanged loaded' })
+  // bindI18n: loaded is needed because of the reloadResources call
+  // if all pages use the reloadResources mechanism, the bindI18n option can also be defined in next-i18next.config.js
+  useEffect(() => {
+     void i18n.reloadResources(i18n.resolvedLanguage, ['common', 'footer'])
+  }, [])
 
   const commentMutation = api.comment.createPostComment.useMutation({
     onSuccess: (data) => {
@@ -218,7 +223,6 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
         boxShadow={"lg"}
         bgColor={"te_dark_ui_bg"}
         textColor={"white"}
-        rounded={"2xl"}
         shadow="lg"
         height={"auto"}
         pb="0"

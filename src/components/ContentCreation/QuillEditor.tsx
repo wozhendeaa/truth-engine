@@ -3,6 +3,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import React, { useState } from "react";
 import { Flex } from "@chakra-ui/react";
 import dynamic from 'next/dynamic';
+import 'react-quill/dist/quill.snow.css'
 const i18n = require('next-i18next.config');
 
 const ReactQuill = dynamic(() => import('react-quill'), {
@@ -17,8 +18,9 @@ const toolbarOptions = {
   ],
   handlers: {'emoji': function() {}}
 }
+
 const modules = {
-      toolbar: toolbarOptions,
+
 }
 const formats = ['font', 'header', 'bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block', 'color', 'background', 'list', 'indent', 'align', 'link', 'image', 'clean', 'emoji']
 
@@ -28,16 +30,15 @@ export const CommentEditor = () => {
 
   return (
     <>
-    <Flex width={'full'}>
-      <ReactQuill  
-        
-         theme="snow"
+    <Flex width={'100%'}>
+      <ReactQuill 
+          theme="snow"
           className="bg-te_dark_ui text-slate-100 w-full flex flex-col-reverse"
-          value={editorContent} onChange={setEditorContent}
+          value={editorContent} onChange={setEditorContent} 
           modules={modules}
           formats={formats}
-            />
-      </Flex>
+      />
+    </Flex>
     </>
   );
 };
