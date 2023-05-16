@@ -12,6 +12,9 @@ import S3 from "aws-sdk/clients/s3";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import React, { useEffect, useState } from 'react'
 import { CommentEditor } from "components/ContentCreation/QuillEditor";
+import FormLabel from "components/Form/FormLabel";
+import Tippy from "components/Tippy";
+import Lucide from "components/Lucide";
 const i18n = require('next-i18next.config');
 
 //@ts-ignore
@@ -75,6 +78,8 @@ export const PostCreator = () => {
           },
     });
 
+
+
     if(!user) return null;
 
     async function uploadToS3() {
@@ -125,6 +130,13 @@ export const PostCreator = () => {
           }
           return "";
       }
+
+      function removePictureFromUploader(index: number, divId: string) {
+        filesContent.splice(index, 1);        
+        console.log(divId)
+        document.getElementById(divId)?.remove();
+      }
+
     return <>
        <div>
         <div className="grid w-full grow h-auto rounded bg-primary text-primary-content place-content-cente">
@@ -181,9 +193,9 @@ export const PostCreator = () => {
                 </div> 
             </div>
 
+      {/* image display section */}
 
-        <div className="grid w-full h-auto rounded bg-accent text-accent-content place-content-end items-end">
-            {/* image display section */}
+        {/* <div className="grid w-full h-auto rounded bg-accent text-accent-content place-content-end items-end">
             {errors.content && <p className="text-red-500 text-sm">{errors.content.message}</p>}
             <div className="sm:p-6 ml-10 mt-auto items-end">
               <ul role="list" className="grid grid-cols-2 ml-6 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8 items-end">
@@ -199,7 +211,37 @@ export const PostCreator = () => {
                 ))}
               </ul>
             </div>
-        </div>
+        </div> */}
+                { filesContent.length > 0 && <div className="mt-3 w-full">
+                      <div className="pt-4 border-2 border-dashed rounded-md dark:border-darkmode-400">
+                        <div className="flex flex-wrap px-4">
+                          {filesContent.map((file, index) => (
+                            <div
+                              id={"uploadImage" + index}
+                              key={"uploadImage" + index}
+                              className="relative mr-5 cursor-pointer image-fit zoom-in"
+                            >
+                              <img
+                                className="rounded-md max-h-[80px]"
+                                alt="Midone Tailwind HTML Admin Template"
+                                src={file.content}
+                              />
+                              <Tippy
+                                as="div"                                
+                                className="absolute top-0 right-0 flex items-center 
+                                justify-center w-5 h-5 -mt-2 -mr-2 text-white rounded-full bg-danger"
+                              >
+                                <Lucide icon="X" onClick={() => removePictureFromUploader(index, "uploadImage" + index)} className="w-6 h-6 bg-red-500 rounded-full
+                                 hover:bg-indigo-500" />
+                              </Tippy>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="relative flex items-center px-4 pb-4 cursor-pointer">
+                        </div>
+                      </div>
+                    </div>
+            }
     </div> 
     </div> 
 

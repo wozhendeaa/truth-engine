@@ -226,7 +226,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
     <>
       <Card
         size={"md"}
-        className="mx-5 my-1 flex-grow font-chinese"
+        className="flex-grow my-1 font-chinese"
         boxShadow={"lg"}
         bgColor={"te_dark_ui_bg"}
         textColor={"white"}
@@ -236,10 +236,10 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
       >
         <div className="group ">
           <CardHeader
-            className="cursor-pointer rounded-tl-2xl rounded-tr-2xl group-hover:bg-te_dark_ui"
+            className="cursor-pointer group-hover:bg-te_dark_ui -p-[40px]"
             onClick={toPostPage}
           >
-            <Flex alignItems={"top"}>
+            <Flex alignItems={"top"} className="-my-4">
               <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
                 <Avatar
                   src={
@@ -284,7 +284,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
               {postWithUser.content}
             </span>
 
-            <div className="bg-accent text-accent-content  grid place-content-end justify-center rounded "
+            <div className="bg-accent text-accent-content  grid place-content-end justify-center "
               onClick={stopParentCLick}>
               {/* image display section */}
               <div className="mt-auto items-end sm:p-6">
@@ -306,7 +306,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
             flexWrap="nowrap"
             mt="-5"
             maxHeight={70}
-            className="cursor-pointer rounded-2xl group-hover:bg-te_dark_ui"
+            className="cursor-pointer group-hover:bg-te_dark_ui"
             sx={{
               "& > button": {
                 minW: "36px",
@@ -497,7 +497,6 @@ export const FeedThread = (props: {postData: FeedProps}) => {
   const observerRef = useInfiniteScroll(() => {
     setChangePosts(posts);
   });
-
 
   if (!posts || posts.length === 0) {
     return (

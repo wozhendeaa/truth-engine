@@ -61,6 +61,7 @@ function toElement(){
 const SinglePostPage: NextPage = (
   props: InferGetStaticPropsType<typeof getStaticProps>
 ) => {
+
   const { data, isLoading, isError } = api.posts.getPostById.useQuery({
     id: props.id,
   });
@@ -74,7 +75,7 @@ const SinglePostPage: NextPage = (
         <Flex className="col-span-4 w-full justify-center">
           <Box alignSelf={"flex-start"} >
             {/* <Link> */}
-              <ArrowBackIcon color={"whatsapp.200"} onClick={()=>toElement()} />
+              {/* <ArrowBackIcon color={"whatsapp.200"} onClick={()=>toElement()} /> */}
             {/* </Link> */}
           </Box>
           <Flex className="w-3/4">
