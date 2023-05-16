@@ -11,7 +11,7 @@ import FeedThread from "components/PostComment/FeedThread";
 import { api } from "utils/api";
 import UserContext from "../helpers/userContext";
 import { GetSekleton } from "../helpers/UIHelper";
-import { isUserVerified } from "helpers/userHelper";
+import { isUserSignedIn, isUserVerified } from "helpers/userHelper";
 import { Provider } from "react-redux";
 
 //@ts-ignore
@@ -70,6 +70,7 @@ const Home: NextPage = () => {
   const [tab, setTab] = useState<(typeof tabs)[number]>("VERIFIED_ENGINE");
 
   const isVerified = isUserVerified(user);
+  const isSignedIn = isUserSignedIn(user);
 
   const { t, i18n } = useTranslation(["common", "footer"], {
     bindI18n: "languageChanged loaded",
@@ -87,14 +88,13 @@ const Home: NextPage = () => {
           <Flex className="hidden h-full md:inline"></Flex>
 
           <Flex className="w-[100%] md:w-[80%] xl:w-[50%]" direction="column">
-            {isVerified && <PostBox />}
+            {(isVerified || (isSignedIn && tab == "COMMUNITY") )&& <PostBox />}
             {isLoading ? (
               <GetSekleton number={5} />
             ) : (
               <>
                 <selectedTabContext.Provider value={{ tab, setTab }}>
                   <Tabs />
-
                   <Box className={tab == "VERIFIED_ENGINE" ? "" : "hidden"}>
                     {
                       //@ts-ignore

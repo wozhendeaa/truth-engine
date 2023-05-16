@@ -67,7 +67,6 @@ const SinglePostPage: NextPage = (
   });
 
   if (!data) return <GetSekleton number={1} />
-
   
   return (
     <>

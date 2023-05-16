@@ -267,10 +267,10 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
               _hover={{ bg: "gray.600" }}
               icon={<BsThreeDotsVertical />}
             /> */}
-              <Box onClick={(e)=> e.stopPropagation()}>
+              <Box onClick={(e)=> e.stopPropagation()} className="group/action">
               <TransparentFeedThreadMenu
-                canDelete={true}                
-                icon={<Icon as={IoEllipsisHorizontal} w="24px" h="24px"  />}
+                canDelete={true}   
+                icon={<Flex className="px-2 group-hover/action:bg-te_dark_font rounded-md"><Icon as={IoEllipsisHorizontal} w="34px" h="34px" /></Flex>}
               />
               </Box>
             </Flex>
@@ -413,7 +413,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
               <CommentThread
                 postId={postWithUser.id}
                 topCommentsOnly={true}
-                onPostPage={false}
+                onPostPage={onPostPage}
               />
             </Box>
             {user && (

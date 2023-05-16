@@ -158,9 +158,9 @@ export const PostCreator = () => {
                 className="flex-none shrink-0 rounded-full"
               />
             </div>
-            <div className="w-full pr-6 ">
+            <div className="w-[100%]">
               <form
-                className="relative mr-[52px]"
+                className="relative"
                 onSubmit={handleSubmit(onSubmit)}
               >
                 <div className="flex w-full flex-1 justify-end rounded-lg  bg-te_dark_ui pb-12 text-slate-200 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600">

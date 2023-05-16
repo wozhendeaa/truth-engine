@@ -148,9 +148,9 @@ const Tiptap = () => {
 
   return (
     <>
-      <Flex direction="column">
+      <Flex direction="column" className="w-[100%]">
         <Flex>
-          <EditorContent editor={editor} className="m-2 w-[100%] border-none" />
+          <EditorContent editor={editor} className="my-2 mr-3 ml-2 w-[100%] border-none" />
         </Flex>
         <Flex className="w-[100%] flex flex-wrap">
           <MenuBar editor={editor} />
