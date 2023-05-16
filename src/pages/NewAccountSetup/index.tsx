@@ -39,7 +39,6 @@ export type AccountSetupSchema = z.infer<typeof accountSetupSchema>;
 
 export function AccountSetupSection( props: {user: UserResource}) {
   const {t} = useTranslation()
-  const router= useRouter()
 
   const { user } = props; 
   const {register,
@@ -226,7 +225,6 @@ export function AccountSetupSection( props: {user: UserResource}) {
 
 const PrepareNewUser: NextPage = () => {
   const {user} = useUser();
-  const route = useRouter();
   if (!user) {
     return null
   }

@@ -75,9 +75,10 @@ export const postsRouter = createTRPCRouter({
             select: {
               userId: true
             }
-          }
+          },
         }
     })
+    
 
     if (!post) throw new TRPCError({code: "NOT_FOUND", message: "没有找到文章"});
     if (post.MarkAsDelete) throw new TRPCError({code: "NOT_FOUND", message: "post_deleted"});
@@ -222,27 +223,34 @@ export const postsRouter = createTRPCRouter({
   }),
 
   //a public trpc procedure that gets all posts by author id(user id)
-  getPostsByUserId: publicProcedure
-  .input(z.object({userId: z.string()}))
-  .query(({ctx, input}) => {
-    ctx.prisma.post.findMany({
-        take:100,   
-        where:{
-            authorId: input.userId
+  getPostsByUserId: publicProcedure.input(z.object({userId: z.string()}))
+  .query(async ({ctx, input}) => {
+    const posts = await ctx.prisma.post.findMany({
+      take:100,   
+      orderBy: [{createdAt: "desc"}],
+      where: {
+        author: {
+          id: input.userId
         },
-        orderBy: [{createdAt: "desc"}],
-        include: {
-          author:true,
-          reactions: {
-            where: {
-              userId: ctx.user?.id,
-            },
-            select: {
-              userId: true
-            }
-          }     
-        }        
-    })
+        MarkAsDelete: false
+      } ,       
+      include: {
+        author: true,     
+        reactions: {
+          where: {
+            userId: ctx.user?.id,              
+          },
+          select:{
+            userId: true
+          }
+        }     
+      },
+  });
+
+  return {
+      posts,
+  };
+
   })
     ,
 

@@ -15,6 +15,66 @@ export const userRouter = createTRPCRouter({
     return null;
   }),
 
+  getUserWithProfileStatsById: publicProcedure.input(z.object({
+    userId: z.string()
+  })).query(async ({ctx, input}) => {
+    
+    const stat = await prisma.user.findFirst({
+      where: {
+        id: input.userId,
+      },
+      select: {
+        id:true,
+        profileImageUrl:true,
+        NiuBi:true,
+        displayname:true,
+        username:true,
+        email:true,
+
+        // Count the number of posts
+        _count: {
+          select: {
+            posts: true,
+            comments: true,
+          },
+        },
+      },
+    })
+
+    return stat;
+  }),
+
+  getUserWithProfileStatsByUserName: publicProcedure.input(z.object({
+    username: z.string()
+  })).query(async ({ctx, input}) => {
+    
+    const stat = await prisma.user.findFirst({
+      where: {
+        username: input.username,
+      },
+      select: {
+        id:true,
+        profileImageUrl:true,
+        NiuBi:true,
+        displayname:true,
+        username:true,
+        email:true,
+        role:true,
+        premiumStatus:true,
+
+        // Count the number of posts
+        _count: {
+          select: {
+            posts: true,
+            comments: true,
+          },
+        },
+      },
+    })
+
+    return stat;
+  }),
+
   isCurrentUserVerifiedEngine: publicProcedure.query(async ({ctx}) => {
     if (!ctx.userId) {
       return false;

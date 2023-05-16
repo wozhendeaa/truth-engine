@@ -7,7 +7,7 @@ import { PageLayout } from "components/layout";
 import { PostCreator as PostBox } from "components/posting/PostBox";
 import { Box,  SkeletonCircle, SkeletonText } from "@chakra-ui/react";
 
-import FeedThread from "components/FeedThread"
+import FeedThread from "components/PostComment/FeedThread"
 import { api } from "utils/api";
 import UserContext from "../helpers/userContext";
 import { GetSekleton } from "../helpers/UIHelper";
@@ -37,14 +37,13 @@ const Home: NextPage = () => {
           
          <div className="col-span-4 lg:col-span-2"> 
 
-         { isVerified &&<PostBox />}
-            
+        { isVerified &&<PostBox />}
         { 
         isLoading ?
           <GetSekleton number={5} />
           :
            //@ts-ignore 
-          <FeedThread posts={data} />}
+          <FeedThread postData={data}/>}
          </div>
 
           <div className="col-span-1 hidden lg:inline ">

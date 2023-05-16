@@ -12,7 +12,7 @@ import { PageLayout } from "components/layout";
 import { Box, Flex, Link } from "@chakra-ui/react";
 import { GetSekleton } from "helpers/UIHelper";
 import React from "react";
-import { SingleFeed } from "components/FeedThread";
+import { SingleFeed } from "components/PostComment/FeedThread";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 const i18n = require('next-i18next.config');
 
@@ -41,28 +41,48 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
+function toElement(){
+  if (typeof window !== 'undefined') {
+      // Get the fragment identifier from the URL
+      const fragment: string = window.location.hash;
+      if (fragment) {
+        // Find the element with the matching id
+        const element: HTMLElement | null = document.querySelector(fragment);
+        if (element) {
+          element.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+        });
+        }
+      }
+}
+}
+
 const SinglePostPage: NextPage = (
   props: InferGetStaticPropsType<typeof getStaticProps>
 ) => {
   const { data, isLoading, isError } = api.posts.getPostById.useQuery({
     id: props.id,
   });
+
   if (!data) return <GetSekleton number={1} />
 
+  
   return (
     <>
       <PageLayout>
         <Flex className="col-span-4 w-full justify-center">
-          <Box alignSelf={"flex-start"}>
-            <Link href="..">
-              <ArrowBackIcon color={"whatsapp.200"} />
-            </Link>
+          <Box alignSelf={"flex-start"} >
+            {/* <Link> */}
+              <ArrowBackIcon color={"whatsapp.200"} onClick={()=>toElement()} />
+            {/* </Link> */}
           </Box>
           <Flex className="w-3/4">
             {isLoading ? (
              <GetSekleton number={1} />
             ) : (
-              <SingleFeed key={data.id} postWithUser={data} onPostPage={true} />
+              <SingleFeed key={data.id} postWithUser={data} onPostPage={true} 
+              loadingCompleteCallBack={toElement} />
             )}
           </Flex>
         </Flex>

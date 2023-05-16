@@ -63,6 +63,13 @@
  "hide_replies":"收起回復",
  "report":"举报",
  "delete":"删除",
+ "posts":"贴文",
+ "comments":"评论",
+ "post_num":"贴文数",
+ "comment_num":"评论数",
+ "niubi":"牛币",
+
+
  
  "empty":""
 }

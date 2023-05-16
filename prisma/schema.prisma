@@ -86,10 +86,10 @@ model User {
   followers       UserFollows[]  @relation("follower")
   reenginedPosts    Post[] @relation(name: "repost")
   posts           Post[] @relation(name: "author")
+  comments        Comment[]
   reports         Report[]
   premiumStatus   Boolean   @default(false)
   reactions       Reaction[]
-  comments        Comment[]
   notifications   Notification[] 
   @@index([id])
   @@index([username])

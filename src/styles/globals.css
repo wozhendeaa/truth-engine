@@ -12,4 +12,5 @@ body {
 
 html{
     @apply h-full  ;
+    scroll-behavior: smooth;
 }

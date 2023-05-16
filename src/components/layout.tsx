@@ -9,7 +9,7 @@ export const PageLayout = (props: PropsWithChildren) => {
       <>
         <MainNavBar />
         <TruthEngineSideBar />
-        <main className='grid grid-cols-4 dark bg-te_dark_bg min-h-screen'>
+        <main className='dark bg-te_dark_bg min-h-screen flex justify-center '>
           {props.children}
         </main>
       </>

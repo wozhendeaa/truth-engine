@@ -1,9 +1,10 @@
 // Chakra imports
 import { Avatar, Box, Flex, Text, useColorModeValue } from '@chakra-ui/react';
 import Card from 'components/card/Card';
+import { string } from 'zod';
 
+banner: string;
 export default function Banner(props: {
-	banner: string;
 	avatar: string;
 	name: string;
 	job: string;
@@ -14,9 +15,9 @@ export default function Banner(props: {
 }) {
 	const { banner, avatar, name, job, posts, followers, following, ...rest } = props;
 	// Chakra Color Mode
-	const textColorPrimary = useColorModeValue('secondaryGray.900', 'white');
+	const textColorPrimary = useColorModeValue('white','secondaryGray.900');
 	const textColorSecondary = 'gray.400';
-	const borderColor = useColorModeValue('white !important', '#111C44 !important');
+	const borderColor = useColorModeValue('#111C44 !important', 'white !important');
 	return (
 		<Card mb={{ base: '0px', lg: '20px' }} alignItems='center' {...rest}>
 			<Box bg={`url(${banner})`} bgSize='cover' borderRadius='16px' h='131px' w='100%' />

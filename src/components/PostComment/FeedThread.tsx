@@ -32,18 +32,18 @@ import ImageModal from "./ImageModal";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 import { MdSend } from "react-icons/md";
-import { HSeparator } from "./separator/Separator";
 import { parseErrorMsg } from "server/helpers/serverErrorMessage";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import CommentThread from "./CommentFeed";
 import { useUser } from "@clerk/nextjs";
 import { IoEllipsisHorizontal } from "react-icons/io5";
-import TransparentFeedThreadMenu from "./menu/TransparentFeedThreadMenu";
 import { useInfiniteScroll } from "helpers/InfiniteScroll";
 import Link from "next/link";
 import UserContext from "helpers/userContext";
 import { useRouter } from "next/router";
-import { LoadingSpinner } from "./loading";
+import { LoadingSpinner } from "components/loading";
+import TransparentFeedThreadMenu from "components/menu/TransparentFeedThreadMenu";
+import { HSeparator } from "components/separator/Separator";
 const {i18n} = require('next-i18next.config')
 
 type PostsWithUserData = Post & {
@@ -56,12 +56,11 @@ type PostsWithUserData = Post & {
 interface SingleFeedProps {
   postWithUser: PostsWithUserData;
   onPostPage: boolean;
+  loadingCompleteCallBack?: () => void;
 }
 
-interface FeedProps {
-  posts: {
-    posts: PostsWithUserData[];
-  };
+export interface FeedProps {
+  posts: PostsWithUserData[];
 }
 
 export function RenderImage(props: {type: string, url: string, index: any}) {
@@ -115,6 +114,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   const postWithUser = singlePostData.postWithUser;
   const mediaStr = singlePostData.postWithUser.media;
   const onPostPage = singlePostData.onPostPage;
+  const loadingCompleteCallBack = singlePostData.loadingCompleteCallBack;
   const user = useContext(UserContext);
   const [comment, SetComment] = useState("");
   const ctx = api.useContext();
@@ -125,10 +125,17 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   const [showComments, setShowComments] = useState(onPostPage);
   const router = useRouter();
   const { t, i18n } = useTranslation(['common', 'footer'], { bindI18n: 'languageChanged loaded' })
+
+  
   // bindI18n: loaded is needed because of the reloadResources call
   // if all pages use the reloadResources mechanism, the bindI18n option can also be defined in next-i18next.config.js
   useEffect(() => {
      void i18n.reloadResources(i18n.resolvedLanguage, ['common', 'footer'])
+      setTimeout(()=>{
+        if (loadingCompleteCallBack) {
+          loadingCompleteCallBack();
+       }
+      }, 2000)
   }, [])
 
   const commentMutation = api.comment.createPostComment.useMutation({
@@ -483,13 +490,14 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   );
 }
 
-export const FeedThread = (postData: FeedProps) => {
+export const FeedThread = (props: {postData: FeedProps}) => {
   const { t } = useTranslation();
-  const posts = postData.posts.posts;
+  const posts = props.postData.posts;
   const [changePosts, setChangePosts] = useState(posts);
   const observerRef = useInfiniteScroll(() => {
     setChangePosts(posts);
   });
+
 
   if (!posts || posts.length === 0) {
     return (

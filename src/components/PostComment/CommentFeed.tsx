@@ -9,14 +9,13 @@ import dayjs from "dayjs";
 dayjs.extend(relativetTime);
 
 import { useTranslation } from "react-i18next";
-import TEComment from "./dataDisplay/TE_Comment";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Link from "next/link";
 import routes from "routes";
+import TEComment from "components/dataDisplay/TE_Comment";
 
 type CommentsWithUserData = RouterOutputs["comment"]["getCommentsForPost"];
-
 
 export const CommentThread = (props: {
   postId: string;

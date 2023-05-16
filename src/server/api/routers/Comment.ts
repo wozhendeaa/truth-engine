@@ -24,11 +24,21 @@ const ratelimitPost = new Ratelimit({
   
 export const commentRouter = createTRPCRouter({
   getCommentsForPost: publicProcedure.input(z.object({postId: z.string(),
-  limit: z.number().default(50),}))
+  limit: z.number().default(50),
+  commentId: z.string().optional()
+}))
   .query(async ({ctx, input}) => {
    let comments = await ctx.prisma.comment.findMany({
         where:{
-          replyToPostId: input.postId
+          OR: [
+            {
+              id: input.commentId,
+            },
+            {
+              replyToPostId: input.postId,
+              MarkAsDelete: false,
+            },
+          ],
         },
         take: input.limit,
         include: {
@@ -67,12 +77,66 @@ export const commentRouter = createTRPCRouter({
   }
 ),
 
+getCommentsForUser: publicProcedure.input(z.object({userId: z.string(),
+  limit: z.number().default(50),}))
+  .query(async ({ctx, input}) => {
+   let comments = await ctx.prisma.comment.findMany({
+        where:{
+          author: {
+            id: input.userId
+          },
+          replyToPostId: {not: null},
+          MarkAsDelete: false
+        },
+        take: input.limit,
+        include: {
+          author: {
+            select : {
+              id: true,
+              username: true,
+              profileImageUrl:true,
+              premiumStatus:true,
+              role:true,
+              displayname:true,
+            },   
+           
+          },
+          post: {
+             select:{
+              id: true,
+             } 
+          },
+
+          reactions: {
+            where: {
+              userId: ctx.user?.id,
+            }
+          }     
+        },
+        orderBy: [{
+          likes:'desc'
+        },
+        {
+          createdAt: "desc"
+        }
+      ]
+
+    })
+    if (!comments) comments = [];
+    
+    return {
+        comments,
+    };
+  }
+),
+
 getCommentsForComment: publicProcedure.input(z.object({commentId: z.string(),
   limit: z.number().default(50),}))
   .query(async ({ctx, input}) => {
    let comments = await ctx.prisma.comment.findMany({
         where:{
-          replyToCommentId: input.commentId
+          replyToCommentId: input.commentId,
+          MarkAsDelete: false
         },
         take: input.limit,
         include: {
@@ -120,10 +184,11 @@ getCommentsForComment: publicProcedure.input(z.object({commentId: z.string(),
     const {success} = await ratelimitPost.limit(userId);
     if (!success) throw new TRPCError({code: "TOO_MANY_REQUESTS", message: "too many requests"})
   
-    const comment = await ctx.prisma.comment.findUnique({
+    const comment = await ctx.prisma.comment.findFirst({
           where:{
-              id: input.commentId
-          },   
+              id: input.commentId,
+              MarkAsDelete: false
+           },   
           
           include: {
             reactions: {
@@ -133,7 +198,7 @@ getCommentsForComment: publicProcedure.input(z.object({commentId: z.string(),
               }
             }
           }
-      })
+      });
 
       if (!comment) throw new TRPCError({code: "NOT_FOUND", 
       message: "点赞时没有找到要点赞的评论id"});
