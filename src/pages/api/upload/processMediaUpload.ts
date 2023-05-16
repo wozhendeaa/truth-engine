@@ -29,8 +29,6 @@ const processImage = async (req: NextApiRequest, res: NextApiResponse) => {
       ContentType: "image/" + ext
     });
 
-    console.log(imgKey);
-
     return res.status(200).json({ uploadUrl: uploadUrl, key: imgKey });
 
   } catch (error) {

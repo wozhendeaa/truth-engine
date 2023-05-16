@@ -2,15 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-    overscroll-behavior: none;
-    
-    @apply h-full ;
-
-    
-}
 
 html{
-    @apply h-full  ;
     scroll-behavior: smooth;
+}
+
+@layer components {
+    .editor-menu-button {
+      @apply bg-white/10 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-white/20;
+    }
+
+    .editor-menu-button-active {
+        @apply bg-indigo-300 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-white/20;
+      }
 }

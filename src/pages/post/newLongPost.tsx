@@ -18,6 +18,7 @@ import Tippy from "components/Tippy";
 import fakerData from "helpers/faker";
 import TomSelect from "components/TomSelect";
 import dynamic from "next/dynamic";
+import Tiptap from "components/TipTap/Tiptap";
 const i18n = require('next-i18next.config');
 
 const Litepicker = dynamic(() => import('components/Litepicker'), {
@@ -51,7 +52,7 @@ const Litepicker = dynamic(() => import('components/Litepicker'), {
     
     return (
       <>
-        <PageLayout>
+        {/* <PageLayout>
         <div className="flex flex-col items-center mt-8 intro-y sm:flex-row">
         <h2 className="mr-auto text-lg font-medium">Add New Post</h2>
         <div className="flex w-full mt-4 sm:w-auto sm:mt-0">
@@ -103,9 +104,9 @@ const Litepicker = dynamic(() => import('components/Litepicker'), {
           </Menu>
         </div>
       </div>
-      <div className="grid grid-cols-12 gap-5 mt-5 intro-y">
+      <div className="grid grid-cols-12 gap-5 mt-5 intro-y"> */}
         {/* BEGIN: Post Content */}
-        <div className="col-span-12 intro-y lg:col-span-8">
+        {/* <div className="col-span-12 intro-y lg:col-span-8">
           <FormInput
             type="text"
             className="px-4 py-3 pr-10 intro-y !box"
@@ -253,10 +254,10 @@ const Litepicker = dynamic(() => import('components/Litepicker'), {
               </Tab.Panel>
             </Tab.Panels>
           </Tab.Group>
-        </div>
+        </div> */}
         {/* END: Post Content */}
         {/* BEGIN: Post Info */}
-        <div className="col-span-12 lg:col-span-4">
+        {/* <div className="col-span-12 lg:col-span-4">
           <div className="p-5 intro-y box">
             <div>
               <FormLabel>Written By</FormLabel>
@@ -355,10 +356,11 @@ const Litepicker = dynamic(() => import('components/Litepicker'), {
               <FormSwitch.Input id="post-form-6" type="checkbox" />
             </FormSwitch>
           </div>
-        </div>
+        </div> */}
         {/* END: Post Info */}
-      </div>
-        </PageLayout>
+      {/* </div> */}
+        {/* </PageLayout> */}
+        <Tiptap />
       </>
     );
   };

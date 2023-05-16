@@ -165,7 +165,6 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   if (!user) {
     return (
       <>
-      <LoadingSpinner />
       <RenderImage type={""} url={""} index={1} />
       </>
     )
@@ -236,7 +235,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
       >
         <div className="group ">
           <CardHeader
-            className="cursor-pointer group-hover:bg-te_dark_ui -p-[40px]"
+            className="cursor-pointer group-hover:bg-te_dark_ui -pt-[40px]"
             onClick={toPostPage}
           >
             <Flex alignItems={"top"} className="-my-4">
@@ -287,7 +286,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
             <div className="bg-accent text-accent-content  grid place-content-end justify-center "
               onClick={stopParentCLick}>
               {/* image display section */}
-              <div className="mt-auto items-end sm:p-6">
+              <div className="mt-auto items-end sm:pb-5">
                 <ul
                   role="list"
                   className="grid auto-cols-auto grid-flow-col gap-x-1 gap-y-2 xl:gap-x-1"
@@ -316,7 +315,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
           >
             <Button
               flex="1"
-              className="shrink"
+              className="shrink p-0"
               variant="ghost"
               _hover={{ bg: "gray.600" }}
               onClick={handleLikeClick}
@@ -330,7 +329,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
                   stroke={liked ? "grey" : "white"}
                   className={
                     "h-6 w-full hover:animate-ping " +
-                    (liked ? " te_dark_liked" : "")
+                    (liked ? "fill-te_dark_liked" : "")
                   }
                 >
                   <path
