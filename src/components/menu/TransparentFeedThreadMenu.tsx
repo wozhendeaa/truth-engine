@@ -10,6 +10,7 @@ import {
 	Icon,
 	Text
 } from '@chakra-ui/react';
+import { ChangeEvent, MouseEventHandler } from 'react';
 import { useTranslation } from 'react-i18next';
 // Assets
 import { MdOutlinePerson, MdDelete } from 'react-icons/md';

@@ -40,6 +40,8 @@ import SignUpCentered from 'views/auth/signUp/SignUpCentered';
 import SignUpDefault from 'views/auth/signUp/SignUpDefault';
 import VerificationCentered from 'views/auth/verification/VerificationCentered';
 import VerificationDefault from 'views/auth/verification/VerificationDefault';
+import NaturalHealing from 'pages/natural-healing/index';
+import RedPillAcademy from 'pages/professor-videos/index';
 
 const routes = {
 	//---posts -----
@@ -47,6 +49,29 @@ const routes = {
 		path: '/post/',
 		icon: <Icon as={MdHome} width='20px' height='20px' color='inherit' />,
 		collapse: true,
+	},
+
+	//---users -----
+	myProfile: {
+		path:'/myprofile/'
+	},
+
+
+	//---public page navigation -----
+	Index: {
+		path:'/'
+	},
+	ProfessorVideos: {
+		path:'/professor-videos'
+	},
+	NaturalHealing: {
+		path:'/natural-healing'
+	},
+	RedPillAcademy: {
+		path:'/red-pill-academy'
+	},
+	FAQ: {
+		path:'/faq'
 	},
 };
 

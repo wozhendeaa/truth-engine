@@ -267,10 +267,12 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
               _hover={{ bg: "gray.600" }}
               icon={<BsThreeDotsVertical />}
             /> */}
+              <Box onClick={(e)=> e.stopPropagation()}>
               <TransparentFeedThreadMenu
-                canDelete={true}
-                icon={<Icon as={IoEllipsisHorizontal} w="24px" h="24px" />}
+                canDelete={true}                
+                icon={<Icon as={IoEllipsisHorizontal} w="24px" h="24px"  />}
               />
+              </Box>
             </Flex>
           </CardHeader>
           <CardBody

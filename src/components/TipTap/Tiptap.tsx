@@ -131,13 +131,6 @@ const Tiptap = () => {
       Color.configure({ types: [TextStyle.name, ListItem.name] }),
       //@ts-ignore
       TextStyle.configure({ types: [ListItem.name] }),
-      Document,
-      Paragraph,
-      Text,
-      Heading.configure({
-        levels: [1, 2, 3],
-      }),
-
       StarterKit.configure({
         bulletList: {
           keepMarks: true,

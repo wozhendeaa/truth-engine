@@ -9,6 +9,7 @@ import { TFunction } from 'i18next';
 import UserContext from 'helpers/userContext';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import routes from 'routes';
 
 
 function classNames(...classes: string[]) {
@@ -69,7 +70,7 @@ export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"
                       <Menu.Item>
                         {({ active }) => (
                           <a
-                            href="#"
+                            href={routes.myProfile.path + user?.id!}
                             className={classNames(active ? 'bg-gray-100 dark:bg-purple-800' : '', 'block px-4 py-2 text-sm text-gray-700 dark:text-slate-300')}
                           >
                               {!isSSR && t('profile_page')}
@@ -90,7 +91,6 @@ export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"
                         {({ active }) => (
                            <SignOutButton>
                             {<a
-                            href="#"
                             className={classNames(active ? 'bg-gray-100 dark:bg-purple-800' : '', 'block px-4 py-2 text-sm text-gray-700 dark:text-slate-300')}>
                               {!isSSR && t('sign_out')} </a>}
                             </SignOutButton>
@@ -128,7 +128,7 @@ export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"
               <div className="mt-3 space-y-1">
                 <Disclosure.Button
                   as="a"
-                  href="#"
+                  href={routes.myProfile.path + user?.id!}
                   className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
                 >
                   {!isSSR && t('profile_page')}
@@ -142,7 +142,6 @@ export const LoggedInUserSection = ({isSSR, t} : {isSSR: boolean, t: TFunction<"
                 </Disclosure.Button>
                 <Disclosure.Button
                   as="a"
-                  href="#"
                   className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
                 >
                 {!isSSR && t('sign_out')}
@@ -205,7 +204,7 @@ export default function MainNavBar() {
                   {/* Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" */}
                   <Link
                   
-                    href="/"
+                    href={routes.Index.path}
                     className={`inline-flex items-center px-1 pt-1  dark:hover:text-purple-300 text-gray-900 font-Noto+Sans+TC hover:border-gray-300 ${
                       isActive('/') ? 'border-b-2 border-indigo-500 dark:text-purple-300' :  'dark:text-slate-100 '
                     }`}
@@ -213,33 +212,33 @@ export default function MainNavBar() {
                     {!isSSR && t('index')}
                   </Link>
                   <Link
-                    href="#"
+                    href={routes.ProfessorVideos.path}
                     className={`inline-flex items-center px-1 pt-1  dark:hover:text-purple-300 text-gray-900 font-Noto+Sans+TC hover:border-gray-300 ${
-                      isActive('/professor-videos') ? 'border-b-2 border-indigo-500 dark:text-purple-300' :  'dark:text-slate-100 '
+                      isActive(routes.ProfessorVideos.path) ? 'border-b-2 border-indigo-500 dark:text-purple-300' :  'dark:text-slate-100 '
                     }`}
                   >
                     {!isSSR && t('professor_videos')}
                   </Link>
                   <Link
-                    href="/natural-healing"
+                    href={routes.NaturalHealing.path}
                     className={`inline-flex items-center px-1 pt-1  dark:hover:text-purple-300 text-gray-900 font-Noto+Sans+TC hover:border-gray-300 ${
-                      isActive('/natural-healing') ? 'border-b-2 border-indigo-500 dark:text-purple-300' :  'dark:text-slate-100 '
+                      isActive(routes.NaturalHealing.path) ? 'border-b-2 border-indigo-500 dark:text-purple-300' :  'dark:text-slate-100 '
                     }`}
                   >
                    {!isSSR && t('natural_healing')}
                   </Link>
                   <Link
-                    href="/red-pill-academy"
+                    href={routes.RedPillAcademy.path}
                     className={`inline-flex items-center px-1 pt-1  dark:hover:text-purple-300 text-gray-900 font-Noto+Sans+TC hover:border-gray-300 ${
-                      isActive('/red-pill-academy') ? 'border-b-2 border-indigo-500 dark:text-purple-300' :  'dark:text-slate-100 '
+                      isActive(routes.RedPillAcademy.path) ? 'border-b-2 border-indigo-500 dark:text-purple-300' :  'dark:text-slate-100 '
                     }`}
                   >
                     {!isSSR && t('redpill_academy')}
                   </Link>
                   <Link
-                    href="/faq"
+                    href={routes.FAQ.path}
                     className={`inline-flex items-center px-1 pt-1  dark:hover:text-purple-300 text-gray-900 font-Noto+Sans+TC hover:border-gray-300 ${
-                      isActive('/faq') ? 'border-b-2 border-indigo-500 dark:text-purple-300' :  'dark:text-slate-100 '
+                      isActive(routes.FAQ.path) ? 'border-b-2 border-indigo-500 dark:text-purple-300' :  'dark:text-slate-100 '
                     }`}
                   >
                  {!isSSR && t('FAQ')}
