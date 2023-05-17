@@ -75,6 +75,8 @@
  "faq":"常见问答",
  "trending":"热点时事",
  "notification":"通知",
+ "link_copied":"链接已复制",
+ "link_copied_failed":"你人品真烂，链接复制失败",
  
  "empty":""
 }

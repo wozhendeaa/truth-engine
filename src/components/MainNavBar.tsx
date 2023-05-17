@@ -198,11 +198,11 @@ export default function MainNavBar() {
   const location = useRouter();
 
   function isActive(path: string) {
-    if (path === "/") {
-      return location.pathname === "/";
+    if (location.pathname === "/") {
+      return path === "/";
     }
 
-    return location.pathname.includes(path);
+    return path.startsWith(location.pathname);
   }
 
   useEffect(() => {
