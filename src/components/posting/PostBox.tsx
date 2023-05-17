@@ -10,13 +10,14 @@ import { useFilePicker } from "use-file-picker";
 import Image from "next/image";
 import S3 from "aws-sdk/clients/s3";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { CommentEditor } from "components/ContentCreation/QuillEditor";
 import FormLabel from "components/Form/FormLabel";
 import Tippy from "components/Tippy";
 import Lucide from "components/Lucide";
 import Tiptap from "components/TipTap/Tiptap";
 import { Flex } from "@chakra-ui/react";
+import UserContext from "helpers/userContext";
 const i18n = require("next-i18next.config");
 
 //@ts-ignore
@@ -59,8 +60,7 @@ export const PostCreator = () => {
       }
     },
   });
-
-  const user = api.user.getCurrentLoggedInUser.useQuery().data;
+  const user = useContext(UserContext);
   const ctx = api.useContext();
   const { t, i18n } = useTranslation(["common", "footer"], {
     bindI18n: "languageChanged loaded",

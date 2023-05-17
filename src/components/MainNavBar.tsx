@@ -9,7 +9,7 @@ import { TFunction } from "i18next";
 import UserContext from "helpers/userContext";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import routes from "routes";
+import TE_Routes from "TE_Routes";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -93,7 +93,7 @@ export const LoggedInUserSection = ({
               <Menu.Item>
                 {({ active }) => (
                   <a
-                    href={routes.myProfile.path + user?.id!}
+                    href={TE_Routes.myProfile.path + user?.id!}
                     className={classNames(
                       active ? "bg-gray-100 dark:bg-purple-800" : "",
                       "block px-4 py-2 text-sm text-gray-700 dark:text-slate-300"
@@ -167,7 +167,7 @@ export const LoggedInUserSection = ({
           <div className="mt-3 space-y-1">
             <Disclosure.Button
               as="a"
-              href={routes.myProfile.path + user?.id!}
+              href={TE_Routes.myProfile.path + user?.id!}
               className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
             >
               {!isSSR && t("profile_page")}
@@ -224,7 +224,7 @@ export default function MainNavBar() {
               <div className="flex h-16 justify-between">
                 <div className="flex px-2 lg:px-0">
                   <div className="flex flex-shrink-0 items-center">
-                    <Link href={routes.Index.path}>
+                    <Link href={TE_Routes.Index.path}>
                       <Image
                         className="block h-8 w-auto lg:hidden hover:cursor-pointer"
                         src="/images/QtruthEngineLogo.png"
@@ -234,7 +234,7 @@ export default function MainNavBar() {
                         priority
                       />
                     </Link>
-                    <Link href={routes.Index.path}>
+                    <Link href={TE_Routes.Index.path}>
                       <Image
                         className="hidden h-8 w-auto lg:block hover:cursor-pointer"
                         src="/images/QtruthEngineLogo.png"
@@ -248,7 +248,7 @@ export default function MainNavBar() {
                   <div className="dark: hidden text-xl text-slate-300 md:ml-6 md:flex md:space-x-8 ">
                     {/* Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" */}
                     <Link
-                      href={routes.Index.path}
+                      href={TE_Routes.Index.path}
                       className={`font-Noto+Sans+TC inline-flex items-center px-1  pt-1 text-gray-900 hover:border-gray-300 dark:hover:text-purple-300 ${
                         isActive("/")
                           ? "border-b-2 border-indigo-500 dark:text-purple-300"
@@ -258,9 +258,9 @@ export default function MainNavBar() {
                       {!isSSR && t("index")}
                     </Link>
                     <Link
-                      href={routes.ProfessorVideos.path}
+                      href={TE_Routes.ProfessorVideos.path}
                       className={`font-Noto+Sans+TC inline-flex items-center px-1  pt-1 text-gray-900 hover:border-gray-300 dark:hover:text-purple-300 ${
-                        isActive(routes.ProfessorVideos.path)
+                        isActive(TE_Routes.ProfessorVideos.path)
                           ? "border-b-2 border-indigo-500 dark:text-purple-300"
                           : "dark:text-slate-100 "
                       }`}
@@ -268,9 +268,9 @@ export default function MainNavBar() {
                       {!isSSR && t("professor_videos")}
                     </Link>
                     <Link
-                      href={routes.NaturalHealing.path}
+                      href={TE_Routes.NaturalHealing.path}
                       className={`font-Noto+Sans+TC inline-flex items-center px-1  pt-1 text-gray-900 hover:border-gray-300 dark:hover:text-purple-300 ${
-                        isActive(routes.NaturalHealing.path)
+                        isActive(TE_Routes.NaturalHealing.path)
                           ? "border-b-2 border-indigo-500 dark:text-purple-300"
                           : "dark:text-slate-100 "
                       }`}
@@ -278,9 +278,9 @@ export default function MainNavBar() {
                       {!isSSR && t("natural_healing")}
                     </Link>
                     <Link
-                      href={routes.RedPillAcademy.path}
+                      href={TE_Routes.RedPillAcademy.path}
                       className={`font-Noto+Sans+TC inline-flex items-center px-1  pt-1 text-gray-900 hover:border-gray-300 dark:hover:text-purple-300 ${
-                        isActive(routes.RedPillAcademy.path)
+                        isActive(TE_Routes.RedPillAcademy.path)
                           ? "border-b-2 border-indigo-500 dark:text-purple-300"
                           : "dark:text-slate-100 "
                       }`}
@@ -288,9 +288,9 @@ export default function MainNavBar() {
                       {!isSSR && t("redpill_academy")}
                     </Link>
                     <Link
-                      href={routes.FAQ.path}
+                      href={TE_Routes.FAQ.path}
                       className={`font-Noto+Sans+TC inline-flex items-center px-1  pt-1 text-gray-900 hover:border-gray-300 dark:hover:text-purple-300 ${
-                        isActive(routes.FAQ.path)
+                        isActive(TE_Routes.FAQ.path)
                           ? "border-b-2 border-indigo-500 dark:text-purple-300"
                           : "dark:text-slate-100 "
                       }`}

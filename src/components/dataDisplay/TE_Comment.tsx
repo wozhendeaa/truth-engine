@@ -24,7 +24,7 @@ import React from "react";
 import { GetSekleton } from "helpers/UIHelper";
 import { LoadingSpinner } from "components/loading";
 import { HSeparator } from "components/separator/Separator";
-import routes from "routes";
+import TE_Routes from "TE_Routes";
 
 // Custom components
 
@@ -81,7 +81,7 @@ export default function TEComment(props: {
 
   async function getRepliesForComment(onPostPage: boolean, postId: string) {
     if (!onPostPage) {
-        window.open(routes.postbyid.path + postId + "#" + commentId, "_blank");
+        window.open(TE_Routes.postbyid.path + postId + "#" + commentId, "_blank");
         return;
     }
 

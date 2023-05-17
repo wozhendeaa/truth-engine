@@ -6,7 +6,7 @@ import { PageLayout } from "components/layout";
 import { api } from "utils/api";
 import { isUserVerified } from "helpers/userHelper";
 import Sidebar from "components/sidebar/Sidebar";
-import appRoutes from 'routes';
+import appRoutes from 'TE_Routes';
 import TESidebar from "components/sidebar/TESidebar";
 
 const FAQ: NextPage = () => {

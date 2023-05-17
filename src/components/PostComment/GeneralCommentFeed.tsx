@@ -10,7 +10,7 @@ dayjs.extend(relativetTime);
 import { useTranslation } from "react-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Link from "next/link";
-import routes from "routes";
+import TE_Routes from "TE_Routes";
 import TEComment from "components/dataDisplay/TE_Comment";
 import { useRouter } from "next/router";
 

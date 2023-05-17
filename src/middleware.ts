@@ -2,27 +2,33 @@ import { clerkClient, getAuth, withClerkMiddleware } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { api } from "./utils/api";
+import TE_Routes from "TE_Routes";
 
 const publicPaths = ['/', '/sign-in*', '/sign-up*', 
 '/api/trpc*', 
 '/api/PostComment*',
 '/api/User*',
-'/natural-healing*',
-'/professor_videos*',
-'/red-pill-academy*',
-'/faq*',
-'/post*',
-
+TE_Routes.Index.path + '*',
+TE_Routes.ProfessorVideos.path + '*',
+TE_Routes.RedPillAcademy.path + '*',
+TE_Routes.FAQ.path + '*',
+TE_Routes.postbyid.path + '*',
+TE_Routes.NewAccountSetup.path + '*',
+TE_Routes.Register.path + '*',
+TE_Routes.PrepareNewUser.path + '*',
 '.*\\.(png|jpg|jpeg|gif|svg|ico)'];
 
 const isPublic = (path: string) => {
-  return publicPaths.find(x =>
-    path.match(new RegExp(`^${x}$`.replace('*$', '($|/)')))
+  return publicPaths.find(x => {
+    const result = path.match(new RegExp(`^${x}`.replace('*$', '($|/).*')))
+    return result;
+  }
   )
 }
  
 export default withClerkMiddleware((request: NextRequest) => {
-  if (isPublic(request.nextUrl.pathname)) {
+  const result = isPublic(request.nextUrl.pathname)
+  if (result) {
     return NextResponse.next()
   }
   // if the user is not signed in redirect them to the sign in page.
@@ -30,15 +36,14 @@ export default withClerkMiddleware((request: NextRequest) => {
 
   if (!userId) {
     // redirect the users to /pages/sign-in/[[...index]].ts
-    const signInUrl = new URL('/sign-in', process.env.NEXT_PUBLIC_BASE_URL)
-    signInUrl.searchParams.set('redirect_url', process.env.NEXT_PUBLIC_BASE_URL!)
+    const signInUrl = new URL(process.env.NEXT_PUBLIC_BASE_URL!)
     return NextResponse.redirect(signInUrl)
   }
 
   return NextResponse.next()
 });
  
-export const config = { matcher:  '/((?!_next/image|_next/static|favicon.ico).*)'};
+export const config = { matcher:'/((?!_next/image|_next/static|favicon.ico).*)'};
 
 const PUBLIC_FILE = /\.(.*)$/
 

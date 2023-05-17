@@ -8,7 +8,7 @@ import { RtlProvider } from 'components/rtlProvider/RtlProvider';
 import { SidebarContext } from 'contexts/SidebarContext';
 import { useState } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import routes from 'routes';
+import TE_Routes from 'TE_Routes';
 
 // Custom Chakra theme
 export default function Dashboard(props: { [x: string]: any }) {
@@ -89,7 +89,7 @@ export default function Dashboard(props: { [x: string]: any }) {
 					toggleSidebar,
 					setToggleSidebar
 				}}>
-				<Sidebar routes={routes} display='none' {...rest} />
+				<Sidebar routes={TE_Routes} display='none' {...rest} />
 				<Box
 					float='left'
 					minHeight='100vh'
@@ -108,9 +108,9 @@ export default function Dashboard(props: { [x: string]: any }) {
 							<Navbar
 								onOpen={onOpen}
 								logoText={'Horizon UI Dashboard'}
-								brandText={getActiveRoute(routes)}
-								secondary={getActiveNavbar(routes)}
-								message={getActiveNavbarText(routes)}
+								brandText={getActiveRoute(TE_Routes)}
+								secondary={getActiveNavbar(TE_Routes)}
+								message={getActiveNavbarText(TE_Routes)}
 								fixed={fixed}
 								{...rest}
 							/>
@@ -120,7 +120,7 @@ export default function Dashboard(props: { [x: string]: any }) {
 					{getRoute() ? (
 						<Box mx='auto' p={{ base: '20px', md: '30px' }} pe='20px' minH='100vh' pt='50px'>
 							<Switch>
-								{getRoutes(routes)}
+								{getRoutes(TE_Routes)}
 								<Redirect from='/' to='/rtl/rtl-default' />
 							</Switch>
 						</Box>

@@ -12,7 +12,7 @@ import { useTranslation } from "react-i18next";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Link from "next/link";
-import routes from "routes";
+import TE_Routes from "TE_Routes";
 import TEComment from "components/dataDisplay/TE_Comment";
 
 type CommentsWithUserData = RouterOutputs["comment"]["getCommentsForPost"];
@@ -79,7 +79,7 @@ export const CommentThread = (props: {
         !props.onPostPage &&
         <Flex justify={"center"} mt={-10} className=" ">
           <div className="flex gap-x-2 text-lg cursor-pointer hover:text-te_dark_action">
-            <Link target="_blank" href={routes.postbyid.path + props.postId} > 
+            <Link target="_blank" href={TE_Routes.postbyid.path + props.postId} > 
               {t("see_all_comments")}
            </Link>
           </div>

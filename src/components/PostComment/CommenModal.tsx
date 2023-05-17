@@ -5,7 +5,7 @@ import { ChangeEvent, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import toast from 'react-hot-toast';
 import { api } from 'utils/api';
-import { parseErrorMsg } from 'server/helpers/serverErrorMessage';
+import { parseErrorMsg } from 'helpers/serverErrorMessage';
 
 
 export default function CommentModal(props:  {replyToCommentId: string,

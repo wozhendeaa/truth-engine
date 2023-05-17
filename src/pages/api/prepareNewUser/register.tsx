@@ -38,11 +38,11 @@ export default async function handler(req:  NextApiRequest, res: NextApiResponse
         // An error from tRPC occured
         const httpCode = getHTTPStatusCodeFromError(cause);
         
-        return res.status(httpCode).json(cause);
+        return res.status(httpCode).json({errors: cause});
       }
       // Another error occured
       console.error(cause);
-      res.status(500).json({ message: 'server_error'});
+      res.status(500).json({ errors: 'server_error'});
    }
 
 }

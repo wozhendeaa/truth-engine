@@ -27,7 +27,7 @@ import { SidebarContext } from 'contexts/SidebarContext';
 import dropdownMain from 'assets/img/layout/dropdownMain.png';
 import dropdown from 'assets/img/layout/dropdown.png';
 import { GoChevronDown } from 'react-icons/go';
-import routes from 'routes';
+import TE_Routes from 'TE_Routes';
 
 export default function AuthNavbar(props: {
 	logo?: JSX.Element | string;
@@ -43,11 +43,11 @@ export default function AuthNavbar(props: {
 	const { isOpen: isOpenNft, onOpen: onOpenNft, onClose: onCloseNft } = useDisclosure();
 	// Menus
 	function getLinks(routeName: string) {
-		let foundRoute = routes.filter((route) => route.items && route.name === routeName);
+		let foundRoute = TE_Routes.filter((route) => route.items && route.name === routeName);
 		return foundRoute[0].items;
 	}
 	function getLinksCollapse(routeName: string) {
-		let foundRoute = routes.filter((route) => route.items && route.name === routeName);
+		let foundRoute = TE_Routes.filter((route) => route.items && route.name === routeName);
 		// let foundLinks: { name: string; layout?: string; path: string; component?: () => JSX.Element }[];
 		let foundLinks: { name: string; layout?: string; path: string; component?: () => JSX.Element }[] = [];
 		if (foundRoute[0].items) {
@@ -349,7 +349,7 @@ export default function AuthNavbar(props: {
 						display={{ base: 'flex', lg: 'none' }}
 						justifyContent='center'
 						alignItems='center'>
-						<SidebarResponsive routes={routes} />
+						<SidebarResponsive routes={TE_Routes} />
 					</Box>
 					{linksAuth}
 					<Link href='https://www.horizon-ui.com/pro'>

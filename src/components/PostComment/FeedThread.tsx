@@ -32,7 +32,7 @@ import ImageModal from "./ImageModal";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 import { MdSend } from "react-icons/md";
-import { parseErrorMsg } from "server/helpers/serverErrorMessage";
+import { parseErrorMsg } from "helpers/serverErrorMessage";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import CommentThread from "./CommentFeed";
 import { useUser } from "@clerk/nextjs";
@@ -123,10 +123,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   const [liked, setLiked] = useState(hasReaction);
   const [likeNumber, setNumber] = useState(postWithUser.likes);
   const [showComments, setShowComments] = useState(onPostPage);
-  const router = useRouter();
   const { t, i18n } = useTranslation(['common', 'footer'], { bindI18n: 'languageChanged loaded' })
-
-  
   // bindI18n: loaded is needed because of the reloadResources call
   // if all pages use the reloadResources mechanism, the bindI18n option can also be defined in next-i18next.config.js
   useEffect(() => {
@@ -162,13 +159,6 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   });
 
   let media = mediaStr ? Array.from(JSON.parse(mediaStr)) : [];
-  if (!user) {
-    return (
-      <>
-      <RenderImage type={""} url={""} index={1} />
-      </>
-    )
-  }
 
   function handleLikeClick() {
     if (!isSignedIn) {
@@ -260,13 +250,6 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
                   {dayjs(postWithUser.createdAt).fromNow()}
                 </Text>
               </Flex>
-              {/* <IconButton
-              variant="ghost"
-              colorScheme="gray"
-              aria-label="See menu"
-              _hover={{ bg: "gray.600" }}
-              icon={<BsThreeDotsVertical />}
-            /> */}
               <Box onClick={(e)=> e.stopPropagation()} className="group/action">
               <TransparentFeedThreadMenu
                 canDelete={true}   
@@ -494,9 +477,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
 export const FeedThread = (props: {postData: FeedProps}) => {
   const { t } = useTranslation();
   const posts = props.postData.posts;
-  const [changePosts, setChangePosts] = useState(posts);
   const observerRef = useInfiniteScroll(() => {
-    setChangePosts(posts);
   });
 
   if (!posts || posts.length === 0) {
@@ -507,9 +488,9 @@ export const FeedThread = (props: {postData: FeedProps}) => {
 
   return (
     <div>
-      {changePosts.map((p) => (
-        <SingleFeed key={p.id} postWithUser={p} onPostPage={false} />
-      ))}
+      {posts.map((p) => {
+       return  <SingleFeed key={p.id} postWithUser={p} onPostPage={false} />
+      })}
       <div ref={observerRef} id="end_of_thread" className="text-slate-200">
         <span></span>
       </div>

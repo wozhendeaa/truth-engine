@@ -6,16 +6,11 @@ import { PageLayout } from "components/layout";
 import { api } from "utils/api";
 import { isUserVerified } from "helpers/userHelper";
 import Sidebar from "components/sidebar/Sidebar";
-import appRoutes from 'routes';
+import appRoutes from 'TE_Routes';
 import TESidebar from "components/sidebar/TESidebar";
 
 const RedPillAcademy: NextPage = () => {
-  const { t, i18n } = useTranslation(['common', 'footer'], { bindI18n: 'languageChanged loaded' })
-  // bindI18n: loaded is needed because of the reloadResources call
-  // if all pages use the reloadResources mechanism, the bindI18n option can also be defined in next-i18next.config.js
-  useEffect(() => {
-     void i18n.reloadResources(i18n.resolvedLanguage, ['common', 'footer'])
-  }, [])
+  const { t } = useTranslation()
 
   return (
     <>

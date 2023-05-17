@@ -11,7 +11,11 @@ import { z } from 'zod';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import axios from 'axios';
 import { prisma } from 'server/db';
-import { useUser } from '@clerk/nextjs';
+import { useSession, useUser } from '@clerk/nextjs';
+import TE_Routes from 'TE_Routes';
+import { parseErrorMsg } from 'helpers/serverErrorMessage';
+import { redirect } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -57,15 +61,15 @@ export function AccountSetupSection( props: {user: UserResource}) {
 
     const watchAllFields = watch();
     const onSubmit: SubmitHandler<AccountSetupSchema> = async (data) => {
-      axios.post('/api/prepareNewUser/register', 
+      axios.post(TE_Routes.Register.path, 
             data
         )
         .then(function (response) {
-       
+           window.location.href = TE_Routes.Index.path;
         })
         .catch(function (e) {
           const errors = e.response.data.errors;
-
+          console.log(errors);
           if (errors.username) {
 
             setError('username', {
@@ -74,11 +78,14 @@ export function AccountSetupSection( props: {user: UserResource}) {
             });
           }
 
-          if (errors.email) {
+         else if (errors.email) {
             setError('email', {
               type: "custom",
               message: errors.email,
             });
+          }
+          else {
+            console.log(e.response.data);
           }
 
         });
@@ -109,7 +116,7 @@ export function AccountSetupSection( props: {user: UserResource}) {
               <use href="#b56e9dab-6ccb-4d32-ad02-6b4bb5d9bbeb" x={86} />
             </svg>
   
-        <form className="space-y-0 pt-8" action='/api/prepareNewUser/register' method="post" onSubmit={handleSubmit(onSubmit, onError)}>
+        <form className="space-y-0 pt-8" action={TE_Routes.Register.path} method="post" onSubmit={handleSubmit(onSubmit, onError)}>
         <Controller
           name="userId"
           control={control}
@@ -224,6 +231,7 @@ export function AccountSetupSection( props: {user: UserResource}) {
 }
 
 const PrepareNewUser: NextPage = () => {
+  
   const {user} = useUser();
   if (!user) {
     return null
@@ -239,14 +247,14 @@ const PrepareNewUser: NextPage = () => {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const {res, req, locale } = ctx;
-  const {user} = getAuth(req);
+  const user = getAuth(req);
 
   const exist = await prisma.user.findFirst({
     select: {
       id:true
     },
     where: {
-      id: user?.id,
+      id: user.userId ?? "",
    }
  })
 

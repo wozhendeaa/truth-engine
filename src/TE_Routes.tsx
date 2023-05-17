@@ -30,20 +30,8 @@ import OthersError from 'views/admin/main/others/404';
 import Messages from 'views/admin/main/others/messages';
 
 // Auth Imports
-import ForgotPasswordCentered from 'views/auth/forgotPassword/ForgotPasswordCentered';
-import ForgotPasswordDefault from 'views/auth/forgotPassword/ForgotPasswordDefault';
-import LockCentered from 'views/auth/lock/LockCentered';
-import LockDefault from 'views/auth/lock/LockDefault';
-import SignInCentered from 'views/auth/signIn/SignInCentered';
-import SignInDefault from 'views/auth/signIn/SignInDefault';
-import SignUpCentered from 'views/auth/signUp/SignUpCentered';
-import SignUpDefault from 'views/auth/signUp/SignUpDefault';
-import VerificationCentered from 'views/auth/verification/VerificationCentered';
-import VerificationDefault from 'views/auth/verification/VerificationDefault';
-import NaturalHealing from 'pages/natural-healing/index';
-import RedPillAcademy from 'pages/professor-videos/index';
 
-const routes = {
+const TE_Routes = {
 	//---posts -----
 	postbyid: {
 		path: '/post/',
@@ -54,8 +42,16 @@ const routes = {
 	//---users -----
 	myProfile: {
 		path:'/myprofile/'
+	},	
+	NewAccountSetup: {
+		path:'/NewAccountSetup/'
 	},
-
+	PrepareNewUser: {
+		path:'/api/prepareNewUser/'
+	},
+	Register: {
+		path:'/api/prepareNewUser/register/'
+	},
 
 	//---public page navigation -----
 	Index: {
@@ -75,4 +71,4 @@ const routes = {
 	},
 };
 
-export default routes;
+export default TE_Routes;

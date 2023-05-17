@@ -120,14 +120,12 @@ export const userRouter = createTRPCRouter({
        const user = await prisma.user.findFirst({
         select: {
           email:true,
-          id:true
         },
        where: {
          email: input.email,
-
        }
      })
-     return user != null && user.id == ctx.userId
+     return user != null;
    }),
   
    getAuthorizedUsers: publicProcedure.query(async ({ctx}) => {
@@ -148,16 +146,15 @@ export const userRouter = createTRPCRouter({
        const user = await prisma.user.findFirst({
         select: {
           username:true,
-          id:true
         },
        where: {
         username: input.username
        }
      })
-     return user != null && user.id == ctx.userId                  
+     return user != null                  
    }),
 
-    registerInMyDatabase: privateProcedure
+registerInMyDatabase: privateProcedure
     .input(accountSetupSchema)
     .mutation(async ({ctx, input}) => {
       const user = {
