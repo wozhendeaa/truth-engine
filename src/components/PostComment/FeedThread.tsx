@@ -95,7 +95,7 @@ export function RenderImage(props: {type: string, url: string, index: any, onPos
             className="absolute inset-0 focus:outline-none"
             onClick={showModal}
           >
-            <span className="sr-only"> </span>
+            <span className="sr-only">open image</span>
           </button>
           {open && (
             //@ts-ignore
@@ -225,7 +225,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
       >
         <div className="group ">
           <CardHeader
-            className="cursor-pointer group-hover:bg-te_dark_ui -pt-[40px] "
+            className="cursor-pointer group-hover:bg-te_dark_ui -pt-[30px] "
             onClick={toPostPage}
           >
             <Flex alignItems={"top"} className="-my-4">
