@@ -1,29 +1,36 @@
 import { Fragment, useContext, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import {
-  Bars3Icon,
-  Cog6ToothIcon,
-  QuestionMarkCircleIcon,
-  PuzzlePieceIcon,
-  VideoCameraIcon,
-  XMarkIcon,
-  AcademicCapIcon,
+  BellAlertIcon,
+  BellIcon,
+  FireIcon,
+  PencilIcon,
 } from '@heroicons/react/24/outline'
 import { useTranslation } from 'react-i18next'
 import UserContext from 'helpers/userContext'
 import { useRouter } from 'next/router'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { HomeIcon, ProfileIcon } from './icons/Icons'
+import TE_Routes from 'TE_Routes'
 
 const navigation = [
-  { name: 'index', href: '/', icon: Cog6ToothIcon },
-  { name: 'professor_videos', href: '/professor-videos', icon: VideoCameraIcon },
-  { name: 'natural_healing', href: '/natural-healing', icon: PuzzlePieceIcon },
-  { name: 'redpill_academy', href: '/red-pill-academy', icon: AcademicCapIcon },
-  { name: 'faq', href: '/faq', icon: QuestionMarkCircleIcon },
+  TE_Routes.Index,
+  TE_Routes.Trending, 
+  TE_Routes.IndexNotification,
+  TE_Routes.myProfile,
 ]
 const actions = [
   { id: 1, name: 'write_long_post', href: '#', initial: 'H' },
 ]
+
+
+function isActive(path: string) {
+  if (path === "/") {
+    return location.pathname === "/";
+  }
+
+  return location.pathname.includes(path);
+}
 
 //@ts-ignore
 function classNames(...classes) {
@@ -45,9 +52,9 @@ export default function TruthEngineSideMenuBar() {
   }
   return (<>
     {/* Static sidebar for desktop */}
-    <div className="hidden lg:flex col-span-2 lg:inset-y-0 lg:z-30 lg:max-w-[200px] 
-    lg:flex-col mr-8 h-screen sticky pt-9">
-          <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-trasparent">
+    <div className="hidden sm:flex lg:flex col-span-2 lg:inset-y-0 lg:z-30 lg:max-w-[100%] 
+    lg:flex-col mr-4 lg:mr-8 h-screen sticky pt-9">
+          <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-trasparent px-3">
             <div className='mt-6'></div>
             <nav className="flex flex-1 flex-col ">
               <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -56,42 +63,39 @@ export default function TruthEngineSideMenuBar() {
                     {navigation.map((item) => (
                       <li key={item.name} >
                         <a
-                          href={item.href}
-                          className={classNames(
-                            isActive(item.href)
-                              ? 'bg-te_dark_darker  text-white '
-                              : 'text-gray-400 hover:text-white rounded-lg',
-                            'group flex gap-x-3 rounded-md p-2 text-xl leading-6  tracking-wider font-semibold'
-                          )}
-                        >
-                          <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
-                          {t(item.name)}
+                          href={item.path}
+                          className={classNames(isActive(item.path) ? 'text-white' : '',
+                            'text-gray-300 hover:text-white rounded-lg group flex gap-x-3 p-2 text-xl leading-5  tracking-widest font-semibold')}>
+                          {item.icon}
+                          <div className='hidden lg:block'>{t(item.name)}</div>
                         </a>
                       </li>
                     ))}
+                    <li>
+                    <div className='hidden lg:block'>
+                  <button
+                        type="button"
+                        className="inline-flex items-center gap-x-2 r w-auto ml-2
+                        rounded-full bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold
+                        text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                      >
+                        <PencilIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
+                        {t(TE_Routes.WriteLongPost.name)}
+                      </button>
+                  </div>
+                  <div className=' lg:hidden'>
+                  <button
+                        type="button"
+                        className="inline-flex items-center gap-x-2 ml-1.5
+                        rounded-lg bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold
+                        text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                      >
+                        <PencilIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
+                      </button>
+                  </div>
+                    </li>
                   </ul>
                 </li>
-                <li>
-                  <div className="text-xs font-semibold leading-6 text-gray-400">Your teams</div>
-                  <ul role="list" className="-mx-2 mt-2 space-y-1">
-                    {actions.map((a) => (
-                      <li key={a.name}>
-                        <a
-                          href={a.href}
-                          className={classNames(
-                            'bg-gray-800 text-white group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
-                          )}
-                        >
-                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white">
-                            {a.initial}
-                          </span>
-                          <span className="truncate">{t(a.name)}</span>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-           
               </ul>
             </nav>
           </div>

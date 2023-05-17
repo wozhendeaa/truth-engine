@@ -72,6 +72,9 @@
  "VERIFIED_ENGINE":"专业引擎",
  "COMMUNITY":"社区引擎",
  "NEWS":"机器人新闻",
+ "faq":"常见问答",
+ "trending":"热点时事",
+ "notification":"通知",
  
  "empty":""
 }

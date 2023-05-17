@@ -81,7 +81,7 @@ const Home: NextPage = () => {
     <>
       <PageLayout>
         <Flex direction="row" justifyContent={"center"}>
-          <Flex className="hidden lg:block">          
+          <Flex className="hidden sm:block">          
             {!isLoading && (<><TruthEngineSideMenuBar /></>)}
           </Flex>
 
@@ -96,9 +96,9 @@ const Home: NextPage = () => {
                   <Box>
                     <Box className={(isVerified || (isSignedIn && tab == "COMMUNITY")) ? "" : "hidden"}>
                       <PostBox />
+                      <Box><HSeparator className="mt-2" /></Box>
                       </Box>
                     </Box>
-                  <Box><HSeparator className="mt-2" /></Box>
                   <Box>
                     <Box className={tab == "VERIFIED_ENGINE" ? "" : "opacity-0"}>
 

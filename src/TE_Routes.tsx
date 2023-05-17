@@ -28,12 +28,16 @@ import OthersNotifications from 'views/admin/main/others/notifications';
 import OthersPricing from 'views/admin/main/others/pricing';
 import OthersError from 'views/admin/main/others/404';
 import Messages from 'views/admin/main/others/messages';
+import Trending from 'views/admin/main/profile/newsfeed/components/Trending';
+import { BellIcon, FireIcon, PencilIcon } from '@heroicons/react/24/outline';
+import { ProfileIcon } from 'components/icons/Icons';
 
 // Auth Imports
 
 const TE_Routes = {
 	//---posts -----
 	postbyid: {
+		name:"post_by_id",
 		path: '/post/',
 		icon: <Icon as={MdHome} width='20px' height='20px' color='inherit' />,
 		collapse: true,
@@ -41,37 +45,91 @@ const TE_Routes = {
 
 	//---users -----
 	myProfile: {
-		path:'/myprofile/'
+		name:"profile_page",
+		path:'/myprofile/',
+		icon: <Icon as={ProfileIcon}  width={{md: 10, lg:7}} height={{md: 10, lg:7}}  color='inherit' />,
+
 	},	
 	userById: {
-		path:'/user/'
+		name:"user_by_id",
+		path:'/user/',
+		icon: <Icon as={MdHome} width='20px' height='20px' color='inherit' />,
+		
 	},	
 	NewAccountSetup: {
-		path:'/NewAccountSetup/'
+		name:"new_account_setup",
+		path:'/NewAccountSetup/',
+		icon: <Icon as={MdHome} width='20px' height='20px' color='inherit' />,
+
 	},
 	PrepareNewUser: {
-		path:'/api/prepareNewUser/'
+		name:"prep_new_user",
+		path:'/api/prepareNewUser/',
+		icon: <Icon as={MdHome} width='20px' height='20px' color='inherit' />,
+
 	},
 	Register: {
-		path:'/api/prepareNewUser/register/'
+		name:"register",
+		path:'/api/prepareNewUser/register/',
+		icon: <Icon as={MdHome} width='20px' height='20px' color='inherit' />,
+
 	},
 
 	//---public page navigation -----
 	Index: {
-		path:'/'
+		name:'index',
+		path:'/',
+		icon: <Icon as={MdHome}  width={{md: 10, lg:7}} height={{md: 10, lg:7}} color='inherit' />,
+
 	},
 	ProfessorVideos: {
-		path:'/professor-videos'
+		name:'professor_videos',
+		path:'/professor-videos/',
+		icon: <Icon as={MdHome} width='20px' height='20px' color='inherit' />,
+
 	},
 	NaturalHealing: {
-		path:'/natural-healing'
+		name:'natural_healing',
+		path:'/natural-healing/',
+		icon: <Icon as={MdHome} width='20px' height='20px' color='inherit' />,
+
 	},
 	RedPillAcademy: {
-		path:'/red-pill-academy'
+		name:'redpill_academy',
+		path:'/red-pill-academy/',
+		icon: <Icon as={MdHome} width='20px' height='20px' color='inherit' />,
+
 	},
 	FAQ: {
-		path:'/faq'
+		name:'faq',
+		path:'/faq/',
+		icon: <Icon as={MdHome} width='20px' height='20px' color='inherit' />,
+
 	},
+
+     //--- index sidebar menu  -----
+	Trending: {
+		name:"trending",
+		path:'/trending/',
+		icon: <Icon as={FireIcon} width={{md: 10, lg:7}} height={{md: 10, lg:7}} color='inherit' />,
+
+	},
+
+	IndexNotification: {
+		name:'notification',
+		path:'/notification/',
+		icon: <Icon as={BellIcon} width={{md: 10, lg:7}} height={{md: 10, lg:7}} color='inherit' />,
+
+	},
+
+	WriteLongPost: {
+		name:'write_long_post',
+		path:'/write-long-post/',
+		icon: <Icon as={PencilIcon} width={{md: 0, lg:7}} height={{md: 10, lg:7}}  color='inherit' />,
+
+	},
+
+
 };
 
 export default TE_Routes;

@@ -11,7 +11,7 @@ export const PageLayout = (props: PropsWithChildren) => {
         <TruthEngineMobileSideBar />
         <main className="dark min-h-screen w-full flex justify-center 
           bg-cover bg-center bg-fixed bg-te_dark_bg ">
-      <div className="absolute inset-0 pointer-events-none bg-repeat-y blur bg-site-bg opacity-[5%]"></div>
+      <div className="absolute inset-0 pointer-events-none bg-repeat-y bg-site-bg opacity-[10%]"></div>
         {props.children}
         </main>
       </>

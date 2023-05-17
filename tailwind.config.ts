@@ -3,6 +3,11 @@ import plugin,{ type Config } from
 export default {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   darkMode: 'class',
+  variants: {
+    extend: {
+      stroke: ['group-hover'],
+    },
+  },
   theme: {
     screens: {
       sm: '640px',
@@ -17,7 +22,7 @@ export default {
       },
       backgroundImage :{
         'AccountSetup': "url('https://images.unsplash.com/photo-1523705480679-b5d0cc17a656?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1935&q=80')",
-        'site-bg': "url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80')"
+        'site-bg': "url('https://wallpapercave.com/wp/wp2726662.jpg')"
       },
   
       container: {
