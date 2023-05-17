@@ -93,20 +93,31 @@ const Home: NextPage = () => {
               <>
                 <selectedTabContext.Provider value={{ tab, setTab }}>
                   <Tabs  />
-                  <Box>{(isVerified || (isSignedIn && tab == "COMMUNITY")) && <PostBox />}</Box>
+                  <Box>
+                    <Box className={(isVerified || (isSignedIn && tab == "COMMUNITY")) ? "" : "hidden"}>
+                      <PostBox />
+                      </Box>
+                    </Box>
                   <Box><HSeparator className="mt-2" /></Box>
-                  <Box className={tab == "VERIFIED_ENGINE" ? "" : "hidden"}>
-                    {
-                      //@ts-ignore
-                      <FeedThread postData={data} />
-                    }
+                  <Box>
+                    <Box className={tab == "VERIFIED_ENGINE" ? "" : "opacity-0"}>
+
+                      {
+                        //@ts-ignore
+                        <FeedThread postData={data} />
+                      }
+                    </Box>
                   </Box>
 
-                  <Box className={tab == "COMMUNITY" ? "w-[100%] min-w-[100%]" : "hidden"}>
-                  社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文
+                  <Box>
+                    <Box className={tab == "COMMUNITY" ? "" : "opacity-0"}>
+                    社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文
+                    </Box>
                   </Box>
-                  <Box className={tab == "NEWS" ? "w-[100%] min-w-[100%]" : "hidden"}>
-                  机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻
+                  <Box >
+                    <Box className={tab == "NEWS" ? "" : "opacity-0"}>
+                    机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻
+                    </Box>
                   </Box>
                 </selectedTabContext.Provider>
               </>
