@@ -63,7 +63,7 @@ export interface FeedProps {
   posts: PostsWithUserData[];
 }
 
-export function RenderImage(props: {type: string, url: string, index: any}) {
+export function RenderImage(props: {type: string, url: string, index: any, onPostPage: boolean}) {
   const [open, setOpen] = useState(false);
   const {type, url, index} = props;
 
@@ -79,16 +79,16 @@ export function RenderImage(props: {type: string, url: string, index: any}) {
     return (
       <li key={crypto.randomUUID()} className="relative">
         <div
-          className="block w-full flex-grow  rounded-lg
+          className="block w-full flex-grow  rounded-lg 
    bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 
       focus-within:ring-offset-2 focus-within:ring-offset-gray-100
     hover:opacity-75"
         >
           <Image
-            objectFit="cover"
             src={url}
             alt=""
-            className="pointer-events-none max-h-full object-cover hover:opacity-75"
+            maxH={props.onPostPage ? "full" : "150px"}
+            className="pointer-events-none object-cover shrink hover:opacity-75"
           />
           <button
             type="button"
@@ -262,6 +262,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
             pb={{ base: "6", sm: "6", md: "0" }}
             pt="0"
             className="cursor-pointer group-hover:bg-te_dark_ui"
+            maxH={onPostPage ? "full" : "250px"}
             onClick={toPostPage}
           >
             <span className="font-chinese text-xl font-bold text-slate-100 shadow-none ">
@@ -269,16 +270,16 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
             </span>
 
             <div className="bg-accent text-accent-content  grid place-content-end justify-center "
-              onClick={stopParentCLick}>
+           >
               {/* image display section */}
-              <div className="mt-auto items-end sm:pb-5">
+              <div className="mt-auto items-end sm:pb-5"    onClick={stopParentCLick}>
                 <ul
                   role="list"
                   className="grid auto-cols-auto grid-flow-col gap-x-1 gap-y-2 xl:gap-x-1"
                 >
                   {media.map((file, index) => {
                     //@ts-ignore
-                    return <RenderImage key={crypto.randomUUID()} type={file.type} url={file.url} index={index} />
+                    return <RenderImage key={crypto.randomUUID()} type={file.type} url={file.url} index={index} onPostPage={onPostPage} />
                   })}
                 </ul>
               </div>
