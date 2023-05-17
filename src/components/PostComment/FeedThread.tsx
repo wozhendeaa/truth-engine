@@ -87,8 +87,8 @@ export function RenderImage(props: {type: string, url: string, index: any, onPos
           <Image
             src={url}
             alt=""
-            maxH={props.onPostPage ? "full" : "150px"}
-            className="pointer-events-none object-cover shrink hover:opacity-75"
+            objectFit={'contain'}
+            className="pointer-events-none max-h-[100%] shrink hover:opacity-75"
           />
           <button
             type="button"
@@ -225,7 +225,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
       >
         <div className="group ">
           <CardHeader
-            className="cursor-pointer group-hover:bg-te_dark_ui -pt-[40px]"
+            className="cursor-pointer group-hover:bg-te_dark_ui -pt-[40px] "
             onClick={toPostPage}
           >
             <Flex alignItems={"top"} className="-my-4">
@@ -259,9 +259,9 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
             </Flex>
           </CardHeader>
           <CardBody
-            pb={{ base: "6", sm: "6", md: "0" }}
+            pb={"0px"}
             pt="0"
-            className="cursor-pointer group-hover:bg-te_dark_ui"
+            className="cursor-pointer group-hover:bg-te_dark_ui overflow-hidden"
             maxH={onPostPage ? "full" : "250px"}
             onClick={toPostPage}
           >
@@ -272,7 +272,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
             <div className="bg-accent text-accent-content  grid place-content-end justify-center "
            >
               {/* image display section */}
-              <div className="mt-auto items-end sm:pb-5"    onClick={stopParentCLick}>
+              <div className="mt-auto items-end"   onClick={stopParentCLick}>
                 <ul
                   role="list"
                   className="grid auto-cols-auto grid-flow-col gap-x-1 gap-y-2 xl:gap-x-1"
@@ -289,7 +289,6 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
             p="0"
             justify="space-between"
             flexWrap="nowrap"
-            mt="-5"
             maxHeight={70}
             className="cursor-pointer group-hover:bg-te_dark_ui"
             sx={{
