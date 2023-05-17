@@ -38,7 +38,7 @@ export default function TEComment(props: {
   time: string;
   likes: number;
   commentNum: number;
-  replyToPostId?: string;
+  replyToPostId: string;
   likedByUser: Reaction[]; //韭菜点赞了哪些评论
   isFirstLevel: boolean; //是不是最顶级的回复
   onPostPage: boolean; //看是不是在帖子专门的页面显示的回复。如果是浏览页面，回复的时候就显示modal回复框，如果不是就直接在评论区显示回复框
@@ -249,7 +249,8 @@ export default function TEComment(props: {
                         w="max-content"
                         _hover={{ color: 'white' }}
                         _active={{ color: 'gray.300' }}
-                         onClick={async ()=> await getRepliesForComment(onPostPage, replyToPostId!)}
+                         onClick={async ()=> 
+                          await getRepliesForComment(onPostPage, replyToPostId!)}
                       >
                         {t(showReplies ? "hide_replies" : "show_replies") + "(" + commentNum + ")"}
                       </Button>)
@@ -299,6 +300,7 @@ export default function TEComment(props: {
                   likes={c.likes}
                   likedByUser={c.reactions}
                   isFirstLevel={false}
+                  replyToPostId={c.replyToPostId ?? ""}
                   onPostPage={onPostPage}
                 />
               ))}

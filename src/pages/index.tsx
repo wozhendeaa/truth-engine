@@ -13,6 +13,7 @@ import UserContext from "../helpers/userContext";
 import { GetSekleton } from "../helpers/UIHelper";
 import { isUserSignedIn, isUserVerified } from "helpers/userHelper";
 import { Provider } from "react-redux";
+import { HSeparator, VSeparator } from "components/separator/Separator";
 
 //@ts-ignore
 function classNames(...classes) {
@@ -38,8 +39,8 @@ export function Tabs() {
 
   return (
     <div>
-      <div className="hidden font-chinese sm:block">
-        <div className="border-b border-gray-200">
+      <div className="font-chinese sm:bloc">
+        <div className="border-b border-gray-200 ">
           <nav className="-mb-px flex" aria-label="Tabs">
             {tabs.map((tab) => (
               <span
@@ -48,7 +49,7 @@ export function Tabs() {
                 className={classNames(
                   tab == selectedTab
                     ? "w-[100%] cursor-pointer border-indigo-400 text-indigo-400 "
-                    : "w-[100%] border-transparent text-gray-300 hover:border-gray-300 hover:text-gray-700",
+                    : "w-[100%] border-transparent text-gray-300 hover:border-gray-300 hover:bg-te_dark_font",
                   "w-1/4 cursor-pointer border-b-2 px-1 py-4 text-center text-sm font-medium"
                 )}
                 aria-current={tab == selectedTab ? "page" : undefined}
@@ -78,16 +79,21 @@ const Home: NextPage = () => {
     <>
       <PageLayout>
         <Flex direction="row" justifyContent={"center"}>
-          <Flex className="hidden h-full md:inline"></Flex>
+          <Flex className="hidden h-full md:inline">
 
-          <Flex className="w-[100%] md:w-[80%] xl:w-[50%]" direction="column">
-            {(isVerified || (isSignedIn && tab == "COMMUNITY") )&& <PostBox />}
+          <VSeparator mr={1} />
+          </Flex>
+
+          <Flex className="w-[100%] md:w-[80%] xl:w-[50%] min-w-[100%] md:min-w-[80%]
+          xl:min-w-[50%]" direction="column">
             {isLoading ? (
               <GetSekleton number={5} />
             ) : (
               <>
                 <selectedTabContext.Provider value={{ tab, setTab }}>
                   <Tabs />
+                  <Box>{(isVerified || (isSignedIn && tab == "COMMUNITY")) && <PostBox />}</Box>
+                  <Box><HSeparator className="mt-2" /></Box>
                   <Box className={tab == "VERIFIED_ENGINE" ? "" : "hidden"}>
                     {
                       //@ts-ignore
@@ -95,10 +101,10 @@ const Home: NextPage = () => {
                     }
                   </Box>
 
-                  <Box className={tab == "COMMUNITY" ? "w-[100%]" : "hidden"}>
+                  <Box className={tab == "COMMUNITY" ? "w-[100%] min-w-[100%]" : "hidden"}>
                   社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文
                   </Box>
-                  <Box className={tab == "NEWS" ? "w-[100%]" : "hidden"}>
+                  <Box className={tab == "NEWS" ? "w-[100%] min-w-[100%]" : "hidden"}>
                   机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻
                   </Box>
                 </selectedTabContext.Provider>
@@ -106,7 +112,9 @@ const Home: NextPage = () => {
             )}
           </Flex>
 
-          <Flex className="hidden lg:inline "></Flex>
+          <Flex className="hidden lg:inline ">
+          <VSeparator ml={1} />
+          </Flex>
         </Flex>
       </PageLayout>
     </>

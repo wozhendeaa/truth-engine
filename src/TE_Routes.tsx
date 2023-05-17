@@ -43,6 +43,9 @@ const TE_Routes = {
 	myProfile: {
 		path:'/myprofile/'
 	},	
+	userById: {
+		path:'/user/'
+	},	
 	NewAccountSetup: {
 		path:'/NewAccountSetup/'
 	},

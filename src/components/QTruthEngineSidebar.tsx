@@ -5,7 +5,6 @@ import {
   Cog6ToothIcon,
   QuestionMarkCircleIcon,
   PuzzlePieceIcon,
-  HomeIcon,
   VideoCameraIcon,
   XMarkIcon,
   AcademicCapIcon,
@@ -32,7 +31,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ') 
 }
 
-export default function TruthEngineSideBar() {
+export default function TruthEngineMobileSideBar() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const user = useContext(UserContext);
   const location = useRouter();

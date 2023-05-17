@@ -142,6 +142,10 @@ export const PostCreator = () => {
   function removePictureFromUploader(index: number, divId: string) {
     filesContent.splice(index, 1);
     document.getElementById(divId)?.remove();
+    if (filesContent.length === 0) {
+      const uploadImageDiv = document.getElementById('uploadImageDiv')
+      if (uploadImageDiv) uploadImageDiv.innerHTML = ''
+    }
   }
 
   return (
@@ -239,7 +243,7 @@ export const PostCreator = () => {
             </div>
         </div> */}
           {filesContent.length > 0 && (
-            <div className="mt-3 w-full">
+            <div className="mt-3 w-full" id="uploadImageDiv" >
               <div className="dark:border-darkmode-400 rounded-md border-2 border-dashed pt-4">
                 <div className="flex flex-wrap px-4">
                   {filesContent.map((file, index) => (
@@ -254,9 +258,12 @@ export const PostCreator = () => {
                         src={file.content}
                       />
                       <Tippy
-                        as="div"
+                        content=" "
+                        aria-controls="content"
+                        aria-selected="true"
                         className="bg-danger absolute right-0 top-0 -mr-2 
-                                -mt-2 flex h-5 w-5 items-center justify-center rounded-full text-white"
+                                -mt-2 flex h-5 w-5 items-center 
+                                justify-center rounded-full text-white"
                       >
                         <Lucide
                           icon="X"
@@ -277,7 +284,7 @@ export const PostCreator = () => {
               </div>
             </div>
           )}
-        </div>
+          </div>
       </div>
     </>
   );

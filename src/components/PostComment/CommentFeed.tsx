@@ -72,6 +72,7 @@ export const CommentThread = (props: {
           commentNum={c.commentCount}
           likedByUser={c.reactions}
           isFirstLevel={true}      
+          replyToPostId={c.replyToPostId ?? ""}
 			  	onPostPage={props.onPostPage}
         />
       ))}

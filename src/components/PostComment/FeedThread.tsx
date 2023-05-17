@@ -44,6 +44,7 @@ import { useRouter } from "next/router";
 import { LoadingSpinner } from "components/loading";
 import TransparentFeedThreadMenu from "components/menu/TransparentFeedThreadMenu";
 import { HSeparator } from "components/separator/Separator";
+import TE_Routes from "TE_Routes";
 const {i18n} = require('next-i18next.config')
 
 type PostsWithUserData = Post & {
@@ -230,15 +231,17 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
           >
             <Flex alignItems={"top"} className="-my-4">
               <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
+              <Link href={TE_Routes.userById.path + postWithUser.author.username} className="hover:underline" onClick={(e)=>e.stopPropagation()}>
                 <Avatar
                   src={
                     postWithUser.author.profileImageUrl ??
                     "/images/default_profile.png"
                   }
                 />
+                </Link>
                 <Flex>
                   <Heading size="md">
-                    <Link href="www.google.com" className="hover:underline">
+                    <Link href={TE_Routes.userById.path + postWithUser.author.username} className="hover:underline" onClick={(e)=>e.stopPropagation()}>
                       {postWithUser.author.displayname}
                     </Link>
                   </Heading>

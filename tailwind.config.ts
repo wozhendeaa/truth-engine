@@ -17,7 +17,9 @@ export default {
       },
       backgroundImage :{
         'AccountSetup': "url('https://images.unsplash.com/photo-1523705480679-b5d0cc17a656?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1935&q=80')",
+        'site-bg': "url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80')"
       },
+  
       container: {
         center: true,
       },
@@ -40,12 +42,25 @@ export default {
         te_dark_liked: '#c095e4',
       },
       backgroundColor: {
-        transparent: "transparent"
+        transparent: "transparent",
+        brand: '#0a1537',
       }
     },
    
   },
   plugins: [
     require('@tailwindcss/forms'),
+    plugin(function ({ addUtilities }) {
+      const newUtilities = {
+        '.filter-hue-rotate-90': {
+          filter: 'hue-rotate(90deg)',
+        },
+        '.opacity-50': {
+          opacity: '0.5',
+        },
+      }
+
+      addUtilities(newUtilities)
+    }),
   ],
 } satisfies Config;

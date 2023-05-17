@@ -6,8 +6,8 @@ const HSeparator = (props: { variant?: string; [x: string]: any }) => {
 };
 
 const VSeparator = (props: { variant?: string; [x: string]: any }) => {
-	const { variant, ...rest } = props;
-	return <Flex w='1px' bg='rgba(135, 140, 189, 0.3)' {...rest} />;
+	const { variant, mr,ml,...rest } = props;
+	return <Flex w='1px' bg='rgba(135, 140, 189, 0.3)' mr={mr ? mr : "0"} ml={ml ? ml : "0"} {...rest} />;
 };
 
 export { HSeparator, VSeparator };

@@ -202,7 +202,7 @@ const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
   });
   const [tab, setTab] = useState<(typeof tabs)[number]>("posts");
 
-  if (!data) return <></>
+  if (!data) return <>500 错误。 用户被ban或不存在</>
 
   return (
     <>
