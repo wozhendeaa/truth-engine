@@ -65,7 +65,7 @@ export default function TruthEngineSideMenuBar() {
                         <a
                           href={item.path}
                           className={classNames(isActive(item.path) ? 'text-white' : '',
-                            'text-gray-300 hover:text-white rounded-lg group flex gap-x-3 p-2 text-xl leading-5  tracking-widest font-semibold')}>
+                            'text-gray-300 hover:text-white rounded-lg group flex gap-x-3 p-2 text-xl leading-6  tracking-widest font-semibold')}>
                           {item.icon}
                           <div className='hidden lg:block'>{t(item.name)}</div>
                         </a>
