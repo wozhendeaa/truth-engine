@@ -52,7 +52,7 @@ export default function TruthEngineSideMenuBar() {
   }
   return (<>
     {/* Static sidebar for desktop */}
-    <div className="hidden sm:flex lg:flex col-span-2 lg:inset-y-0 lg:z-30 lg:max-w-[100%] 
+    <div className="hidden sm:flex lg:flex col-span-2 lg:inset-y-0 lg:z-30 lg:max-w-[100%]  shrink-0
     lg:flex-col mr-4 lg:mr-8 h-screen sticky pt-9">
           <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-trasparent px-3">
             <div className='mt-6'></div>
