@@ -167,7 +167,7 @@ export const LoggedInUserSection = ({
           <div className="mt-3 space-y-1">
             <Disclosure.Button
               as="a"
-              href={TE_Routes.myProfile.path + user?.id!}
+              href={TE_Routes.myProfile.path}
               className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
             >
               {!isSSR && t("profile_page")}
@@ -181,7 +181,7 @@ export const LoggedInUserSection = ({
             </Disclosure.Button>
             <Disclosure.Button
               as="a"
-              className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+              className="block px-4 py-2 text-base cursor-pointer font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
             >
               {!isSSR && t("sign_out")}
             </Disclosure.Button>
@@ -209,19 +209,17 @@ export default function MainNavBar() {
     setIsSSR(false);
   }, []);
   const { t } = useTranslation();
-
   return (
     <>
       <Disclosure
         as="nav"
-        className="bg-blur sticky top-0 z-50 
-       border-b-4
+        className="sticky top-0 z-50  border-b-4 
     border-b-gray-800 bg-white font-chinese text-4xl shadow-xl
      dark:bg-te_dark_ui"
       >
         {({ open }) => (
           <>
-            <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8        bg-transparent  bg-opacity-10     ">
+            <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8 ">
               <div className="flex h-16 justify-between">
                 <div className="flex px-2 lg:px-0">
                   <div className="flex flex-shrink-0 items-center">

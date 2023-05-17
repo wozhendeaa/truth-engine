@@ -1,5 +1,5 @@
-import plugin,{ type Config } from "tailwindcss";
-
+import plugin,{ type Config } from 
+"tailwindcss";
 export default {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   darkMode: 'class',
@@ -50,17 +50,5 @@ export default {
   },
   plugins: [
     require('@tailwindcss/forms'),
-    plugin(function ({ addUtilities }) {
-      const newUtilities = {
-        '.filter-hue-rotate-90': {
-          filter: 'hue-rotate(90deg)',
-        },
-        '.opacity-50': {
-          opacity: '0.5',
-        },
-      }
-
-      addUtilities(newUtilities)
-    }),
   ],
 } satisfies Config;

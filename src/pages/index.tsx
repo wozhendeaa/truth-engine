@@ -14,6 +14,7 @@ import { GetSekleton } from "../helpers/UIHelper";
 import { isUserSignedIn, isUserVerified } from "helpers/userHelper";
 import { Provider } from "react-redux";
 import { HSeparator, VSeparator } from "components/separator/Separator";
+import TruthEngineSideMenuBar from "components/QTruthEngineSideMenubar";
 
 //@ts-ignore
 function classNames(...classes) {
@@ -38,7 +39,8 @@ export function Tabs() {
   }
 
   return (
-    <div>
+    <div className="sticky top-[68px] z-50 backdrop-blur-md
+    bg-opacity-80  bg-te_dark_bg">
       <div className="font-chinese sm:bloc">
         <div className="border-b border-gray-200 ">
           <nav className="-mb-px flex" aria-label="Tabs">
@@ -79,19 +81,18 @@ const Home: NextPage = () => {
     <>
       <PageLayout>
         <Flex direction="row" justifyContent={"center"}>
-          <Flex className="hidden h-full md:inline">
-
-          <VSeparator mr={1} />
+          <Flex className="hidden lg:block">          
+            {!isLoading && (<><TruthEngineSideMenuBar /></>)}
           </Flex>
 
-          <Flex className="w-[100%] md:w-[80%] xl:w-[50%] min-w-[100%] md:min-w-[80%]
+        <Flex className="w-[100%] md:w-[80%] lg:w-[50%] min-w-[100%] md:min-w-[80%]
           xl:min-w-[50%]" direction="column">
             {isLoading ? (
               <GetSekleton number={5} />
             ) : (
               <>
                 <selectedTabContext.Provider value={{ tab, setTab }}>
-                  <Tabs />
+                  <Tabs  />
                   <Box>{(isVerified || (isSignedIn && tab == "COMMUNITY")) && <PostBox />}</Box>
                   <Box><HSeparator className="mt-2" /></Box>
                   <Box className={tab == "VERIFIED_ENGINE" ? "" : "hidden"}>
@@ -112,8 +113,9 @@ const Home: NextPage = () => {
             )}
           </Flex>
 
-          <Flex className="hidden lg:inline ">
-          <VSeparator ml={1} />
+          <Flex className="hidden lg:block ">
+          {!isLoading && (<><VSeparator mr={1} /></>)}
+         
           </Flex>
         </Flex>
       </PageLayout>

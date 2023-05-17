@@ -1,6 +1,6 @@
 import { PropsWithChildren, useEffect } from "react";
 import MainNavBar from "./MainNavBar";
-import TruthEngineMobileSideBar from "./QTruthEngineSidebar";
+import TruthEngineMobileSideBar from "./QTruthEngineSideNavbar";
 
 
 export const PageLayout = (props: PropsWithChildren) => {
