@@ -121,7 +121,7 @@ const Home: NextPage = () => {
         </Flex>
 
         <Flex
-          className="w-[100%] md:w-[80%] lg:w-[60%] xl:w-[50%]"
+          className="w-[100%] md:w-[80%] lg:w-[50%]"
           direction="column"
         >
           {isCurrentTabLoading("VERIFIED_ENGINE") ? (

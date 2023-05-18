@@ -52,12 +52,12 @@ export default function TruthEngineSideMenuBar() {
   }
   return (<>
     {/* Static sidebar for desktop */}
-    <div className="hidden sm:flex lg:flex col-span-2 lg:inset-y-0 lg:z-30 lg:max-w-[100%]  shrink-0
-    lg:flex-col mr-4 lg:mr-8 h-screen sticky pt-9">
-          <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-trasparent px-3">
+    <div className="sm:flex md:flex lg:flex col-span-2 lg:inset-y-0 lg:z-30 lg:max-w-[100%]  shrink-0
+    lg:flex-col md:mr-4 md:-ml-8 lg:mr-8 h-screen sticky pt-9 sm:mr-0">
+          <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-trasparent px-3 lg:-ml-[200px]">
             <div className='mt-6'></div>
             <nav className="flex flex-1 flex-col ">
-              <ul role="list" className="flex flex-1 flex-col gap-y-7">
+              <ul role="list" className="flex flex-1 flex-col gap-y-7  ">
                 <li>
                   <ul role="list" className="-mx-2 space-y-1 ">
                     {navigation.map((item) => (
@@ -83,7 +83,7 @@ export default function TruthEngineSideMenuBar() {
                         {t(TE_Routes.WriteLongPost.name)}
                       </button>
                   </div>
-                  <div className=' lg:hidden'>
+                  <div className='lg:hidden'>
                   <button
                         type="button"
                         className="inline-flex items-center gap-x-2 ml-2.5 md:ml-1.5
