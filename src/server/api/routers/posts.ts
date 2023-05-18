@@ -169,13 +169,41 @@ export const postsRouter = createTRPCRouter({
     return feed;
   }),
 
-  getAllWithReactionsDataForUser: publicProcedure.query(async ({ ctx }) => {
+  getVerifiedEngineFeed: publicProcedure.query(async ({ ctx }) => {
     const posts = await ctx.prisma.post.findMany({
         take:100,   
         orderBy: [{createdAt: "desc"}],
         where: {
           author:{
             role: {in: ['ADMIN_VERYFIED_ENGINE','VERYFIED_ENGINE']}
+          },
+          MarkAsDelete: false
+        } ,       
+        include: {
+          author: true,     
+          reactions: {
+            where: {
+              userId: ctx.user?.id,              
+            },
+            select:{
+              userId: true
+            }
+          }     
+        },
+    });
+
+    return {
+        posts,
+    };
+  }),
+
+  getCommunityEngineFeed: publicProcedure.query(async ({ ctx }) => {
+    const posts = await ctx.prisma.post.findMany({
+        take:100,   
+        orderBy: [{createdAt: "desc"}],
+        where: {
+          author:{
+            role: {not : {in: ['ADMIN_VERYFIED_ENGINE','VERYFIED_ENGINE']}}
           },
           MarkAsDelete: false
         } ,       

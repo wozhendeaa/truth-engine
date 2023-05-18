@@ -16,7 +16,7 @@ import FormLabel from "components/Form/FormLabel";
 import Tippy from "components/Tippy";
 import Lucide from "components/Lucide";
 import Tiptap from "components/TipTap/Tiptap";
-import { Flex } from "@chakra-ui/react";
+import { Box, Flex, Grid, GridItem } from "@chakra-ui/react";
 import UserContext from "helpers/userContext";
 const i18n = require("next-i18next.config");
 
@@ -65,6 +65,8 @@ export const PostCreator = () => {
   const { t, i18n } = useTranslation(["common", "footer"], {
     bindI18n: "languageChanged loaded",
   });
+  const [imageWidth, setImageWidth] = useState(0);
+
   // bindI18n: loaded is needed because of the reloadResources call
   // if all pages use the reloadResources mechanism, the bindI18n option can also be defined in next-i18next.config.js
   useEffect(() => {
@@ -143,89 +145,38 @@ export const PostCreator = () => {
     filesContent.splice(index, 1);
     document.getElementById(divId)?.remove();
     if (filesContent.length === 0) {
-      const uploadImageDiv = document.getElementById('uploadImageDiv')
-      if (uploadImageDiv) uploadImageDiv.innerHTML = ''
+      const uploadImageDiv = document.getElementById("uploadImageDiv");
+      if (uploadImageDiv) uploadImageDiv.innerHTML = "";
     }
   }
 
+
+  const handleImageLoad = (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    const target = event.target as HTMLImageElement;
+    setImageWidth(target.width + 10);
+  };
+
   return (
     <>
-      <div>
-        <div className="bg-primary text-primary-content place-content-center h-auto w-full">
-          <div className="flex grow space-x-3 pl-5 pt-5 lg:text-lg">
-            <div className="h-auto shrink-0">
+        <div className=" w-[100%] place-content-center">
+          <Flex>
+            <Box flex="none">
               <Image
                 src={user.profileImageUrl ?? "/images/default_profile.png"}
                 alt=""
-                width={50}
-                height={50}
-                className="flex-none shrink-0 rounded-full"
+                width={60}
+                height={60}
+                onLoad={handleImageLoad}
+                className="flex-none shrink-0 rounded-full p-2"
               />
-            </div>
-            <div className="w-[100%]">
-              <form
-                className="relative"
-                onSubmit={handleSubmit(onSubmit)}
-              >
-                <div className="flex w-full flex-1 justify-end rounded-lg  bg-te_dark_ui pb-12 text-slate-200 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600">
-                  <label htmlFor="content" className="sr-only">
-                    {t("Add_your_comment")}
-                  </label>
-                  <Flex className="w-[100%]">
-                    <Tiptap />
-                  </Flex>
-                </div>
-                {/* <div className="absolute inset-x-0 bottom-0 flex justify-between py-2 pl-3 pr-2">
-                  <div className="flex items-center space-x-5">
-                    <div className="flex items-center">
-                      <button
-                        type="button"
-                        disabled={isPosting}
-                        onClick={() => openFileSelector()}
-                        className="-m-2.5 flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:text-gray-500"
-                      >
-                        <label
-                          htmlFor="file_upload"
-                          className="-m-2.5 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-gray-400 hover:text-gray-500"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="h-6 w-6"
-                            aria-hidden="true"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                            />
-                          </svg>
-                          <span className="sr-only">{t("upload_file")}</span>
-                        </label>
-                      </button>
-                    </div>
-                  </div> 
-
-                  <button
-                    type="submit"
-                    disabled={isPosting}
-                    className="text-md rounded-md bg-white  px-2.5
-                   pt-2 align-middle  font-semibold text-gray-900 shadow-sm ring-1
-                    ring-inset ring-gray-300 hover:bg-gray-300"
-                  >
-                    {t("post")}
-                  </button>
-                </div> */}
-              </form>
-            </div>
-          </div>
-
+            </Box>
+            <Box className="float-left w-full" style={{ maxWidth: `calc(100% - ${imageWidth}px)` }}>
+              <Tiptap />
+            </Box>
+            </Flex>
           {/* image display section */}
           {filesContent.length > 0 && (
-            <div className="mt-3 w-full" id="uploadImageDiv" >
+            <div className="mt-3 w-full" id="uploadImageDiv">
               <div className="dark:border-darkmode-400 rounded-md border-2 border-dashed pt-4">
                 <div className="flex flex-wrap px-4">
                   {filesContent.map((file, index) => (
@@ -266,8 +217,7 @@ export const PostCreator = () => {
               </div>
             </div>
           )}
-          </div>
-      </div>
+        </div>
     </>
   );
 };

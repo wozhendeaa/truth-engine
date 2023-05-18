@@ -1,18 +1,19 @@
 "use client";
 
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useEditor, EditorContent, generateHTML, JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Extension } from "@tiptap/core";
 import { Color } from "@tiptap/extension-color";
 import ListItem from "@tiptap/extension-list-item";
 import TextStyle from "@tiptap/extension-text-style";
-import React from "react";
+import React, { useMemo } from "react";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
 import Heading from "@tiptap/extension-heading";
 import { Box, Flex } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
+import { HSeparator } from "components/separator/Separator";
 
 //@ts-ignore
 const MenuBar = ({ editor }) => {
@@ -112,37 +113,54 @@ const MenuBar = ({ editor }) => {
   );
 };
 
-export interface CustomExtensionOptions {
-  awesomeness: number;
+export interface EmojiExtensionOptions {
+  smileyFace: string;
 }
 
-const CustomExtension = Extension.create<CustomExtensionOptions>({
-  name: "customExtension",
+const EmojiExtention = Extension.create<EmojiExtensionOptions>({
+  name: "emoji",
   addStorage() {
     return {
-      awesomeness: 100,
+      smileyFace: ":)",
     };
   },
 });
 
+export function gettHtmlFromJson(json: JSONContent) {
+  const output = useMemo(() => {
+    return generateHTML(json, [
+      Document,
+      Paragraph,
+      Text,
+    ])
+  }, [json])
+
+  return (
+    <>
+      {output}
+    </>
+  )
+}
+
 const Tiptap = () => {
-  const editor = useEditor({
+  const editor = useEditor({    
+    editorProps: {
+      attributes: {
+        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl px-2 mx-auto min-h-[100px] focus:outline-none',        
+      },      
+    },
     extensions: [
       Color.configure({ types: [TextStyle.name, ListItem.name] }),
       //@ts-ignore
       TextStyle.configure({ types: [ListItem.name] }),
+      EmojiExtention,
       StarterKit.configure({
-        bulletList: {
-          keepMarks: true,
-          keepAttributes: false,
-          // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+        heading: {
+          levels: [1, 2, 3],
         },
-        orderedList: {
-          keepMarks: true,
-          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
-        },
+        
       }),
-    ],
+    ],    
     content: "<p>Hello World! 🌎️</p>",
   });
 
@@ -150,9 +168,10 @@ const Tiptap = () => {
     <>
       <Flex direction="column" className="w-[100%]">
         <Flex>
-          <EditorContent editor={editor} className="my-2 mr-3 ml-2 w-[100%] border-none" />
+          <EditorContent editor={editor} className="w-[100%] text-slate-50" />
         </Flex>
         <Flex className="w-[100%] flex flex-wrap">
+          <HSeparator my={1} />
           <MenuBar editor={editor} />
         </Flex>
       </Flex>

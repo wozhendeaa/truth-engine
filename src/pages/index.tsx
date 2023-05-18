@@ -35,13 +35,16 @@ export function Tabs() {
   const { tab: selectedTab, setTab } = useContext(selectedTabContext);
 
   function changeTab(tab: (typeof tabs)[number]) {
+    console.log(tab);
     setTab(tab);
   }
 
   return (
-    <div className="sticky top-[68px] z-40 backdrop-blur-md
-    bg-opacity-80  bg-te_dark_bg">
-      <div className="font-chinese sm:bloc">
+    <div
+      className="sticky top-[68px] z-40 bg-te_dark_bg
+    bg-opacity-80  backdrop-blur-md"
+    >
+      <div className="sm:bloc font-chinese">
         <div className="border-b border-gray-200 ">
           <nav className="-mb-px flex" aria-label="Tabs">
             {tabs.map((tab) => (
@@ -67,8 +70,12 @@ export function Tabs() {
 }
 
 const Home: NextPage = () => {
-  const { data, isLoading } =
-    api.posts.getAllWithReactionsDataForUser.useQuery();
+  const { data: verifiedFeed, isLoading: isVerifiedLoading } =
+    api.posts.getVerifiedEngineFeed.useQuery();
+
+  const { data: communityFeed, isLoading: isCommunityLoading } =
+    api.posts.getCommunityEngineFeed.useQuery();
+
   const user = useContext(UserContext);
   const [tab, setTab] = useState<(typeof tabs)[number]>("VERIFIED_ENGINE");
 
@@ -77,57 +84,104 @@ const Home: NextPage = () => {
 
   const { t } = useTranslation();
 
+  function isAnyTabLoading() {
+    if (tab == "VERIFIED_ENGINE") {
+      return isVerifiedLoading;
+    } else if (tab == "COMMUNITY") {
+      return isCommunityLoading;
+    } else if (tab == "NEWS") {
+      return false;
+    }
+
+    return false;
+  }
+
+  function isCurrentTabLoading(currTab: (typeof tabs)[number]) {
+    if (currTab == "VERIFIED_ENGINE") {
+      return isVerifiedLoading;
+    } else if (currTab == "COMMUNITY") {
+      return isCommunityLoading;
+    } else if (currTab == "NEWS") {
+      return false;
+    }
+
+    return false;
+  }
+
   return (
     <>
       <PageLayout>
-        <Flex direction="row" justifyContent={"center"}>
-          <Flex className="hidden sm:block">          
-            {!isLoading && (<><TruthEngineSideMenuBar /></>)}
-          </Flex>
+        <Flex className="hidden sm:block">
+          {!isAnyTabLoading() && (
+            <>
+              <TruthEngineSideMenuBar />
+            </>
+          )}
+        </Flex>
 
-        <Flex className="w-[100%] md:w-[80%] lg:w-[50%] min-w-[100%] md:min-w-[80%]
-          xl:min-w-[50%]" direction="column">
-            {isLoading ? (
-              <GetSekleton number={5} />
-            ) : (
-              <>
-                <selectedTabContext.Provider value={{ tab, setTab }}>
-                  <Tabs  />
-                  <Box>
-                    <Box className={(isVerified || (isSignedIn && tab == "COMMUNITY")) ? "" : "hidden"}>
-                      <PostBox />
-                      <Box><HSeparator className="mt-2" /></Box>
-                      </Box>
+        <Flex
+          className="w-[100%] md:w-[80%] lg:w-[60%] xl:w-[50%]"
+          direction="column"
+        >
+          {isCurrentTabLoading("VERIFIED_ENGINE") ? (
+            <GetSekleton number={5} />
+          ) : (
+            <>
+              <selectedTabContext.Provider value={{ tab, setTab }}>
+                <Tabs />
+                <Box>
+                  <Box
+                    className={
+                      isVerified && tab == "VERIFIED_ENGINE" ? "" : "hidden"
+                    }
+                  >
+                    <PostBox />
+                    <Box>
+                      <HSeparator className="mt-2" />
                     </Box>
-                  <Box>
-                    <Box className={tab == "VERIFIED_ENGINE" ? "" : "opacity-0"}>
+                  </Box>
+                </Box>
+                <Box>
+                  <Box className={tab == "VERIFIED_ENGINE" ? "" : "hidden"}>
+                    {
+                      //@ts-ignore
+                      <FeedThread postData={verifiedFeed} />
+                    }
+                  </Box>
+                </Box>
 
+                <Flex direction={"column"}>
+                  <Box className={tab == "COMMUNITY" ? "" : " hidden "}>
+                    <Flex>
+                      <PostBox />
+                    </Flex>
+                    <Flex>
+                      <HSeparator className="mt-2" />
+                    </Flex>
+                    <Flex>
                       {
                         //@ts-ignore
-                        <FeedThread postData={data} />
+                        <FeedThread postData={communityFeed} />
                       }
-                    </Box>
+                    </Flex>
                   </Box>
-
-                  <Box>
-                    <Box className={tab == "COMMUNITY" ? "" : "opacity-0"}>
-                    社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文社区贴文
-                    </Box>
-                  </Box>
-                  <Box >
-                    <Box className={tab == "NEWS" ? "" : "opacity-0"}>
+                </Flex>
+                <Box className="w-full">
+                  <Box className={tab == "NEWS" ? "" : "hidden"}>
                     机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻
-                    </Box>
                   </Box>
-                </selectedTabContext.Provider>
-              </>
-            )}
-          </Flex>
+                </Box>
+              </selectedTabContext.Provider>
+            </>
+          )}
+        </Flex>
 
-          <Flex className="hidden lg:block ">
-          {!isLoading && (<><VSeparator mr={1} /></>)}
-         
-          </Flex>
+        <Flex className="hidden lg:block ">
+          {!isAnyTabLoading() && (
+            <>
+              <VSeparator mr={1} />
+            </>
+          )}
         </Flex>
       </PageLayout>
     </>

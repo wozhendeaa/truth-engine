@@ -1,13 +1,13 @@
 import {
-    GetStaticProps,
-    GetStaticPropsContext,
-    InferGetStaticPropsType,
-    type NextPage,
-  } from "next";
+  GetStaticProps,
+  GetStaticPropsContext,
+  InferGetStaticPropsType,
+  type NextPage,
+} from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { PageLayout } from "components/layout";
 import React, { useState } from "react";
-import { Button, FormLabel } from "@chakra-ui/react";
+import { Box, Button, Flex, FormLabel } from "@chakra-ui/react";
 import _ from "lodash";
 import Lucide from "components/Lucide";
 import Menu from "components/Headless/Menu";
@@ -19,40 +19,46 @@ import fakerData from "helpers/faker";
 import TomSelect from "components/TomSelect";
 import dynamic from "next/dynamic";
 import Tiptap from "components/TipTap/Tiptap";
-const i18n = require('next-i18next.config');
+import { PostCreator as PostBox} from "components/posting/PostBox";
+import { HSeparator } from "components/separator/Separator";
+import TruthEngineSideMenuBar from "components/QTruthEngineSideMenubar";
+const i18n = require("next-i18next.config");
 
-const Litepicker = dynamic(() => import('components/Litepicker'), {
+const Litepicker = dynamic(() => import("components/Litepicker"), {
+  ssr: false,
+  loading: () => <p>Loading ...</p>,
+});
+
+const ClassicEditor = dynamic(
+  () => import("components/Ckeditor/ClassicEditor"),
+  {
     ssr: false,
     loading: () => <p>Loading ...</p>,
-  });
+  }
+);
 
-  const ClassicEditor = dynamic(() => import('components/Ckeditor/ClassicEditor'), {
-    ssr: false,
-    loading: () => <p>Loading ...</p>,
-  });
-  
-  export const getStaticProps: GetStaticProps = async (
-    context: GetStaticPropsContext
-  ) => {
-    const locale = "zh-CN";
-    return {
-      props: {
-        ...(await serverSideTranslations(locale, ["common", "footer"], i18n)),
-      },
-    };
+export const getStaticProps: GetStaticProps = async (
+  context: GetStaticPropsContext
+) => {
+  const locale = "zh-CN";
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common", "footer"], i18n)),
+    },
   };
+};
 
-  const NewLongPostPage: NextPage = (
-    props: InferGetStaticPropsType<typeof getStaticProps>
-  ) => {
-    const [categories, setCategories] = useState(["1", "2"]);
-    const [tags, setTags] = useState(["1", "2"]);
-    const [salesReportFilter, setSalesReportFilter] = useState<string>();
-    const [editorData, setEditorData] = useState("<p>Content of the editor.</p>");
-    
-    return (
-      <>
-        {/* <PageLayout>
+const NewLongPostPage: NextPage = (
+  props: InferGetStaticPropsType<typeof getStaticProps>
+) => {
+  const [categories, setCategories] = useState(["1", "2"]);
+  const [tags, setTags] = useState(["1", "2"]);
+  const [salesReportFilter, setSalesReportFilter] = useState<string>();
+  const [editorData, setEditorData] = useState("<p>Content of the editor.</p>");
+
+  return (
+    <>
+      {/* <PageLayout>
         <div className="flex flex-col items-center mt-8 intro-y sm:flex-row">
         <h2 className="mr-auto text-lg font-medium">Add New Post</h2>
         <div className="flex w-full mt-4 sm:w-auto sm:mt-0">
@@ -105,8 +111,8 @@ const Litepicker = dynamic(() => import('components/Litepicker'), {
         </div>
       </div>
       <div className="grid grid-cols-12 gap-5 mt-5 intro-y"> */}
-        {/* BEGIN: Post Content */}
-        {/* <div className="col-span-12 intro-y lg:col-span-8">
+      {/* BEGIN: Post Content */}
+      {/* <div className="col-span-12 intro-y lg:col-span-8">
           <FormInput
             type="text"
             className="px-4 py-3 pr-10 intro-y !box"
@@ -255,9 +261,9 @@ const Litepicker = dynamic(() => import('components/Litepicker'), {
             </Tab.Panels>
           </Tab.Group>
         </div> */}
-        {/* END: Post Content */}
-        {/* BEGIN: Post Info */}
-        {/* <div className="col-span-12 lg:col-span-4">
+      {/* END: Post Content */}
+      {/* BEGIN: Post Info */}
+      {/* <div className="col-span-12 lg:col-span-4">
           <div className="p-5 intro-y box">
             <div>
               <FormLabel>Written By</FormLabel>
@@ -357,13 +363,56 @@ const Litepicker = dynamic(() => import('components/Litepicker'), {
             </FormSwitch>
           </div>
         </div> */}
-        {/* END: Post Info */}
+      {/* END: Post Info */}
       {/* </div> */}
-        {/* </PageLayout> */}
-        <Tiptap />
-      </>
-    );
-  };
-  
-  export default NewLongPostPage;
-  
+      {/* </PageLayout> */}
+      <PageLayout>
+          <Flex className="hidden sm:block">
+              <>
+                <TruthEngineSideMenuBar />
+              </>
+          </Flex>
+          <Flex
+            className="w-[100%] md:w-[80%] lg:w-[60%] xl:w-[50%]"
+            direction="column"
+          >
+            {(
+              <>
+                  <Box>
+                    <Box
+                      className={
+                        true
+                          ? ""
+                          : "hidden"
+                      }
+                    >
+                      <PostBox />
+                      <Box>
+                        <HSeparator className="mt-2" />
+                      </Box>
+                    </Box>
+                  </Box>
+                  <Box>
+                    <Box
+                      className={false ? "" : "hidden"}
+                    >
+                      {
+                        //@ts-ignore
+                      }
+                    </Box>
+                  </Box>
+
+              </>
+            )}
+          </Flex>
+
+          <Flex className="hidden lg:block ">
+              <>
+              </>
+          </Flex>
+      </PageLayout>
+    </>
+  );
+};
+
+export default NewLongPostPage;

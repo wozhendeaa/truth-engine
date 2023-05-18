@@ -515,7 +515,9 @@ export const FeedThread = (props: {postData: FeedProps}) => {
 
   if (!posts || posts.length === 0) {
     return (
-      <div className="text-center text-slate-200">{t("no_data_found")}</div>
+      <div className="text-center text-slate-200 w-full">
+        {t("no_data_found")}
+        </div>
     );
   }
 
