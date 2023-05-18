@@ -1,5 +1,4 @@
 "use client";
-
 import {
   useEditor,
   EditorContent,
@@ -11,25 +10,43 @@ import { Extension } from "@tiptap/core";
 import { Color } from "@tiptap/extension-color";
 import ListItem from "@tiptap/extension-list-item";
 import TextStyle from "@tiptap/extension-text-style";
-import React, { useMemo } from "react";
+import Placeholder from "@tiptap/extension-placeholder";
+import React, { useMemo, useRef, useState } from "react";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
-import { Flex } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { HSeparator } from "components/separator/Separator";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import data from '@emoji-mart/data'
+import NimblePicker  from '@emoji-mart/react'
 
 //@ts-ignore
 const MenuBar = ({ editor }) => {
   const { t } = useTranslation();
+  const [showEmoji, setShowEmoji] = useState(false);
+  const iconRef = useRef<HTMLButtonElement | null>(null);
 
   if (!editor) {
     return null;
   }
 
+  const handleOnClickOutside = (event: MouseEvent) => {
+    // Check if the click was on the icon that opens the picker
+    //@ts-ignore
+    if (iconRef.current && iconRef.current.contains(event.target as Node)) {
+      // If the click was on the icon, toggle the visibility of the picker
+      setShowEmoji(true);
+    } else {
+      // If the click was outside of the icon and the picker, hide the picker
+      setShowEmoji(false);
+    }
+  };
+  
   return (
     <>
-      <ul className="flex flex-row gap-1 pt-2 w-full justify-between ">
+      <ul className="flex w-full flex-row justify-between gap-1 pt-2 ">
         <li className="float-left">
           <button
             onClick={() => editor.chain().focus().toggleBold().run()}
@@ -114,33 +131,41 @@ const MenuBar = ({ editor }) => {
         </li>
         <li>
           {/* emoji */}
-        <button
-            onClick={() => editor.chain().focus().run()}
+          <button
+            ref={iconRef} 
+            onClick={() => setShowEmoji(!showEmoji)}
             disabled={!editor.can().chain().focus().run()}
             className={editor.isActive("") ? "is-active pl-1" : " pl-1"}
-          >
-       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-        className={
-          editor.isActive("emoji")
-            ? " editor-menu-button-active"
-            : "editor-menu-button"}>
-       <path d="M10.5199 19.8634C10.5955 18.6615 10.8833 17.5172 11.3463 16.4676C9.81124 16.3252 8.41864 15.6867 7.33309 14.7151L8.66691 13.2248C9.55217 14.0172 10.7188 14.4978 12 14.4978C12.1763 14.4978 12.3501 14.4887 12.5211 14.471C14.227 12.2169 16.8661 10.7083 19.8634 10.5199C19.1692 6.80877 15.9126 4 12 4C7.58172 4 4 7.58172 4 12C4 15.9126 6.80877 19.1692 10.5199 19.8634ZM19.0233 12.636C15.7891 13.2396 13.2396 15.7891 12.636 19.0233L19.0233 12.636ZM22 12C22 12.1677 21.9959 12.3344 21.9877 12.5L12.5 21.9877C12.3344 21.9959 12.1677 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12ZM10 10C10 10.8284 9.32843 11.5 8.5 11.5C7.67157 11.5 7 10.8284 7 10C7 9.17157 7.67157 8.5 8.5 8.5C9.32843 8.5 10 9.17157 10 10ZM17 10C17 10.8284 16.3284 11.5 15.5 11.5C14.6716 11.5 14 10.8284 14 10C14 9.17157 14.6716 8.5 15.5 8.5C16.3284 8.5 17 9.17157 17 10Z"></path></svg>
-          </button>
-        </li>
-
-        {/* send button  */}
-        <li className="ml-auto pr-5" >
-          <button
-            onClick={() => editor.chain().focus().run()}
-            disabled={!editor.can().chain().focus().toggleCode().run()}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               className={
-                editor.isActive("send")
-                  ? " "
-                  : "editor-send"}
+                showEmoji
+                  ? " editor-menu-button-active"
+                  : "editor-menu-button"
+              }
+            >
+              <path d="M10.5199 19.8634C10.5955 18.6615 10.8833 17.5172 11.3463 16.4676C9.81124 16.3252 8.41864 15.6867 7.33309 14.7151L8.66691 13.2248C9.55217 14.0172 10.7188 14.4978 12 14.4978C12.1763 14.4978 12.3501 14.4887 12.5211 14.471C14.227 12.2169 16.8661 10.7083 19.8634 10.5199C19.1692 6.80877 15.9126 4 12 4C7.58172 4 4 7.58172 4 12C4 15.9126 6.80877 19.1692 10.5199 19.8634ZM19.0233 12.636C15.7891 13.2396 13.2396 15.7891 12.636 19.0233L19.0233 12.636ZM22 12C22 12.1677 21.9959 12.3344 21.9877 12.5L12.5 21.9877C12.3344 21.9959 12.1677 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12ZM10 10C10 10.8284 9.32843 11.5 8.5 11.5C7.67157 11.5 7 10.8284 7 10C7 9.17157 7.67157 8.5 8.5 8.5C9.32843 8.5 10 9.17157 10 10ZM17 10C17 10.8284 16.3284 11.5 15.5 11.5C14.6716 11.5 14 10.8284 14 10C14 9.17157 14.6716 8.5 15.5 8.5C16.3284 8.5 17 9.17157 17 10Z"></path>
+            </svg>
+          </button>
+          <Box className={"absolute z-50 "}>
+              {
+               showEmoji && <NimblePicker  locale={"zh"} data={data} 
+               onEmojiSelect={(e: any)=> {editor.commands.insertContent(e.native)}}
+               onClickOutside={handleOnClickOutside}
+                />
+              }
+            </Box>
+        </li>
+
+        {/* send button  */}
+        <li className="ml-auto pr-5">
+          <button onClick={() => editor.commands.insertContent("!")}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              className={editor.isActive("send") ? " " : "editor-send"}
             >
               <path d="M3 13.0001H9V11.0001H3V1.8457C3 1.56956 3.22386 1.3457 3.5 1.3457C3.58425 1.3457 3.66714 1.36699 3.74096 1.4076L22.2034 11.562C22.4454 11.695 22.5337 11.9991 22.4006 12.241C22.3549 12.3241 22.2865 12.3925 22.2034 12.4382L3.74096 22.5925C3.499 22.7256 3.19497 22.6374 3.06189 22.3954C3.02129 22.3216 3 22.2387 3 22.1544V13.0001Z"></path>
             </svg>{" "}
@@ -151,19 +176,6 @@ const MenuBar = ({ editor }) => {
   );
 };
 
-export interface EmojiExtensionOptions {
-  smileyFace: string;
-}
-
-const EmojiExtention = Extension.create<EmojiExtensionOptions>({
-  name: "emoji",
-  addStorage() {
-    return {
-      smileyFace: ":)",
-    };
-  },
-});
-
 export function gettHtmlFromJson(json: JSONContent) {
   const output = useMemo(() => {
     return generateHTML(json, [Document, Paragraph, Text]);
@@ -173,18 +185,23 @@ export function gettHtmlFromJson(json: JSONContent) {
 }
 
 const CommentEditor = () => {
+  const { t } = useTranslation();
+
   const editor = useEditor({
     editorProps: {
       attributes: {
+        placeholder: "发布信息驱动真相",
         class:
-          "prose font-chinese prose-sm sm:prose lg:prose-lg xl:prose-2xl px-2 pt-2 mx-auto min-h-[100px] focus:outline-none",
+          "prose font-chinese text-2xl prose-sm sm:prose lg:prose-lg xl:prose-2xl px-2 pt-2 mx-auto min-h-[100px] focus:outline-none",
       },
     },
     extensions: [
       Color.configure({ types: [TextStyle.name, ListItem.name] }),
+      Placeholder.configure({
+        placeholder: t("post_place_holder").toString(),
+      }),
       //@ts-ignore
       TextStyle.configure({ types: [ListItem.name] }),
-      EmojiExtention,
       StarterKit.configure({
         heading: {
           levels: [1, 2, 3],
@@ -199,7 +216,7 @@ const CommentEditor = () => {
         },
       }),
     ],
-    content: "<p>Hello World! 🌎️</p> ",
+    content: null,
   });
 
   return (
@@ -218,3 +235,9 @@ const CommentEditor = () => {
 };
 
 export default CommentEditor;
+
+export const getServerSideProps = async ({ locale }: { locale: string }) => ({
+  props: {
+    ...(await serverSideTranslations(locale, ["common", "footer"])),
+  },
+});
