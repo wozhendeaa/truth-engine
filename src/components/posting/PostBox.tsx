@@ -11,11 +11,9 @@ import Image from "next/image";
 import S3 from "aws-sdk/clients/s3";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import React, { useContext, useEffect, useState } from "react";
-import { CommentEditor } from "components/ContentCreation/QuillEditor";
-import FormLabel from "components/Form/FormLabel";
 import Tippy from "components/Tippy";
 import Lucide from "components/Lucide";
-import Tiptap from "components/TipTap/Tiptap";
+import CommentEditor from "components/TipTap/CommentEditor";
 import { Box, Flex, Grid, GridItem } from "@chakra-ui/react";
 import UserContext from "helpers/userContext";
 const i18n = require("next-i18next.config");
@@ -171,7 +169,7 @@ export const PostCreator = () => {
               />
             </Box>
             <Box className="float-left w-full" style={{ maxWidth: `calc(100% - ${imageWidth}px)` }}>
-              <Tiptap />
+              <CommentEditor />
             </Box>
             </Flex>
           {/* image display section */}
