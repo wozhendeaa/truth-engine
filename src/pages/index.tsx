@@ -117,6 +117,7 @@ const Home: NextPage = () => {
               <TruthEngineSideMenuBar />
             </>
           )}
+          <VSeparator />
         </Flex>
 
         <Flex

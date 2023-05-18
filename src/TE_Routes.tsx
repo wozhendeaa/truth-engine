@@ -47,7 +47,7 @@ const TE_Routes = {
 	myProfile: {
 		name:"profile_page",
 		path:'/myprofile/',
-		icon: <Icon as={ProfileIcon}  width={{md: 10, lg:7}} height={{md: 10, lg:7}}  color='inherit' />,
+		icon: <Icon as={ProfileIcon}  width={{base:12, md: 10, lg:7}} height={{base:12,md: 10, lg:7}}  color='inherit' />,
 
 	},	
 	userById: {
@@ -79,7 +79,7 @@ const TE_Routes = {
 	Index: {
 		name:'index',
 		path:'/',
-		icon: <Icon as={MdHome}  width={{md: 10, lg:7}} height={{md: 10, lg:7}} color='inherit' />,
+		icon: <Icon as={MdHome}  width={{base:12,md: 10, lg:7}} height={{base:12,md: 10, lg:7}} color='inherit' />,
 
 	},
 	ProfessorVideos: {
@@ -111,14 +111,14 @@ const TE_Routes = {
 	Trending: {
 		name:"trending",
 		path:'/trending/',
-		icon: <Icon as={FireIcon} width={{md: 10, lg:7}} height={{md: 10, lg:7}} color='inherit' />,
+		icon: <Icon as={FireIcon} width={{base:12,md: 10, lg:7}} height={{base:12,md: 10, lg:7}} color='inherit' />,
 
 	},
 
 	IndexNotification: {
 		name:'notification',
 		path:'/notification/',
-		icon: <Icon as={BellIcon} width={{md: 10, lg:7}} height={{md: 10, lg:7}} color='inherit' />,
+		icon: <Icon as={BellIcon} width={{base:12,md: 10, lg:7}} height={{base:12,md: 10, lg:7}} color='inherit' />,
 
 	},
 

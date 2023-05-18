@@ -12,22 +12,40 @@ import ListItem from "@tiptap/extension-list-item";
 import TextStyle from "@tiptap/extension-text-style";
 import Placeholder from "@tiptap/extension-placeholder";
 import React, { useMemo, useRef, useState } from "react";
-import Document from "@tiptap/extension-document";
-import Paragraph from "@tiptap/extension-paragraph";
-import Text from "@tiptap/extension-text";
 import { Box, Flex } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { HSeparator } from "components/separator/Separator";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import data from '@emoji-mart/data'
 import NimblePicker  from '@emoji-mart/react'
+import { useFilePicker } from "use-file-picker";
+import S3 from "aws-sdk/clients/s3";
+import axios from "axios";
+import { api } from "utils/api";
+import toast from "react-hot-toast";
+import Tippy from "components/Tippy";
+import Lucide from "components/Lucide";
 
 //@ts-ignore
-const MenuBar = ({ editor }) => {
+const MenuBar = ({ editor, openFileSelector }) => {
   const { t } = useTranslation();
   const [showEmoji, setShowEmoji] = useState(false);
   const iconRef = useRef<HTMLButtonElement | null>(null);
+  const ctx = api.useContext();
+  const { mutate, isLoading: isPosting } = api.posts.createPost.useMutation({
+    onSuccess: () => {
+      // setValue("content", "null");
+      void ctx.posts.getAll.invalidate();
+    },
 
+    onError: (e) => {
+      const errorMessage = e.data?.code;
+      if (errorMessage) {
+        // toast.error(t(errorMessage));
+      }
+    },
+  });
+  
   if (!editor) {
     return null;
   }
@@ -43,6 +61,55 @@ const MenuBar = ({ editor }) => {
       setShowEmoji(false);
     }
   };
+
+  async function uploadToS3() {
+    let keys = [];
+    const s3 = new S3();
+
+    //@ts-ignore
+    for (let i = 0; i < filesContent.length; i++) {
+      //@ts-ignore
+      let file = filesContent[i];
+      //@ts-ignore
+      const fileType = encodeURIComponent(file?.name.split(".").at(1));
+      const { data } = await axios.post(
+        `/api/upload/processMediaUpload?fileType=${fileType}`
+      );
+      const { uploadUrl, key } = data;
+      keys.push({ key, fileType });
+
+      //convert base64 to blob
+      const str = "data:image/" + { fileType } + "base64,";
+      const base64Str = file?.content.toString() ?? "";
+      const response = await fetch(base64Str);
+      const blob = await response.blob();
+
+      const ss = await axios
+        .put(uploadUrl, blob)
+        .then((res) => {})
+        .catch((e) => {
+          toast(e.message);
+        });
+    }
+    return keys;
+  }
+
+ async function postContent(editor: any) { 
+     try {
+      // const keys = await uploadToS3();
+      mutate({
+        content: JSON.stringify(editor.getJSON()),
+        media: JSON.stringify(""),
+      });
+      // setValue("content", "");
+      // clear();
+      void ctx.posts.getAll.invalidate();
+    } catch (cause) {
+      // setError("content", { type: "custom", message: "媒体文件上传失败" });
+    }
+    return "";
+  }
+
   
   return (
     <>
@@ -108,12 +175,10 @@ const MenuBar = ({ editor }) => {
             </svg>
           </button>
         </li>
-
         <li>
           {/* image upload */}
           <button
-            onClick={() => editor.chain().focus().toggleCode().run()}
-            disabled={!editor.can().chain().focus().toggleCode().run()}
+            onClick={()=>{openFileSelector()}}
             className={editor.isActive("code") ? "is-active pl-1" : " pl-1"}
           >
             <svg
@@ -161,7 +226,7 @@ const MenuBar = ({ editor }) => {
 
         {/* send button  */}
         <li className="ml-auto pr-5">
-          <button onClick={() => editor.commands.insertContent("!")}>
+          <button onClick={() => postContent(editor)}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -176,16 +241,34 @@ const MenuBar = ({ editor }) => {
   );
 };
 
-export function gettHtmlFromJson(json: JSONContent) {
+export function gettHtmlFromJson(json: JSONContent) : string{
   const output = useMemo(() => {
-    return generateHTML(json, [Document, Paragraph, Text]);
+    return generateHTML(json, [StarterKit]);
   }, [json]);
 
-  return <>{output}</>;
+  return output.toString();
 }
 
 const CommentEditor = () => {
   const { t } = useTranslation();
+  const [
+     openFileSelector,
+    { filesContent, plainFiles, loading, errors: pickerError, clear },
+  ] = useFilePicker({
+    readAs: "DataURL",
+    accept: "image/*",
+    multiple: true,
+    limitFilesConfig: { max: 5 },
+    // minFileSize: 0.1, // in megabytes
+    maxFileSize: 5,
+    imageSizeRestrictions: {
+      maxHeight: 2000, // in pixels
+      maxWidth: 1920,
+      minHeight: 100,
+      minWidth: 200,
+    },
+    onFilesSuccessfulySelected: (data) => {if(filesContent.length > 0) clear()}
+  });
 
   const editor = useEditor({
     editorProps: {
@@ -219,15 +302,49 @@ const CommentEditor = () => {
     content: null,
   });
 
+  function removePicturesFromUploader() {
+       clear()
+  }
+
   return (
     <>
       <Flex direction="column" className="w-[100%]">
         <Flex>
-          <EditorContent editor={editor} className="w-[100%] text-slate-50" />
+          <EditorContent editor={editor} className="w-[100%] text-slate-50 pr-2" />
         </Flex>
-        <Flex className="flex w-[100%] flex-wrap">
+        <Flex className="flex w-[100%] flex-wrap pr-4">
+          {/* image display section */}
+          {filesContent.length > 0 && (
+            <div className="mt-3 w-full" id="uploadImageDiv">
+              <div className="dark:border-darkmode-400 rounded-md border-2 border-dashed pt-4">
+                <div className="flex flex-wrap px-4">
+                  {filesContent.map((file, index) => (
+                    <div
+                      id={"uploadImage" + index}
+                      key={"uploadImage" + index}
+                      className="image-fit zoom-in relative mr-5 cursor-pointer"
+                    >
+                      <img
+                        className="max-h-[80px] rounded-md"
+                        alt="Midone Tailwind HTML Admin Template"
+                        src={file.content}
+                      />
+                    </div>
+                  ))}
+                  <div className="-5 cursor-pointer" 
+                   onClick={() =>
+                            removePicturesFromUploader()} >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" 
+                  className="editor-menu-button h-[80px] w-[80px]">
+                    <path d="M17 6H22V8H20V21C20 21.5523 19.5523 22 19 22H5C4.44772 22 4 21.5523 4 21V8H2V6H7V3C7 2.44772 7.44772 2 8 2H16C16.5523 2 17 2.44772 17 3V6ZM18 8H6V20H18V8ZM9 11H11V17H9V11ZM13 11H15V17H13V11ZM9 4V6H15V4H9Z"></path></svg>
+                  </div>
+                </div>
+                <div className="relative flex cursor-pointer items-center px-4 pb-4"></div>
+              </div>
+            </div>
+          )}
           <HSeparator my={1} />
-          <MenuBar editor={editor} />
+          <MenuBar editor={editor} openFileSelector={openFileSelector} />
         </Flex>
       </Flex>
     </>

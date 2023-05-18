@@ -86,7 +86,7 @@ export default function TruthEngineSideMenuBar() {
                   <div className=' lg:hidden'>
                   <button
                         type="button"
-                        className="inline-flex items-center gap-x-2 ml-1.5
+                        className="inline-flex items-center gap-x-2 ml-2.5 md:ml-1.5
                         rounded-lg bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold
                         text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                       >

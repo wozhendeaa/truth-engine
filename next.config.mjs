@@ -38,6 +38,9 @@ const config = {
     return config;
   },
   
+  experimental: {
+    esmExternals: false, // THIS IS THE FLAG THAT MATTERS
+  },
 
   typescript:{
     ignoreBuildErrors:true,

@@ -40,12 +40,13 @@ import { IoEllipsisHorizontal } from "react-icons/io5";
 import { useInfiniteScroll } from "helpers/InfiniteScroll";
 import Link from "next/link";
 import UserContext from "helpers/userContext";
-import { useRouter } from "next/router";
-import { LoadingSpinner } from "components/loading";
 import TransparentFeedThreadMenu from "components/menu/TransparentFeedThreadMenu";
 import { HSeparator } from "components/separator/Separator";
 import TE_Routes from "TE_Routes";
+import { gettHtmlFromJson } from "components/TipTap/CommentEditor";
 const {i18n} = require('next-i18next.config')
+import DOMPurify from 'isomorphic-dompurify';
+
 
 type PostsWithUserData = Post & {
   reactions: {
@@ -125,6 +126,14 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   const [likeNumber, setNumber] = useState(postWithUser.likes);
   const [showComments, setShowComments] = useState(onPostPage);
   const { t, i18n } = useTranslation(['common', 'footer'], { bindI18n: 'languageChanged loaded' })
+
+  let postContentHTML: string = "";
+  try {
+    postContentHTML = gettHtmlFromJson(JSON.parse(postWithUser.content))
+    postContentHTML = DOMPurify.sanitize(postContentHTML);
+  } catch(cause) {
+    postContentHTML = postWithUser.content
+  }
   // bindI18n: loaded is needed because of the reloadResources call
   // if all pages use the reloadResources mechanism, the bindI18n option can also be defined in next-i18next.config.js
   useEffect(() => {
@@ -283,7 +292,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
             onClick={toPostPage}
           >
             <span className="font-chinese text-xl font-bold text-slate-100 shadow-none ">
-              {postWithUser.content}
+               <div dangerouslySetInnerHTML={{ __html: postContentHTML }} />
             </span>
 
             <div className="bg-accent text-accent-content  grid place-content-end justify-center "
