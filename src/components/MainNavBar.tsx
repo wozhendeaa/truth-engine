@@ -64,7 +64,7 @@ export const LoggedInUserSection = ({
           <BellIcon className="h-6 w-6" aria-hidden="true" />
         </button>
         {/* Profile dropdown */}
-        <Menu as="div" className="relative ml-4 flex-shrink-0">
+        <Menu as="div" className="relative ml-4 flex-shrink-0 z-87 ">
           <div>
             <Menu.Button
               className="hover:focus:outline-solid flex rounded-full bg-white text-sm focus:outline-none
@@ -87,15 +87,15 @@ export const LoggedInUserSection = ({
             enterTo="transform opacity-100 scale-100"
             leave="transition ease-in duration-75"
             leaveFrom="transform opacity-100 scale-100"
-            leaveTo="transform opacity-0 scale-95"
+            leaveTo="transform opacity-0 scale-95"            
           >
-            <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800">
+            <Menu.Items className="absolute right-0 z-70 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800">
               <Menu.Item>
                 {({ active }) => (
                   <a
                     href={TE_Routes.myProfile.path + user?.id!}
                     className={classNames(
-                      active ? "bg-gray-100 dark:bg-purple-800" : "",
+                      active ? "bg-gray-100 dark:bg-purple-800 z-51" : "",
                       "block px-4 py-2 text-sm text-gray-700 dark:text-slate-300"
                     )}
                   >
@@ -136,58 +136,6 @@ export const LoggedInUserSection = ({
           </Transition>
         </Menu>
       </div>
-      <Disclosure.Panel className="lg:hidden">
-        <div className="border-t border-gray-200 pb-3 pt-4 ">
-          <div className="flex items-center px-4">
-            <div className="flex-shrink-0">
-              <Image
-                className="rounded-full"
-                width={20}
-                height={20}
-                src={user?.profileImageUrl ?? "/images/default-profile.png"}
-                alt=""
-              />
-            </div>
-            <div className="ml-3">
-              <div className="text-base font-medium text-gray-800">#todo</div>
-              <div className="text-sm font-medium text-gray-500">#todo.com</div>
-            </div>
-            <button
-              type="button"
-              className="ml-auto flex-shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500
-                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-gray-800"
-            >
-              <span className="sr-only">
-                {" "}
-                {!isSSR && t("view_notifications")}
-              </span>
-              <BellIcon className="h-6 w-6" aria-hidden="true" />
-            </button>
-          </div>
-          <div className="mt-3 space-y-1">
-            <Disclosure.Button
-              as="a"
-              href={TE_Routes.myProfile.path}
-              className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-            >
-              {!isSSR && t("profile_page")}
-            </Disclosure.Button>
-            <Disclosure.Button
-              as="a"
-              href="#"
-              className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-            >
-              {!isSSR && t("settings")}
-            </Disclosure.Button>
-            <Disclosure.Button
-              as="a"
-              className="block px-4 py-2 text-base cursor-pointer font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-            >
-              {!isSSR && t("sign_out")}
-            </Disclosure.Button>
-          </div>
-        </div>
-      </Disclosure.Panel>
     </>
   );
 };
@@ -244,7 +192,7 @@ export default function MainNavBar() {
                       />
                     </Link>
                   </div>{" "}
-                  <div className="dark: hidden text-xl text-slate-300 md:ml-6 md:flex md:space-x-8 ">
+                  <div className="dark: hidden text-xl text-slate-300 md:ml-6 md:flex md:space-x-8  ">
                     {/* Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" */}
                     <Link
                       href={TE_Routes.Index.path}

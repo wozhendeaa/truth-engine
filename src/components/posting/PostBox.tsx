@@ -157,8 +157,8 @@ export const PostCreator = () => {
               <Image
                 src={user.profileImageUrl ?? "/images/default_profile.png"}
                 alt=""
-                width={60}
-                height={60}
+                width={50}
+                height={50}
                 className="flex-none shrink-0 rounded-full"
               />
             </div>
@@ -175,7 +175,7 @@ export const PostCreator = () => {
                     <Tiptap />
                   </Flex>
                 </div>
-                <div className="absolute inset-x-0 bottom-0 flex justify-between py-2 pl-3 pr-2">
+                {/* <div className="absolute inset-x-0 bottom-0 flex justify-between py-2 pl-3 pr-2">
                   <div className="flex items-center space-x-5">
                     <div className="flex items-center">
                       <button
@@ -207,7 +207,7 @@ export const PostCreator = () => {
                         </label>
                       </button>
                     </div>
-                  </div>
+                  </div> 
 
                   <button
                     type="submit"
@@ -218,30 +218,12 @@ export const PostCreator = () => {
                   >
                     {t("post")}
                   </button>
-                </div>
+                </div> */}
               </form>
             </div>
           </div>
 
           {/* image display section */}
-
-          {/* <div className="grid w-full h-auto rounded bg-accent text-accent-content place-content-end items-end">
-            {errors.content && <p className="text-red-500 text-sm">{errors.content.message}</p>}
-            <div className="sm:p-6 ml-10 mt-auto items-end">
-              <ul role="list" className="grid grid-cols-2 ml-6 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8 items-end">
-                {filesContent.map((file, index) => (
-                  <li key={index} className="relative">
-                    <div className="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
-                      <img src={file.content} alt="" className="pointer-events-none object-cover group-hover:opacity-75 aspect-video" />
-                      <button type="button" className="absolute inset-0 focus:outline-none">
-                        <span className="sr-only">View details for {file.name}</span>
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-        </div> */}
           {filesContent.length > 0 && (
             <div className="mt-3 w-full" id="uploadImageDiv" >
               <div className="dark:border-darkmode-400 rounded-md border-2 border-dashed pt-4">

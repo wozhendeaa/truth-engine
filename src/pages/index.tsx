@@ -39,7 +39,7 @@ export function Tabs() {
   }
 
   return (
-    <div className="sticky top-[68px] z-50 backdrop-blur-md
+    <div className="sticky top-[68px] z-40 backdrop-blur-md
     bg-opacity-80  bg-te_dark_bg">
       <div className="font-chinese sm:bloc">
         <div className="border-b border-gray-200 ">
