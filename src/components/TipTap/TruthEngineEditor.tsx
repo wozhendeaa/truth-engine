@@ -23,6 +23,7 @@ import Mention from "@tiptap/extension-mention";
 import CharacterCount from "@tiptap/extension-character-count";
 import Tippy from "components/Tippy";
 import Lucide from "components/Lucide";
+import toast from "react-hot-toast";
 
 //@ts-ignore
 const MenuBar = (props: {
@@ -77,11 +78,11 @@ const MenuBar = (props: {
 
     if (preparedToSend()) {
       editor.setEditable(false);
-      const result = await onSend(editor, setDisableSend);
-      console.log(result);
+      const result = await onSend(editor, mediaFiles, setDisableSend);
+      
       if (result) {
         setMediaFiles([]);     
-       }
+       } 
     }
   }
 
@@ -254,12 +255,10 @@ export function renderAsHTML(content: string) {
 const types = ["POST", "LONG_POST", "COMMENT", "COMMENT_TALL"] as const;
 type EditorType = (typeof types)[number];
 
-// const callbackStatus = ["SUCCESS", "LOADING", "ERROR"] as const
-// type callbackStatusType = (typeof callbackStatus)[number];
-
 interface TruthEngineEditorOnSendCallback {
   (
     editor: any,
+    mediaFiles:FileContent[],//any data
     setState: React.Dispatch<React.SetStateAction<boolean>>
   ): Promise<boolean>; //return if action is successful
 }

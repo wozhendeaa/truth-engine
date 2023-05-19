@@ -14,6 +14,7 @@ import toast from "react-hot-toast";
 import { api } from "utils/api";
 import { parseErrorMsg } from "helpers/serverErrorMessage";
 import TruthEngineEditor from "components/TipTap/TruthEngineEditor";
+import { FileContent } from "use-file-picker";
 
 
 export default function CommentModal(props: {
@@ -38,6 +39,7 @@ export default function CommentModal(props: {
   //being called by the editor when uploading content
   async function OnSend(
     editor: any,
+    mediaFiles:FileContent[],
     setDisableSend: React.Dispatch<React.SetStateAction<boolean>>
   ) {
     if (!isSignedIn) {

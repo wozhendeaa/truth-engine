@@ -46,6 +46,7 @@ import TE_Routes from "TE_Routes";
 import TruthEngineEditor, { gettHtmlFromJson, renderAsHTML } from "components/TipTap/TruthEngineEditor";
 const {i18n} = require('next-i18next.config')
 import DOMPurify from 'isomorphic-dompurify';
+import { FileContent } from "use-file-picker";
 
 
 type PostsWithUserData = Post & {
@@ -118,8 +119,8 @@ interface MousePosition {
 
 export function SingleFeed(singlePostData: SingleFeedProps) {
   const postWithUser = singlePostData.postWithUser;
-  const mediaStr = singlePostData.postWithUser.media;
   const onPostPage = singlePostData.onPostPage;
+  const mediaFilesString = singlePostData.postWithUser.media;
   const loadingCompleteCallBack = singlePostData.loadingCompleteCallBack;
   const user = useContext(UserContext);
   const ctx = api.useContext();
@@ -130,6 +131,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   const [showComments, setShowComments] = useState(onPostPage);
   const { t, i18n } = useTranslation(['common', 'footer'], { bindI18n: 'languageChanged loaded' })
   const [mouseDownPos, setMouseDownPos] = useState<MousePosition>({ x: 0, y: 0 });
+
 
   // bindI18n: loaded is needed because of the reloadResources call
   // if all pages use the reloadResources mechanism, the bindI18n option can also be defined in next-i18next.config.js
@@ -157,7 +159,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   });
 
 
-  let media = mediaStr ? Array.from(JSON.parse(mediaStr)) : [];
+  let mediaFiles = mediaFilesString ? Array.from(JSON.parse(mediaFilesString)) : [];
 
   function handleLikeClick() {
     if (!isSignedIn) {
@@ -189,6 +191,8 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   };
 
   const handleMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+
     const dx = event.clientX - mouseDownPos.x;
     const dy = event.clientY - mouseDownPos.y;
 
@@ -214,18 +218,15 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
     toast(t('link_copied'));
   };
 
-  const stopParentCLick = (event: React.SyntheticEvent) => {
-    event.stopPropagation();
-  };
-
   function setError(err: string) {
 
   }
 
   //being called by the editor when uploading content
   async function OnSend(
-      editor: any,
-      setDisableSend: React.Dispatch<React.SetStateAction<boolean>>
+    editor: any,
+    mediaFiles:FileContent[],
+    setDisableSend: React.Dispatch<React.SetStateAction<boolean>>
     ) {
       if (!isSignedIn) {
         toast("login_before_comment");
@@ -339,16 +340,14 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
             <span className="font-chinese text-xl font-bold text-slate-100 shadow-none ">
              {renderAsHTML(postWithUser.content)}
             </span>
-
-            <div className="bg-accent text-accent-content  grid place-content-end justify-center "
-           >
+            <div className="bg-accent text-accent-content  grid place-content-end justify-center ">
               {/* image display section */}
-              <div className="mt-auto items-end"   onClick={stopParentCLick}>
+              <div className="mt-auto items-end" onClick={ (e)=> {e.stopPropagation(); console.log(111)}}>
                 <ul
-                  role="list"
+                role="list"
                   className="grid auto-cols-auto grid-flow-col gap-x-1 gap-y-2 xl:gap-x-1"
                 >
-                  {media.map((file, index) => {
+                  {mediaFiles.map((file, index) => {
                     //@ts-ignore
                     return <RenderImage key={crypto.randomUUID()} type={file.type} url={file.url} index={index} onPostPage={onPostPage} />
                   })}

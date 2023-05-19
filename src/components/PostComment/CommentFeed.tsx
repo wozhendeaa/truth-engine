@@ -9,7 +9,6 @@ import dayjs from "dayjs";
 dayjs.extend(relativetTime);
 
 import { useTranslation } from "react-i18next";
-import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Link from "next/link";
 import TE_Routes from "TE_Routes";

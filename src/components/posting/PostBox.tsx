@@ -10,6 +10,8 @@ import React, { useContext, useEffect, useState } from "react";
 import TruthEngineEditor from "components/TipTap/TruthEngineEditor";
 import { Box, Flex } from "@chakra-ui/react";
 import UserContext from "helpers/userContext";
+import TE_Routes from "TE_Routes";
+import { FileContent } from "use-file-picker";
 const i18n = require("next-i18next.config");
 
 //create react hook validation schema for post
@@ -19,42 +21,30 @@ export const postSchema = z.object({
 });
 
 export const PostCreator = () => {
-  const { mutate, isLoading: isPosting } = api.posts.createPost.useMutation();
-  const [creationSuccess, setCreationSuccess] = useState(false);
-  const [creationError, setCreationError] = useState(false);
+  const { mutate} = api.posts.createPost.useMutation();
 
   const user = useContext(UserContext);
   const ctx = api.useContext();
-  const { t, i18n } = useTranslation(["common", "footer"], {
-    bindI18n: "languageChanged loaded",
-  });
-  const [imageWidth, setImageWidth] = useState(0);
-  // bindI18n: loaded is needed because of the reloadResources call
-  // if all pages use the reloadResources mechanism, the bindI18n option can also be defined in next-i18next.config.js
-  useEffect(() => {
-    void i18n.reloadResources(i18n.resolvedLanguage, ["common", "footer"]);
-  }, []);
+  const {t} = useTranslation();
 
+  const [imageWidth, setImageWidth] = useState(0);
   if (!user) return null;
 
-  async function uploadToS3() {
+  async function uploadToS3(mediaFiles:FileContent[]) {
     let keys = [];
-    const s3 = new S3();
-
-    //@ts-ignore
-    for (let i = 0; i < filesContent.length; i++) {
-      //@ts-ignore
-      let file = filesContent[i];
-      //@ts-ignore
-      const fileType = encodeURIComponent(file?.name.split(".").at(1));
-      const { data } = await axios.post(
-        `/api/upload/processMediaUpload?fileType=${fileType}`
-      );
+    for (let i = 0; i < mediaFiles.length; i++) {
+    
+      let file = mediaFiles[i];
+      if (!file) continue;
+      let fileType = file.name.split(".").at(1);
+      if (!fileType) continue;
+      fileType = encodeURIComponent(fileType).toString();
+      const apiUrl = TE_Routes.uploadPicture.path + fileType;
+      const { data } = await axios.post(apiUrl);
       const { uploadUrl, key } = data;
       keys.push({ key, fileType });
 
       //convert base64 to blob
-      const str = "data:image/" + { fileType } + "base64,";
       const base64Str = file?.content.toString() ?? "";
       const response = await fetch(base64Str);
       const blob = await response.blob();
@@ -64,8 +54,10 @@ export const PostCreator = () => {
         .then((res) => {})
         .catch((e) => {
           toast(e.message);
+          console.log(e.message);
         });
     }
+
     return keys;
   }
 
@@ -83,19 +75,25 @@ export const PostCreator = () => {
   //being called by the editor when uploading content
   async function OnSend(
     editor: any,
+    mediaFiles:FileContent[],
     setDisableSend: React.Dispatch<React.SetStateAction<boolean>>
   ) {
+    let keys: any = undefined;
     try {
-      // const keys = await uploadToS3();
+        keys = await uploadToS3(mediaFiles);
+
     } catch (cause) {
       setError("图片上传失败，可能是网络问题");
+      return false;
     }
+
     try {
        let result = false
       const promise = new Promise<void>((resolve) => {
         mutate(
           {
             content: JSON.stringify(editor.getJSON()),
+            media: JSON.stringify(keys)         
           },
           {
             onSuccess: () => {

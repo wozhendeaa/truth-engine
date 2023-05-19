@@ -83,6 +83,6 @@
  "try_long_post":"太长了？试试发精致引擎文",
  "pics_only_default_text":"[分享图片]",
  "post_good":"传递信息成功",
- 
+ "action_failed":"发送失败，这都是命啊",
  "empty":""
 }
