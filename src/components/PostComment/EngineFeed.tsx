@@ -43,7 +43,7 @@ import UserContext from "helpers/userContext";
 import TransparentFeedThreadMenu from "components/menu/TransparentFeedThreadMenu";
 import { HSeparator } from "components/separator/Separator";
 import TE_Routes from "TE_Routes";
-import { gettHtmlFromJson } from "components/TipTap/CommentEditor";
+import TruthEngineEditor, { gettHtmlFromJson, renderAsHTML } from "components/TipTap/TruthEngineEditor";
 const {i18n} = require('next-i18next.config')
 import DOMPurify from 'isomorphic-dompurify';
 
@@ -111,6 +111,10 @@ export function RenderImage(props: {type: string, url: string, index: any, onPos
   }
 }
 
+interface MousePosition {
+  x: number;
+  y: number;
+}
 
 export function SingleFeed(singlePostData: SingleFeedProps) {
   const postWithUser = singlePostData.postWithUser;
@@ -118,7 +122,6 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   const onPostPage = singlePostData.onPostPage;
   const loadingCompleteCallBack = singlePostData.loadingCompleteCallBack;
   const user = useContext(UserContext);
-  const [comment, SetComment] = useState("");
   const ctx = api.useContext();
   const { isSignedIn } = useUser();
   const hasReaction = postWithUser.reactions.length > 0;
@@ -126,14 +129,8 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   const [likeNumber, setNumber] = useState(postWithUser.likes);
   const [showComments, setShowComments] = useState(onPostPage);
   const { t, i18n } = useTranslation(['common', 'footer'], { bindI18n: 'languageChanged loaded' })
+  const [mouseDownPos, setMouseDownPos] = useState<MousePosition>({ x: 0, y: 0 });
 
-  let postContentHTML: string = "";
-  try {
-    postContentHTML = gettHtmlFromJson(JSON.parse(postWithUser.content))
-    postContentHTML = DOMPurify.sanitize(postContentHTML);
-  } catch(cause) {
-    postContentHTML = postWithUser.content
-  }
   // bindI18n: loaded is needed because of the reloadResources call
   // if all pages use the reloadResources mechanism, the bindI18n option can also be defined in next-i18next.config.js
   useEffect(() => {
@@ -145,16 +142,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
       }, 2000)
   }, [])
 
-  const commentMutation = api.comment.createPostComment.useMutation({
-    onSuccess: (data) => {
-      void ctx.posts.getCommentsForPost.invalidate();
-    },
-    onError: (e: any) => {
-      const err = parseErrorMsg(e);
-      toast.error(t(err));
-    },
-  });
-
+  const {mutate, isLoading} = api.comment.createPostComment.useMutation();
   const likePostMutation = api.posts.likePost.useMutation({
     onSuccess: () => {},
     onError: (error: any) => {
@@ -167,6 +155,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
       setLiked(!liked);
     },
   });
+
 
   let media = mediaStr ? Array.from(JSON.parse(mediaStr)) : [];
 
@@ -189,33 +178,27 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
     setShowComments(!showComments);
   }
 
-  function handleChangeEvent(e: ChangeEvent<HTMLInputElement>) {
-    SetComment(e.target.value);
-  }
 
-  function makeComment() {
-    if (!isSignedIn) {
-      toast("login_before_comment");
-      return;
-    }
 
-    if (commentMutation.isLoading) return;
-
-    commentMutation.mutate({
-      content: comment,
-      replyToPostId: postWithUser.id,
-    });
-
-    SetComment("");
-  }
   const handleLike = (post: PostsWithUserData) => {
     likePostMutation.mutate({ postId: post.id });
   };
 
-
-  const toPostPage = (event: React.SyntheticEvent) => {
-    window.open("/post/" + postWithUser.id, "_blank");
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+    setMouseDownPos({ x: event.clientX, y: event.clientY });
   };
+
+  const handleMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
+    const dx = event.clientX - mouseDownPos.x;
+    const dy = event.clientY - mouseDownPos.y;
+
+    // Only trigger the onClick event if the mouse has not moved significantly
+    const noMouseDrag = Math.sqrt(dx * dx + dy * dy) < 5;
+    if (noMouseDrag && !onPostPage) {
+        window.open("/post/" + postWithUser.id, "_blank");
+    }
+  };
+
 
   const copyPostLink = async () => {
     let link = window.location.href;
@@ -235,6 +218,66 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
     event.stopPropagation();
   };
 
+  function setError(err: string) {
+
+  }
+
+  //being called by the editor when uploading content
+  async function OnSend(
+      editor: any,
+      setDisableSend: React.Dispatch<React.SetStateAction<boolean>>
+    ) {
+      if (!isSignedIn) {
+        toast("login_before_comment");
+        return false;
+      }
+
+      try {
+        // const keys = await uploadToS3();
+      } catch (cause) {
+        setError("图片上传失败，可能是网络问题");
+      }
+      try {
+         let result = false
+        const promise = new Promise<void>((resolve) => {
+          mutate(
+            {
+              content: JSON.stringify(editor.getJSON()),
+              replyToPostId: postWithUser.id
+            },
+            {
+              onSuccess: () => {
+                void ctx.comment.getCommentsForPost.invalidate();
+                editor.commands.setContent(null);
+                editor.setEditable(true);
+                result = true;
+                resolve();
+                toast(t('post_good'));
+              },
+              onError: (e) => {
+                const errorMessage = e.data?.code;
+                console.log(errorMessage);
+                if (errorMessage) {
+                  toast.error(t(errorMessage));
+                }     
+                resolve();         
+              },
+            }
+          );
+        });
+  
+        await promise;
+        setDisableSend(false)
+        return result;
+  
+      } catch (cause) {
+        console.log(cause);
+        setError("发表信息失败，可能是网络问题");
+        return false;
+      } 
+      
+    }
+
   return (
     <>
       <Card
@@ -250,7 +293,8 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
         <div className="group ">
           <CardHeader
             className="cursor-pointer group-hover:bg-te_dark_ui -pt-[30px] "
-            onClick={toPostPage}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
           >
             <Flex alignItems={"top"} className="-my-4">
               <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
@@ -286,13 +330,14 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
           </CardHeader>
           <CardBody
             pb={"0px"}
-            pt="0"
+            pt={2}
             className="cursor-pointer group-hover:bg-te_dark_ui overflow-hidden"
             maxH={onPostPage ? "full" : "250px"}
-            onClick={toPostPage}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
           >
             <span className="font-chinese text-xl font-bold text-slate-100 shadow-none ">
-               <div dangerouslySetInnerHTML={{ __html: postContentHTML }} />
+             {renderAsHTML(postWithUser.content)}
             </span>
 
             <div className="bg-accent text-accent-content  grid place-content-end justify-center "
@@ -316,6 +361,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
             justify="space-between"
             flexWrap="nowrap"
             maxHeight={70}
+            pt={3}
             className="cursor-pointer group-hover:bg-te_dark_ui"
             sx={{
               "& > button": {
@@ -442,43 +488,21 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
               />
             </Box>
             {user && (
-              <Flex align="center" position="relative" p={0}>
-                <Avatar
-                  display={{ base: "none", md: "unset" }}
-                  w="50px"
-                  h="50px"
-                  me="15px"
-                  src={postWithUser.author.profileImageUrl!}
-                />
-                <InputGroup>
-                  <Input
-                    variant="social"
-                    className="resize-none overflow-hidden"
-                    placeholder={t("make_simple_comment") ?? ""}
-                    size="md"
-                    onChange={handleChangeEvent}
-                    _focus={{ borderColor: "blue.500" }}
-                  />
-                  <InputRightElement width="4.5rem">
-                    <IconButton
-                      aria-label="image"
-                      me="2px"
-                      pl="20px"
-                      variant="no-hover"
-                      bg="transparent"
-                    >
-                      <Icon
-                        onClick={makeComment}
-                        as={MdSend}
-                        _hover={{ color: "te_dark_green" }}
-                        h="20px"
-                        w="20px"
-                        color="secondaryGray.700"
-                      />
-                    </IconButton>
-                  </InputRightElement>
-                </InputGroup>
+              <Flex className="pt-3">
+              <Box flex="none">
+              <Image
+                src={user.profileImageUrl ?? "/images/default_profile.png"}
+                alt=""
+                width={"50px"}
+                height={"50px"}
+                className="flex-none shrink-0 rounded-full p-2"
+              />
+              </Box>
+              <Box className="float-left w-full" style={{ maxWidth: `calc(100% - 50px)` }}>
+                <TruthEngineEditor editorType={"COMMENT"} onSend={OnSend}  />
+              </Box>
               </Flex>
+
             )}
             {!onPostPage && (
               <Flex
@@ -516,7 +540,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   );
 }
 
-export const FeedThread = (props: {postData: FeedProps}) => {
+export const EngineFeed = (props: {postData: FeedProps}) => {
   const { t } = useTranslation();
   const posts = props.postData.posts;
   const observerRef = useInfiniteScroll(() => {
@@ -542,7 +566,7 @@ export const FeedThread = (props: {postData: FeedProps}) => {
   );
 };
 
-export default FeedThread;
+export default EngineFeed;
 
 export const getServerSideProps = async ({ locale }: { locale: string }) => ({
   props: {

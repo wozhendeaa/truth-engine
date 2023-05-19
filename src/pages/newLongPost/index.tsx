@@ -18,7 +18,7 @@ import Tippy from "components/Tippy";
 import fakerData from "helpers/faker";
 import TomSelect from "components/TomSelect";
 import dynamic from "next/dynamic";
-import CommentEditor from "components/TipTap/CommentEditor";
+import TruthEngineEditor from "components/TipTap/TruthEngineEditor";
 import { PostCreator as PostBox} from "components/posting/PostBox";
 import { HSeparator } from "components/separator/Separator";
 import TruthEngineSideMenuBar from "components/QTruthEngineSideMenubar";

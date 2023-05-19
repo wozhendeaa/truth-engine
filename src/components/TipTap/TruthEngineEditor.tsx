@@ -6,12 +6,11 @@ import {
   JSONContent,
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { Extension } from "@tiptap/core";
 import { Color } from "@tiptap/extension-color";
 import ListItem from "@tiptap/extension-list-item";
 import TextStyle from "@tiptap/extension-text-style";
 import Placeholder from "@tiptap/extension-placeholder";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Box, Flex } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { HSeparator } from "components/separator/Separator";
@@ -19,33 +18,22 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import data from '@emoji-mart/data'
 import NimblePicker  from '@emoji-mart/react'
 import { useFilePicker } from "use-file-picker";
-import S3 from "aws-sdk/clients/s3";
-import axios from "axios";
 import { api } from "utils/api";
-import toast from "react-hot-toast";
-import Tippy from "components/Tippy";
-import Lucide from "components/Lucide";
+import DOMPurify from "dompurify";
+import Mention from '@tiptap/extension-mention'
+import CharacterCount from '@tiptap/extension-character-count'
 
 //@ts-ignore
-const MenuBar = ({ editor, openFileSelector }) => {
+const MenuBar = ({ editor, filePicker, editorType,onSend},) => {
   const { t } = useTranslation();
   const [showEmoji, setShowEmoji] = useState(false);
+  const [disableSend, setDisableSend] = useState(false);
   const iconRef = useRef<HTMLButtonElement | null>(null);
-  const ctx = api.useContext();
-  const { mutate, isLoading: isPosting } = api.posts.createPost.useMutation({
-    onSuccess: () => {
-      // setValue("content", "null");
-      void ctx.posts.getAll.invalidate();
-    },
+  const [
+    openFileSelector,
+   { filesContent, loading, errors: pickerError, clear },
+ ] = filePicker;
 
-    onError: (e) => {
-      const errorMessage = e.data?.code;
-      if (errorMessage) {
-        // toast.error(t(errorMessage));
-      }
-    },
-  });
-  
   if (!editor) {
     return null;
   }
@@ -62,54 +50,36 @@ const MenuBar = ({ editor, openFileSelector }) => {
     }
   };
 
-  async function uploadToS3() {
-    let keys = [];
-    const s3 = new S3();
-
-    //@ts-ignore
-    for (let i = 0; i < filesContent.length; i++) {
-      //@ts-ignore
-      let file = filesContent[i];
-      //@ts-ignore
-      const fileType = encodeURIComponent(file?.name.split(".").at(1));
-      const { data } = await axios.post(
-        `/api/upload/processMediaUpload?fileType=${fileType}`
-      );
-      const { uploadUrl, key } = data;
-      keys.push({ key, fileType });
-
-      //convert base64 to blob
-      const str = "data:image/" + { fileType } + "base64,";
-      const base64Str = file?.content.toString() ?? "";
-      const response = await fetch(base64Str);
-      const blob = await response.blob();
-
-      const ss = await axios
-        .put(uploadUrl, blob)
-        .then((res) => {})
-        .catch((e) => {
-          toast(e.message);
-        });
-    }
-    return keys;
+  function isNullOrEmpty(str: string | null | undefined): boolean {
+    return !str || str.trim().length === 0;
   }
 
- async function postContent(editor: any) { 
-     try {
-      // const keys = await uploadToS3();
-      mutate({
-        content: JSON.stringify(editor.getJSON()),
-        media: JSON.stringify(""),
-      });
-      // setValue("content", "");
-      // clear();
-      void ctx.posts.getAll.invalidate();
-    } catch (cause) {
-      // setError("content", { type: "custom", message: "媒体文件上传失败" });
+  function preparedToSend() {
+    if (!onSend) return false;
+    if (editor.isEmpty && filesContent.length > 0) {
+       editor.commands.insertContent(t('pics_only_default_text'));
+       return true;
+    } else if (isNullOrEmpty(editor.getText())) {
+      return false;
     }
-    return "";
+    
+    setDisableSend(true);
+    return true;
   }
 
+  async function handleSend() {
+    console.log(editor.getText())
+
+    if (preparedToSend()) {
+      editor.setEditable(false)
+      const result = await onSend(editor, setDisableSend);
+      console.log(result)
+      if (result) {
+        clear()
+      }
+
+    }
+  }
   
   return (
     <>
@@ -136,8 +106,8 @@ const MenuBar = ({ editor, openFileSelector }) => {
             </svg>
           </button>
         </li>
-
-        <li className="items-start">
+        {/* italic */}
+        <li className="-ml-1.5">
           <button
             onClick={() => editor.chain().focus().toggleItalic().run()}
             disabled={!editor.can().chain().focus().toggleItalic().run()}
@@ -156,7 +126,8 @@ const MenuBar = ({ editor, openFileSelector }) => {
             </svg>
           </button>
         </li>
-        <li>
+        {/* strike  */}
+        <li className="-ml-1">
           <button
             onClick={() => editor.chain().focus().toggleStrike().run()}
             disabled={!editor.can().chain().focus().toggleStrike().run()}
@@ -175,7 +146,7 @@ const MenuBar = ({ editor, openFileSelector }) => {
             </svg>
           </button>
         </li>
-        <li>
+        <li className={editorType === "COMMENT" || editorType === "COMMENT_TALL" ? "hidden" : ""}>
           {/* image upload */}
           <button
             onClick={()=>{openFileSelector()}}
@@ -194,13 +165,13 @@ const MenuBar = ({ editor, openFileSelector }) => {
             </svg>
           </button>
         </li>
-        <li>
+        <li className="pl-1">
           {/* emoji */}
           <button
             ref={iconRef} 
             onClick={() => setShowEmoji(!showEmoji)}
             disabled={!editor.can().chain().focus().run()}
-            className={editor.isActive("") ? "is-active pl-1" : " pl-1"}
+            className={editor.isActive("") ? "is-active " : ""}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -226,11 +197,11 @@ const MenuBar = ({ editor, openFileSelector }) => {
 
         {/* send button  */}
         <li className="ml-auto pr-5">
-          <button onClick={() => postContent(editor)}>
+          <button disabled={disableSend} onClick={() => handleSend()}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
-              className={editor.isActive("send") ? " " : "editor-send"}
+              className={disableSend ? "editor-sending" : "editor-send"}
             >
               <path d="M3 13.0001H9V11.0001H3V1.8457C3 1.56956 3.22386 1.3457 3.5 1.3457C3.58425 1.3457 3.66714 1.36699 3.74096 1.4076L22.2034 11.562C22.4454 11.695 22.5337 11.9991 22.4006 12.241C22.3549 12.3241 22.2865 12.3925 22.2034 12.4382L3.74096 22.5925C3.499 22.7256 3.19497 22.6374 3.06189 22.3954C3.02129 22.3216 3 22.2387 3 22.1544V13.0001Z"></path>
             </svg>{" "}
@@ -249,12 +220,51 @@ export function gettHtmlFromJson(json: JSONContent) : string{
   return output.toString();
 }
 
-const CommentEditor = () => {
+export function renderAsHTML(content: string){
+  let result:string = "";
+
+  try {
+    result = gettHtmlFromJson(JSON.parse(content))
+    result = DOMPurify.sanitize(result);
+  } catch(cause) {
+    result = content
+  }
+
+  return(
+  <>
+   <span dangerouslySetInnerHTML={{ __html: result }} >
+  </span>
+  </>);
+}
+
+const types = ["POST", "LONG_POST", "COMMENT", "COMMENT_TALL"] as const
+type EditorType = (typeof types)[number];
+
+// const callbackStatus = ["SUCCESS", "LOADING", "ERROR"] as const
+// type callbackStatusType = (typeof callbackStatus)[number];
+
+interface TruthEngineEditorOnSendCallback {
+  (editor: any, setState: React.Dispatch<React.SetStateAction<boolean>>):
+   Promise<boolean>; //return if action is successful
+}
+
+interface TruthEngineEditorOnLoadCallback {
+  (editor: any): void;
+}
+
+interface TruthEngineEditorProps {
+  editorType: EditorType;
+  onSend: TruthEngineEditorOnSendCallback;
+  onLoad?: TruthEngineEditorOnLoadCallback;
+} 
+
+const wordLimit = 500;
+
+const TruthEngineEditor: React.FC<TruthEngineEditorProps> = 
+({ editorType, onSend, onLoad }) => {
+
   const { t } = useTranslation();
-  const [
-     openFileSelector,
-    { filesContent, plainFiles, loading, errors: pickerError, clear },
-  ] = useFilePicker({
+  const filePicker = useFilePicker({
     readAs: "DataURL",
     accept: "image/*",
     multiple: true,
@@ -266,25 +276,39 @@ const CommentEditor = () => {
       maxWidth: 1920,
       minHeight: 100,
       minWidth: 200,
-    },
-    onFilesSuccessfulySelected: (data) => {if(filesContent.length > 0) clear()}
+    }
   });
+
+  const [
+    openFileSelector,
+   { filesContent, plainFiles, loading, errors: pickerError, clear },
+ ] = filePicker;
 
   const editor = useEditor({
     editorProps: {
       attributes: {
-        placeholder: "发布信息驱动真相",
         class:
-          "prose font-chinese text-2xl prose-sm sm:prose lg:prose-lg xl:prose-2xl px-2 pt-2 mx-auto min-h-[100px] focus:outline-none",
+          getMinHeightForEditor() + " prose font-chinese text-2xl prose-sm sm:prose lg:prose-lg xl:prose-2xl px-2 pt-2 mx-auto min-h-[100px] focus:outline-none",
       },
     },
     extensions: [
       Color.configure({ types: [TextStyle.name, ListItem.name] }),
       Placeholder.configure({
-        placeholder: t("post_place_holder").toString(),
+        placeholder: getPlaceHolderForEditor(),
       }),
       //@ts-ignore
       TextStyle.configure({ types: [ListItem.name] }),
+      Mention.configure({
+        HTMLAttributes: {
+          class: 'text-red-400',
+        },
+        renderLabel({ options, node }) {
+          return `${options.suggestion.char}${node.attrs.label ?? node.attrs.id}`
+        }
+      }),
+      CharacterCount.configure({
+        limit: wordLimit,
+      }),
       StarterKit.configure({
         heading: {
           levels: [1, 2, 3],
@@ -298,6 +322,7 @@ const CommentEditor = () => {
           keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
         },
       }),
+
     ],
     content: null,
   });
@@ -306,11 +331,54 @@ const CommentEditor = () => {
        clear()
   }
 
+  function getPlaceHolderForEditor() {
+    if (editorType === "POST") {
+        return t("post_place_holder").toString();
+    } 
+    else if(editorType === "COMMENT") {
+      return t("comment_place_holder").toString();
+    }  
+    else if(editorType === "LONG_POST") {
+      return t("long_post_place_holder").toString();
+    }
+    return "";
+  }
+
+  function getMinHeightForEditor() {
+    if (editorType === "POST") {
+        return "min-h-[100px]";
+    } 
+    else if(editorType === "COMMENT") {
+      return "min-h-[20px]";
+    }  
+    else if(editorType === "COMMENT_TALL") {
+      return "min-h-[80px]";
+    }  
+    else if(editorType === "LONG_POST") {
+      return "min-h-full"
+    }
+    return "";
+  }
+
+  useEffect(() => {
+    const loadData = async () => {
+      if (onLoad) {
+        await onLoad(editor);
+      }
+    };
+    loadData();
+  }, []);
+
+  if (!editor) return <></>
   return (
     <>
       <Flex direction="column" className="w-[100%]">
         <Flex>
           <EditorContent editor={editor} className="w-[100%] text-slate-50 pr-2" />
+        </Flex>
+        <Flex className="font-chinese items-end justify-end pr-6">
+             {editor.storage.characterCount.characters()}/{wordLimit} 
+             {editor.storage.characterCount.characters() === wordLimit && <span className=" ml-3 text-red-300">{t('try_long_post')}</span>}
         </Flex>
         <Flex className="flex w-[100%] flex-wrap pr-4">
           {/* image display section */}
@@ -344,14 +412,18 @@ const CommentEditor = () => {
             </div>
           )}
           <HSeparator my={1} />
-          <MenuBar editor={editor} openFileSelector={openFileSelector} />
+          <MenuBar editor={editor} 
+          filePicker={filePicker} 
+          editorType={editorType}
+          onSend={onSend}
+           />
         </Flex>
       </Flex>
     </>
   );
 };
 
-export default CommentEditor;
+export default TruthEngineEditor;
 
 export const getServerSideProps = async ({ locale }: { locale: string }) => ({
   props: {

@@ -25,16 +25,17 @@ const ratelimitPost = new Ratelimit({
 export const commentRouter = createTRPCRouter({
   getCommentsForPost: publicProcedure.input(z.object({postId: z.string(),
   limit: z.number().default(50),
-  commentId: z.string().optional()
+  commentId: z.string().optional()//把用户从通知或者主页哪里要查看的那条评论也找出来
 }))
   .query(async ({ctx, input}) => {
    let comments = await ctx.prisma.comment.findMany({
         where:{
           OR: [
             {
-              id: input.commentId,
+              id: input.commentId,//指定评论
             },
             {
+              //或者是某个帖子的所有评论
               replyToPostId: input.postId,
               MarkAsDelete: false,
             },
@@ -72,6 +73,48 @@ export const commentRouter = createTRPCRouter({
     return {
       props: {
         comments: comments,
+      }
+    };
+  }
+),
+
+getUserNewCommentForComment: publicProcedure.input(z.object({commentId: z.string(),
+}))
+  .query(async ({ctx, input}) => {
+   let comment = await ctx.prisma.comment.findMany({
+        where:{
+          replyToCommentId: input.commentId,
+          MarkAsDelete: false,
+        },
+        take: 1,
+        include: {
+          author: {
+            select : {
+              id: true,
+              username: true,
+              profileImageUrl:true,
+              premiumStatus:true,
+              role:true,
+              displayname:true,
+            },          
+          },
+          reactions: {
+            where: {
+              userId: ctx.user?.id,
+            }
+          }     
+        },
+        orderBy: [
+        {
+          createdAt: "desc"
+        }
+      ]
+
+    })
+    
+    return {
+      props: {
+        comment
       }
     };
   }

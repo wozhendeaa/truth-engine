@@ -39,6 +39,11 @@ body{
       active:bg-transparent active:fill-te_dark_font
     }
 
+    .editor-sending {
+      @apply w-8 h-8  cursor-default 
+      fill-gray-600 
+    }
+
     .editor-send-active {
       @apply w-8 h-8 cursor-pointer hover:bg-transparent
       fill-indigo-200 stroke-indigo-200 

@@ -26,7 +26,7 @@ import avatar from "assets/img/avatars/avatar4.png";
 import { useTranslation } from "react-i18next";
 import { ChangeEventHandler, createContext, useContext, useState } from "react";
 import UserContext from "helpers/userContext";
-import FeedThread from "components/PostComment/FeedThread";
+import EngineFeed from "components/PostComment/EngineFeed";
 import { isUserVerified } from "helpers/userHelper";
 import CommentThread from "components/PostComment/CommentFeed";
 import GeneralCommentThread from "components/PostComment/GeneralCommentFeed";
@@ -89,7 +89,7 @@ export function ProfileBanner(props: {user:userWithStat}) {
   const {t} = useTranslation();
 
   // Chakra Color Mode
-  const textColorPrimary = useColorModeValue("white", "secondaryGray.900");
+  const textColorPrimary = useColorModeValue("secondaryGray.900","white");
   const textColorSecondary = "gray.400";
   const borderColor = useColorModeValue(
     "#111C44 !important",
@@ -159,7 +159,7 @@ export function ProfileBanner(props: {user:userWithStat}) {
 
 export function Posts() {
   // Chakra Color Mode
-  const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
+  const textColorPrimary = useColorModeValue("white","secondaryGray.900");
   const textColorSecondary = "gray.400";
   const user = useContext(UserContext);
 
@@ -169,7 +169,7 @@ export function Posts() {
     <>
        {isLoading && <LoadingSpinner />}
        <Box className={true ? "" : "" }>
-        <FeedThread postData={data} />
+        <EngineFeed postData={data} />
       </Box>
     </>
   );

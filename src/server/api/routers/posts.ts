@@ -45,7 +45,23 @@ export const postsRouter = createTRPCRouter({
         replyToPostId: input.id,
       },
       include: {
-        author: true
+        author: true,
+        comments: {
+          take: 1,
+           orderBy: [
+    {
+      createdAt: 'desc',
+    },
+    {
+      likes: 'desc',
+    },
+  ],
+          where : {
+             author: {
+                id: ctx.userId ?? ""
+             }
+          }
+        }     
       },
       orderBy:[
         {pinned: "asc",},
@@ -76,6 +92,22 @@ export const postsRouter = createTRPCRouter({
               userId: true
             }
           },
+          comments: {
+            take: 1,
+             orderBy: [
+    {
+      createdAt: 'desc',
+    },
+    {
+      likes: 'desc',
+    },
+  ],
+            where : {
+               author: {
+                  id: ctx.userId ?? ""
+               }
+            }
+          }     
         }
     })
     
@@ -155,12 +187,29 @@ export const postsRouter = createTRPCRouter({
   ),
 
   getPublicTimelineFeed: publicProcedure.query(async ({ ctx }) => {
-       
       const feed = await ctx.prisma.post.findMany({
         where:{
             author: {
               role: 'ADMIN_VERYFIED_ENGINE' || 'VERYFIED_ENGINE'
             }
+        },
+        include: {
+          comments: {
+            take: 1,
+             orderBy: [
+    {
+      createdAt: 'desc',
+    },
+    {
+      likes: 'desc',
+    },
+  ],
+            where : {
+               author: {
+                  id: ctx.userId ?? ""
+               }
+            }
+          }
         },
         orderBy: {createdAt: "desc"},
         take: 100,
@@ -187,6 +236,22 @@ export const postsRouter = createTRPCRouter({
             },
             select:{
               userId: true
+            }
+          },
+          comments: {
+            take: 1,
+             orderBy: [
+    {
+      createdAt: 'desc',
+    },
+    {
+      likes: 'desc',
+    },
+  ],
+            where : {
+               author: {
+                  id: ctx.userId ?? ""
+               }
             }
           }     
         },
@@ -216,14 +281,28 @@ export const postsRouter = createTRPCRouter({
             select:{
               userId: true
             }
-          }     
+          }  ,
+          comments: {
+            take: 1,
+             orderBy: [
+    {
+      createdAt: 'desc',
+    },
+    {
+      likes: 'desc',
+    },
+  ],
+            where : {
+               author: {
+                  id: ctx.userId ?? ""
+               }
+            }
+          }        
         },
     });
-
     return {
         posts,
     };
- 
   }),
 
   getAll: publicProcedure.query(async ({ ctx }) => {
@@ -241,6 +320,22 @@ export const postsRouter = createTRPCRouter({
             },
             select: {
               userId: true
+            }
+          }     ,
+          comments: {
+            take: 1,
+             orderBy: [
+    {
+      createdAt: 'desc',
+    },
+    {
+      likes: 'desc',
+    },
+  ],
+            where : {
+               author: {
+                  id: ctx.userId ?? ""
+               }
             }
           }     
         }
@@ -271,7 +366,23 @@ export const postsRouter = createTRPCRouter({
           select:{
             userId: true
           }
-        }     
+        }  ,
+        comments: {
+          take: 1,
+           orderBy: [
+    {
+      createdAt: 'desc',
+    },
+    {
+      likes: 'desc',
+    },
+  ],
+          where : {
+             author: {
+                id: ctx.userId ?? ""
+             }
+          }
+        }        
       },
   });
 

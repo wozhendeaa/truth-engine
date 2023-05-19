@@ -25,9 +25,12 @@ import { GetSekleton } from "helpers/UIHelper";
 import { LoadingSpinner } from "components/loading";
 import { HSeparator } from "components/separator/Separator";
 import TE_Routes from "TE_Routes";
+import { renderAsHTML } from "components/TipTap/TruthEngineEditor";
+
+type replyType = 
+RouterOutputs["comment"]["getCommentsForComment"]["props"]["comments"];
 
 // Custom components
-
 export default function TEComment(props: {
   avatar: string;
   name: string;
@@ -60,8 +63,8 @@ export default function TEComment(props: {
   } = props;
 
   // Chakra Color Mode
-  const textColor = useColorModeValue("white", "secondaryGray.900");
-  const textColorSecondary = useColorModeValue("secondaryGray.600", "white");
+  const textColor = useColorModeValue( "secondaryGray.900","white");
+  const textColorSecondary = useColorModeValue("secondaryGray.600","white");
   const textGray = useColorModeValue("#68769F", "secondaryGray.600");
   const { t } = useTranslation();
   const userId = useAuth().userId;
@@ -74,12 +77,16 @@ export default function TEComment(props: {
 
   const [likeNumber, setNumber] = useState(likes);
   const [showReplies, setShowReplies] = useState(false);
-  type replyType =
-    RouterOutputs["comment"]["getCommentsForComment"]["props"]["comments"];
-  const [replies, setReplies] = useState<replyType>([]);
+
+  const [replies, setReplies] = useState<replyType>();
   const [loadingReplies, setLoadingReplies] = useState(false);
 
   async function getRepliesForComment(onPostPage: boolean, postId: string) {
+    if (showReplies) {
+      setShowReplies(false);
+      return;
+    }
+
     if (!onPostPage) {
         window.open(TE_Routes.postbyid.path + postId + "#" + commentId, "_blank");
         return;
@@ -98,6 +105,40 @@ export default function TEComment(props: {
       .catch((error) => {
         // Handle error
         console.error(error);
+        toast(error)
+      })
+      .finally(() => {
+        // Request is complete
+        setLoadingReplies(false);
+      });
+  }
+
+  async function getUserNewlyMadeComment(onPostPage: boolean, postId: string) {
+    if (showReplies) {
+      setShowReplies(false);
+      return;
+    }
+
+    if (!onPostPage) {
+        window.open(TE_Routes.postbyid.path + postId + "#" + commentId, "_blank");
+        return;
+    }
+
+    await axios
+      .post("/api/userNewComment?commentId=" + commentId)
+      .then((response) => {
+        type newReplayType = 
+RouterOutputs["comment"]["getUserNewCommentForComment"]["props"]["comment"];
+        const data: newReplayType = response.data.props.comment;
+        if (data) {
+          setReplies(data);
+          setShowReplies(true);
+        }
+      })
+      .catch((error) => {
+        // Handle error
+        console.error(error);
+        toast(error)
       })
       .finally(() => {
         // Request is complete
@@ -215,7 +256,7 @@ export default function TEComment(props: {
 
         <Flex align="left" direction={"column"}>
           <Flex mt={2} px={isFirstLevel ? 0 : 3} fontSize={"md"} className={"text-" + textColor}>
-            {props.text}
+            {renderAsHTML(props.text)}
           </Flex>
 
           {/* 点赞按钮 */}
@@ -255,8 +296,12 @@ export default function TEComment(props: {
                         {t(showReplies ? "hide_replies" : "show_replies") + "(" + commentNum + ")"}
                       </Button>)
                 }
+
                 {disc.isOpen && <CommentModal disc={disc} 
-                replyToCommentId={commentId} />}
+                replyToCommentId={commentId} 
+                postId={replyToPostId!}
+                commentCallback={getUserNewlyMadeComment}
+                />}
 
                 <Button
                   color={textGray}
@@ -274,9 +319,9 @@ export default function TEComment(props: {
               </Flex>
           </Flex>
           <Flex
-            width={"90%"}
+            width={"full"}
             direction="column"
-            ml={10}
+            pl={16}
             mt={isFirstLevel ? 3 : -1}
           >
             {loadingReplies && (
@@ -284,7 +329,7 @@ export default function TEComment(props: {
                 <LoadingSpinner />
               </Flex>
             )}
-            {showReplies &&
+            {showReplies && 
               replies?.map((c) => (
                 <TEComment
                   avatar={

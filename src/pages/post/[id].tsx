@@ -12,7 +12,7 @@ import { PageLayout } from "components/layout";
 import { Box, Flex, Link } from "@chakra-ui/react";
 import { GetSekleton } from "helpers/UIHelper";
 import React from "react";
-import { SingleFeed } from "components/PostComment/FeedThread";
+import { SingleFeed } from "components/PostComment/EngineFeed";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 const i18n = require('next-i18next.config');
 
@@ -77,7 +77,7 @@ const SinglePostPage: NextPage = (
               {/* <ArrowBackIcon color={"whatsapp.200"} onClick={()=>toElement()} /> */}
             {/* </Link> */}
           </Box>
-          <Flex className="w-3/4">
+          <Flex className="w-2/4">
             {isLoading ? (
              <GetSekleton number={1} />
             ) : (

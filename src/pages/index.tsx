@@ -7,7 +7,7 @@ import { PageLayout } from "components/layout";
 import { PostCreator as PostBox } from "components/posting/PostBox";
 import { Box, Flex, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
 
-import FeedThread from "components/PostComment/FeedThread";
+import EngineFeed from "components/PostComment/EngineFeed";
 import { api } from "utils/api";
 import UserContext from "../helpers/userContext";
 import { GetSekleton } from "../helpers/UIHelper";
@@ -146,7 +146,7 @@ const Home: NextPage = () => {
                   <Box className={tab == "VERIFIED_ENGINE" ? "" : "hidden"}>
                     {
                       //@ts-ignore
-                      <FeedThread postData={verifiedFeed} />
+                      <EngineFeed postData={verifiedFeed} />
                     }
                   </Box>
                 </Box>
@@ -162,7 +162,7 @@ const Home: NextPage = () => {
                     <Flex>
                       {
                         //@ts-ignore
-                        <FeedThread postData={communityFeed} />
+                        <EngineFeed postData={communityFeed} />
                       }
                     </Flex>
                   </Box>

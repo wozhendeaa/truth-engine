@@ -77,7 +77,12 @@
  "notification":"通知",
  "link_copied":"链接已复制",
  "link_copied_failed":"你人品真烂，链接复制失败",
- "post_place_holder":"发表信息，驱动真相...",
+ "post_place_holder":"传播信息，驱动真相...",
+ "comment_place_holder":"传播你的思想...",
+ "long_post_place_holder":"让世界拥抱你的知识...",
+ "try_long_post":"太长了？试试发精致引擎文",
+ "pics_only_default_text":"[分享图片]",
+ "post_good":"传递信息成功",
  
  "empty":""
 }
