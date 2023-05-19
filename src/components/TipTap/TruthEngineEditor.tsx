@@ -15,24 +15,29 @@ import { Box, Flex } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { HSeparator } from "components/separator/Separator";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import data from '@emoji-mart/data'
-import NimblePicker  from '@emoji-mart/react'
-import { useFilePicker } from "use-file-picker";
-import { api } from "utils/api";
+import data from "@emoji-mart/data";
+import NimblePicker from "@emoji-mart/react";
+import { FileContent, SelectedFiles, useFilePicker } from "use-file-picker";
 import DOMPurify from "dompurify";
-import Mention from '@tiptap/extension-mention'
-import CharacterCount from '@tiptap/extension-character-count'
+import Mention from "@tiptap/extension-mention";
+import CharacterCount from "@tiptap/extension-character-count";
+import Tippy from "components/Tippy";
+import Lucide from "components/Lucide";
 
 //@ts-ignore
-const MenuBar = ({ editor, filePicker, editorType,onSend},) => {
+const MenuBar = (props: {
+  editor: any,
+  openFileSelector: any,
+  mediaFileState: any,
+  editorType: any,
+  onSend: any,
+}) => {
+  const { editor, openFileSelector, mediaFileState, editorType, onSend } = props;
   const { t } = useTranslation();
   const [showEmoji, setShowEmoji] = useState(false);
   const [disableSend, setDisableSend] = useState(false);
   const iconRef = useRef<HTMLButtonElement | null>(null);
-  const [
-    openFileSelector,
-   { filesContent, loading, errors: pickerError, clear },
- ] = filePicker;
+  const [mediaFiles, setMediaFiles] = mediaFileState;
 
   if (!editor) {
     return null;
@@ -56,31 +61,30 @@ const MenuBar = ({ editor, filePicker, editorType,onSend},) => {
 
   function preparedToSend() {
     if (!onSend) return false;
-    if (editor.isEmpty && filesContent.length > 0) {
-       editor.commands.insertContent(t('pics_only_default_text'));
-       return true;
+    if (editor.isEmpty && mediaFiles.length > 0) {
+      editor.commands.insertContent(t("pics_only_default_text"));
+      return true;
     } else if (isNullOrEmpty(editor.getText())) {
       return false;
     }
-    
+
     setDisableSend(true);
     return true;
   }
 
   async function handleSend() {
-    console.log(editor.getText())
+    console.log(editor.getText());
 
     if (preparedToSend()) {
-      editor.setEditable(false)
+      editor.setEditable(false);
       const result = await onSend(editor, setDisableSend);
-      console.log(result)
+      console.log(result);
       if (result) {
-        clear()
-      }
-
+        setMediaFiles([]);     
+       }
     }
   }
-  
+
   return (
     <>
       <ul className="flex w-full flex-row justify-between gap-1 pt-2 ">
@@ -146,10 +150,18 @@ const MenuBar = ({ editor, filePicker, editorType,onSend},) => {
             </svg>
           </button>
         </li>
-        <li className={editorType === "COMMENT" || editorType === "COMMENT_TALL" ? "hidden" : ""}>
+        <li
+          className={
+            editorType === "COMMENT" || editorType === "COMMENT_TALL"
+              ? "hidden"
+              : ""
+          }
+        >
           {/* image upload */}
           <button
-            onClick={()=>{openFileSelector()}}
+            onClick={() => {
+              openFileSelector();
+            }}
             className={editor.isActive("code") ? "is-active pl-1" : " pl-1"}
           >
             <svg
@@ -168,7 +180,7 @@ const MenuBar = ({ editor, filePicker, editorType,onSend},) => {
         <li className="pl-1">
           {/* emoji */}
           <button
-            ref={iconRef} 
+            ref={iconRef}
             onClick={() => setShowEmoji(!showEmoji)}
             disabled={!editor.can().chain().focus().run()}
             className={editor.isActive("") ? "is-active " : ""}
@@ -177,22 +189,24 @@ const MenuBar = ({ editor, filePicker, editorType,onSend},) => {
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               className={
-                showEmoji
-                  ? " editor-menu-button-active"
-                  : "editor-menu-button"
+                showEmoji ? " editor-menu-button-active" : "editor-menu-button"
               }
             >
               <path d="M10.5199 19.8634C10.5955 18.6615 10.8833 17.5172 11.3463 16.4676C9.81124 16.3252 8.41864 15.6867 7.33309 14.7151L8.66691 13.2248C9.55217 14.0172 10.7188 14.4978 12 14.4978C12.1763 14.4978 12.3501 14.4887 12.5211 14.471C14.227 12.2169 16.8661 10.7083 19.8634 10.5199C19.1692 6.80877 15.9126 4 12 4C7.58172 4 4 7.58172 4 12C4 15.9126 6.80877 19.1692 10.5199 19.8634ZM19.0233 12.636C15.7891 13.2396 13.2396 15.7891 12.636 19.0233L19.0233 12.636ZM22 12C22 12.1677 21.9959 12.3344 21.9877 12.5L12.5 21.9877C12.3344 21.9959 12.1677 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12ZM10 10C10 10.8284 9.32843 11.5 8.5 11.5C7.67157 11.5 7 10.8284 7 10C7 9.17157 7.67157 8.5 8.5 8.5C9.32843 8.5 10 9.17157 10 10ZM17 10C17 10.8284 16.3284 11.5 15.5 11.5C14.6716 11.5 14 10.8284 14 10C14 9.17157 14.6716 8.5 15.5 8.5C16.3284 8.5 17 9.17157 17 10Z"></path>
             </svg>
           </button>
           <Box className={"absolute z-50 "}>
-              {
-               showEmoji && <NimblePicker  locale={"zh"} data={data} 
-               onEmojiSelect={(e: any)=> {editor.commands.insertContent(e.native)}}
-               onClickOutside={handleOnClickOutside}
-                />
-              }
-            </Box>
+            {showEmoji && (
+              <NimblePicker
+                locale={"zh"}
+                data={data}
+                onEmojiSelect={(e: any) => {
+                  editor.commands.insertContent(e.native);
+                }}
+                onClickOutside={handleOnClickOutside}
+              />
+            )}
+          </Box>
         </li>
 
         {/* send button  */}
@@ -212,7 +226,7 @@ const MenuBar = ({ editor, filePicker, editorType,onSend},) => {
   );
 };
 
-export function gettHtmlFromJson(json: JSONContent) : string{
+export function gettHtmlFromJson(json: JSONContent): string {
   const output = useMemo(() => {
     return generateHTML(json, [StarterKit]);
   }, [json]);
@@ -220,32 +234,34 @@ export function gettHtmlFromJson(json: JSONContent) : string{
   return output.toString();
 }
 
-export function renderAsHTML(content: string){
-  let result:string = "";
+export function renderAsHTML(content: string) {
+  let result: string = "";
 
   try {
-    result = gettHtmlFromJson(JSON.parse(content))
+    result = gettHtmlFromJson(JSON.parse(content));
     result = DOMPurify.sanitize(result);
-  } catch(cause) {
-    result = content
+  } catch (cause) {
+    result = content;
   }
 
-  return(
-  <>
-   <span dangerouslySetInnerHTML={{ __html: result }} >
-  </span>
-  </>);
+  return (
+    <>
+      <span dangerouslySetInnerHTML={{ __html: result }}></span>
+    </>
+  );
 }
 
-const types = ["POST", "LONG_POST", "COMMENT", "COMMENT_TALL"] as const
+const types = ["POST", "LONG_POST", "COMMENT", "COMMENT_TALL"] as const;
 type EditorType = (typeof types)[number];
 
 // const callbackStatus = ["SUCCESS", "LOADING", "ERROR"] as const
 // type callbackStatusType = (typeof callbackStatus)[number];
 
 interface TruthEngineEditorOnSendCallback {
-  (editor: any, setState: React.Dispatch<React.SetStateAction<boolean>>):
-   Promise<boolean>; //return if action is successful
+  (
+    editor: any,
+    setState: React.Dispatch<React.SetStateAction<boolean>>
+  ): Promise<boolean>; //return if action is successful
 }
 
 interface TruthEngineEditorOnLoadCallback {
@@ -256,14 +272,53 @@ interface TruthEngineEditorProps {
   editorType: EditorType;
   onSend: TruthEngineEditorOnSendCallback;
   onLoad?: TruthEngineEditorOnLoadCallback;
-} 
+}
 
 const wordLimit = 500;
 
-const TruthEngineEditor: React.FC<TruthEngineEditorProps> = 
-({ editorType, onSend, onLoad }) => {
+const WordCountCircle = (props: { percentage: number }) => {
+  const {percentage} = props;
+  let strokeColor = "";
+  if (percentage >= 90) {
+    strokeColor = 'red'
+  } else if (percentage >= 70) {
+    strokeColor = "yellow"
+  } else {
+    strokeColor = "#00b474"
+  }
+  return (
+    <>
+      <svg
+        height="30"
+        width="30"
+        viewBox="0 0 20 20"
+        className="character-count__graph pr-1"
+      >
+        <circle r="10" cx="10" cy="10" fill="white"  />
+        <circle
+          r="5"
+          cx="10"
+          cy="10"
+          fill="white"
+          stroke={strokeColor}
+          strokeWidth="10"
+          strokeDasharray={`calc(${percentage} * 31.4 / 100) 31.4`}
+          transform="rotate(-90) translate(-20)"
+        />
+        <circle r="6" cx="10" cy="10" fill="lightgray" />
+      </svg>
+    </>
+  );
+};
 
+const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
+  editorType,
+  onSend,
+  onLoad,
+}) => {
   const { t } = useTranslation();
+  const mediaFileState = useState<FileContent[]>([]);
+  const [mediaFiles, setMediaFiles] = mediaFileState;
   const filePicker = useFilePicker({
     readAs: "DataURL",
     accept: "image/*",
@@ -272,23 +327,32 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> =
     // minFileSize: 0.1, // in megabytes
     maxFileSize: 5,
     imageSizeRestrictions: {
-      maxHeight: 2000, // in pixels
+      maxHeight: 1080, // in pixels
       maxWidth: 1920,
       minHeight: 100,
       minWidth: 200,
-    }
+    },
+    onFilesSuccessfulySelected: (data: SelectedFiles) => {
+      setMediaFiles((prev) => {
+        const unique = data.filesContent.filter((newFile) => {
+          return !mediaFiles.some((existingFile) => newFile.name === existingFile.name);
+        });
+        return prev.concat(unique);
+      });
+    },
   });
 
   const [
     openFileSelector,
-   { filesContent, plainFiles, loading, errors: pickerError, clear },
- ] = filePicker;
+    { filesContent, plainFiles, loading, errors: pickerError, clear },
+  ] = filePicker;
 
   const editor = useEditor({
     editorProps: {
       attributes: {
         class:
-          getMinHeightForEditor() + " prose font-chinese text-2xl prose-sm sm:prose lg:prose-lg xl:prose-2xl px-2 pt-2 mx-auto min-h-[100px] focus:outline-none",
+          getMinHeightForEditor() +
+          " prose font-chinese text-2xl prose-sm sm:prose lg:prose-lg xl:prose-2xl px-2 pt-2 mx-auto min-h-[100px] focus:outline-none",
       },
     },
     extensions: [
@@ -300,11 +364,13 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> =
       TextStyle.configure({ types: [ListItem.name] }),
       Mention.configure({
         HTMLAttributes: {
-          class: 'text-red-400',
+          class: "text-red-400",
         },
         renderLabel({ options, node }) {
-          return `${options.suggestion.char}${node.attrs.label ?? node.attrs.id}`
-        }
+          return `${options.suggestion.char}${
+            node.attrs.label ?? node.attrs.id
+          }`;
+        },
       }),
       CharacterCount.configure({
         limit: wordLimit,
@@ -322,23 +388,22 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> =
           keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
         },
       }),
-
     ],
     content: null,
   });
 
-  function removePicturesFromUploader() {
-       clear()
+  function removePictureFromUploader(name_id: string) {
+    let copy = mediaFiles.filter((file) => file.name !== name_id);
+    setMediaFiles(copy);
   }
+
 
   function getPlaceHolderForEditor() {
     if (editorType === "POST") {
-        return t("post_place_holder").toString();
-    } 
-    else if(editorType === "COMMENT") {
+      return t("post_place_holder").toString();
+    } else if (editorType === "COMMENT") {
       return t("comment_place_holder").toString();
-    }  
-    else if(editorType === "LONG_POST") {
+    } else if (editorType === "LONG_POST") {
       return t("long_post_place_holder").toString();
     }
     return "";
@@ -346,45 +411,50 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> =
 
   function getMinHeightForEditor() {
     if (editorType === "POST") {
-        return "min-h-[100px]";
-    } 
-    else if(editorType === "COMMENT") {
-      return "min-h-[20px]";
-    }  
-    else if(editorType === "COMMENT_TALL") {
       return "min-h-[100px]";
-    }  
-    else if(editorType === "LONG_POST") {
-      return "min-h-full"
+    } else if (editorType === "COMMENT") {
+      return "min-h-[20px]";
+    } else if (editorType === "COMMENT_TALL") {
+      return "min-h-[100px]";
+    } else if (editorType === "LONG_POST") {
+      return "min-h-full";
     }
     return "";
   }
 
-  if (onLoad){
+  if (onLoad) {
     onLoad(editor);
   }
 
-  if (!editor) return <></>
+  if (!editor) return <></>;
+
+  let newPercentage = (editor.storage.characterCount.characters() / wordLimit) * 100.0;
   return (
     <>
       <Flex direction="column" className="w-[100%]">
         <Flex>
-          <EditorContent editor={editor} className="w-[100%] text-slate-50 pr-2" />
+          <EditorContent
+            editor={editor}
+            className="w-[100%] pr-2 text-slate-50"
+          />
         </Flex>
-        <Flex className="font-chinese items-end justify-end pr-6">
-             {editor.storage.characterCount.characters()}/{wordLimit} 
-             {editor.storage.characterCount.characters() === wordLimit && <span className=" ml-3 text-red-300">{t('try_long_post')}</span>}
+        <Flex className="items-end justify-end pr-6 font-chinese">
+          <WordCountCircle percentage={newPercentage} />
+          {editor.storage.characterCount.characters()}/{wordLimit}
+          {editor.storage.characterCount.characters() === wordLimit && (
+            <span className=" ml-3 text-red-300">{t("try_long_post")}</span>
+          )}
         </Flex>
         <Flex className="flex w-[100%] flex-wrap pr-4">
           {/* image display section */}
-          {filesContent.length > 0 && (
+          {mediaFiles.length > 0 && (
             <div className="mt-3 w-full" id="uploadImageDiv">
-              <div className="dark:border-darkmode-400 rounded-md border-2 border-dashed pt-4">
+              <div className="dark:border-darkmode-400 rounded-md border-2 border-dashed py-2">
                 <div className="flex flex-wrap px-4">
-                  {filesContent.map((file, index) => (
+                  {mediaFiles.map((file, index) => (
                     <div
-                      id={"uploadImage" + index}
-                      key={"uploadImage" + index}
+                      id={file.name}
+                      key={file.name}
                       className="image-fit zoom-in relative mr-5 cursor-pointer"
                     >
                       <img
@@ -392,26 +462,35 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> =
                         alt="Midone Tailwind HTML Admin Template"
                         src={file.content}
                       />
+                      <Tippy
+                        content=" "
+                        aria-controls="content"
+                        aria-selected="true"
+                        className="bg-danger absolute right-0 top-0 -mr-2 
+                                -mt-2 flex h-5 w-5 items-center 
+                                justify-center rounded-full text-white"
+                      >
+                        <Lucide
+                          icon="X"
+                          onClick={() => removePictureFromUploader(file.name)}
+                          className="h-6 w-6 rounded-full bg-red-500
+                                 hover:bg-indigo-500"
+                        />
+                      </Tippy>
                     </div>
                   ))}
-                  <div className="-5 cursor-pointer" 
-                   onClick={() =>
-                            removePicturesFromUploader()} >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" 
-                  className="editor-menu-button h-[80px] w-[80px]">
-                    <path d="M17 6H22V8H20V21C20 21.5523 19.5523 22 19 22H5C4.44772 22 4 21.5523 4 21V8H2V6H7V3C7 2.44772 7.44772 2 8 2H16C16.5523 2 17 2.44772 17 3V6ZM18 8H6V20H18V8ZM9 11H11V17H9V11ZM13 11H15V17H13V11ZM9 4V6H15V4H9Z"></path></svg>
-                  </div>
                 </div>
-                <div className="relative flex cursor-pointer items-center px-4 pb-4"></div>
               </div>
             </div>
           )}
           <HSeparator my={1} />
-          <MenuBar editor={editor} 
-          filePicker={filePicker} 
-          editorType={editorType}
-          onSend={onSend}
-           />
+          <MenuBar
+            editor={editor}
+            openFileSelector={openFileSelector}
+            mediaFileState={mediaFileState}
+            editorType={editorType}
+            onSend={onSend}
+          />
         </Flex>
       </Flex>
     </>
