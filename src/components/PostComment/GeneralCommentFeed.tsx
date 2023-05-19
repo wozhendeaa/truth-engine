@@ -20,12 +20,11 @@ export const GeneralCommentThread = (props: {
   comments: commentsData  
 }) => {
   const { t } = useTranslation();
-  const router = useRouter();
   const comments = props.comments.comments;
 
   if (!comments || comments.length === 0) {
     return (
-      <div className="text-center text-slate-200">{t("no_comments_found")}</div>
+      <div className="text-center text-slate-200" >{t("no_comments_found")}</div>
     );
   }
 
@@ -37,7 +36,9 @@ export const GeneralCommentThread = (props: {
   return (
     <div >
       {comments.map((c) => (
-        <div className="cursor-pointer hover:bg-te_dark_ui" onClick={()=>{goToCommentPost(c.post?.id, c.id)}}>
+        <div className="cursor-pointer hover:bg-te_dark_ui" 
+        key={c.id + '1'}
+        onClick={()=>{goToCommentPost(c.post?.id, c.id)}}>
         <TEComment
           avatar={c.author.profileImageUrl ?? "images/default_avatar.png"}
           key={c.id}

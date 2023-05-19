@@ -47,6 +47,7 @@ import TruthEngineEditor, { gettHtmlFromJson, renderAsHTML } from "components/Ti
 const {i18n} = require('next-i18next.config')
 import DOMPurify from 'isomorphic-dompurify';
 import { FileContent } from "use-file-picker";
+import data from '@emoji-mart/data';
 
 
 type PostsWithUserData = Post & {
@@ -94,6 +95,7 @@ export function RenderImage(props: {type: string, url: string, index: any, onPos
             className="pointer-events-none max-h-[100%] shrink hover:opacity-75"
           />
           <button
+            name="image"
             type="button"
             className="absolute inset-0 focus:outline-none"
             onClick={showModal}
@@ -186,19 +188,33 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
     likePostMutation.mutate({ postId: post.id });
   };
 
-  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseDown = (event: React.MouseEvent) => {
     setMouseDownPos({ x: event.clientX, y: event.clientY });
   };
 
-  const handleMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseUp = (event: React.MouseEvent) => {
     event.stopPropagation();
 
     const dx = event.clientX - mouseDownPos.x;
     const dy = event.clientY - mouseDownPos.y;
 
     // Only trigger the onClick event if the mouse has not moved significantly
-    const noMouseDrag = Math.sqrt(dx * dx + dy * dy) < 5;
-    if (noMouseDrag && !onPostPage) {
+    const isClick = Math.sqrt(dx * dx + dy * dy) < 5;
+    if (!isClick) return;
+
+    //检查他妈的点中的到底是什么东西
+    const element = event.target as any;
+    if (element.name) {
+      const n = element.name;
+      const clickableNames =  ["image",
+       "name","username", "feedMenu", "avatar"]
+       if (clickableNames.some((n2)=> n2 === n)) {
+          if (n === "image") element.click();
+          return;
+       }
+    }
+
+    if (isClick && !onPostPage) {
         window.open("/post/" + postWithUser.id, "_blank");
     }
   };
@@ -292,14 +308,15 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
         pb="0"
       >
         <div className="group ">
-          <CardHeader
+          <CardHeader       
             className="cursor-pointer group-hover:bg-te_dark_ui -pt-[30px] "
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
           >
             <Flex alignItems={"top"} className="-my-4">
               <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
-              <Link href={TE_Routes.userById.path + postWithUser.author.username} className="hover:underline" onClick={(e)=>e.stopPropagation()}>
+               {//@ts-ignore
+              <Link name="avatar" href={TE_Routes.userById.path + postWithUser.author.username} className="hover:underline" onClick={(e)=>e.stopPropagation()}>
                 <Avatar
                   src={
                     postWithUser.author.profileImageUrl ??
@@ -307,25 +324,35 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
                   }
                 />
                 </Link>
+                } 
                 <Flex>
                   <Heading size="md">
-                    <Link href={TE_Routes.userById.path + postWithUser.author.username} className="hover:underline" onClick={(e)=>e.stopPropagation()}>
+                      {//@ts-ignore
+                    <Link name="name" href={TE_Routes.userById.path + postWithUser.author.username} 
+                    className="hover:underline">
                       {postWithUser.author.displayname}
-                    </Link>
+                    </Link>}
                   </Heading>
-                  <Text textColor={"gray.400"} ml={2}>
+                    {//@ts-ignore
+                  <Link name="username" href={TE_Routes.userById.path + postWithUser.author.username} 
+                    className="border-b-2 border-transparent hover:border-gray-400">
+                  <Text textColor={"gray.400"} ml={2}>                    
                     {"@" + postWithUser.author.username}
                   </Text>
+                  </Link>
+}
                 </Flex>
                 <Text textColor={"gray.400"} mt={0.5}>
                   {dayjs(postWithUser.createdAt).fromNow()}
                 </Text>
               </Flex>
-              <Box onClick={(e)=> e.stopPropagation()} className="group/action">
-              <TransparentFeedThreadMenu
+              <Box className="group/action">
+              {
+              //@ts-ignore
+              <TransparentFeedThreadMenu name="feedMenu"
                 canDelete={true}   
                 icon={<Flex className="px-2 group-hover/action:bg-te_dark_font rounded-md"><Icon as={IoEllipsisHorizontal} w="34px" h="34px" /></Flex>}
-              />
+              />}
               </Box>
             </Flex>
           </CardHeader>
@@ -342,7 +369,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
             </span>
             <div className="bg-accent text-accent-content  grid place-content-end justify-center ">
               {/* image display section */}
-              <div className="mt-auto items-end" onClick={ (e)=> {e.stopPropagation(); console.log(111)}}>
+              <div className="mt-auto items-end">
                 <ul
                 role="list"
                   className="grid auto-cols-auto grid-flow-col gap-x-1 gap-y-2 xl:gap-x-1"
