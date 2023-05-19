@@ -352,7 +352,7 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> =
       return "min-h-[20px]";
     }  
     else if(editorType === "COMMENT_TALL") {
-      return "min-h-[80px]";
+      return "min-h-[100px]";
     }  
     else if(editorType === "LONG_POST") {
       return "min-h-full"
@@ -360,14 +360,9 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> =
     return "";
   }
 
-  useEffect(() => {
-    const loadData = async () => {
-      if (onLoad) {
-        await onLoad(editor);
-      }
-    };
-    loadData();
-  }, []);
+  if (onLoad){
+    onLoad(editor);
+  }
 
   if (!editor) return <></>
   return (

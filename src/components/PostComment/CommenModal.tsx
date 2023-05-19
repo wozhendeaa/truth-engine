@@ -1,4 +1,3 @@
-import Image from "next/image";
 import {
   Button,
   Modal,
@@ -88,6 +87,13 @@ export default function CommentModal(props: {
       setError("发表信息失败，可能是网络问题");
       return false;
     }
+    
+  }
+
+  function OnLoad(editor: any) {
+    if (!editor) return;
+     editor.chain().focus().run();
+    
   }
 
   return (
@@ -97,7 +103,7 @@ export default function CommentModal(props: {
         <ModalContent>
           <ModalCloseButton />
           <ModalBody>
-            <TruthEngineEditor editorType={"COMMENT_TALL"} onSend={OnSend} />
+            <TruthEngineEditor editorType={"COMMENT_TALL"} onSend={OnSend} onLoad={OnLoad} />
           </ModalBody>
           <ModalFooter></ModalFooter>
         </ModalContent>
