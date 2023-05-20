@@ -101,9 +101,15 @@ export default function CommentModal(props: {
   return (
     <>
       <Modal isOpen={isOpen!} onClose={onClose!}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalCloseButton />
+      <ModalOverlay 
+            bg='none'
+            pointerEvents="auto"
+            backdropFilter='auto'
+            backdropBlur='12px'
+        />
+        <ModalContent padding={0}  bg={'none'} 
+           pointerEvents="auto"
+    containerProps={{ pointerEvents: "auto" }} >
           <ModalBody>
             <TruthEngineEditor editorType={"COMMENT_TALL"} onSend={OnSend} onLoad={OnLoad} />
           </ModalBody>

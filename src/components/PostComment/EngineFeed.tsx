@@ -31,8 +31,6 @@ dayjs.extend(relativetTime);
 import ImageModal from "./ImageModal";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
-import { MdSend } from "react-icons/md";
-import { parseErrorMsg } from "helpers/serverErrorMessage";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import CommentThread from "./CommentFeed";
 import { useUser } from "@clerk/nextjs";
@@ -45,9 +43,7 @@ import { HSeparator } from "components/separator/Separator";
 import TE_Routes from "TE_Routes";
 import TruthEngineEditor, { gettHtmlFromJson, renderAsHTML } from "components/TipTap/TruthEngineEditor";
 const {i18n} = require('next-i18next.config')
-import DOMPurify from 'isomorphic-dompurify';
 import { FileContent } from "use-file-picker";
-import data from '@emoji-mart/data';
 
 
 type PostsWithUserData = Post & {
@@ -204,17 +200,19 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
 
     //检查他妈的点中的到底是什么东西
     const element = event.target as any;
+    let isBody = false;
     if (element.name) {
       const n = element.name;
       const clickableNames =  ["image",
-       "name","username", "feedMenu", "avatar"]
+       "name","username", "feedMenu", "avatar","close"]
        if (clickableNames.some((n2)=> n2 === n)) {
           if (n === "image") element.click();
           return;
        }
+       
     }
-
-    if (isClick && !onPostPage) {
+    console.log(element)
+    if (!onPostPage) {
         window.open("/post/" + postWithUser.id, "_blank");
     }
   };
@@ -308,7 +306,8 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
         pb="0"
       >
         <div className="group ">
-          <CardHeader       
+          <CardHeader  
+            as="div" 
             className="cursor-pointer group-hover:bg-te_dark_ui -pt-[30px] "
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
@@ -357,6 +356,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
             </Flex>
           </CardHeader>
           <CardBody
+            as="div"
             pb={"0px"}
             pt={2}
             className="cursor-pointer group-hover:bg-te_dark_ui overflow-hidden"
