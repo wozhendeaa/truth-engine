@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import postReducer from "./postSlice";
 import userReducer from "./userSlice";
+import truthEditorReducer from "./truthEditorSlice";
 
 export const store = configureStore({
     reducer: {
         posts: postReducer,
         user: userReducer,
+        truthEditor: truthEditorReducer,
     },
 });
 

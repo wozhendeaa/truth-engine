@@ -8,11 +8,15 @@ import S3 from "aws-sdk/clients/s3";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import React, { useContext, useEffect, useState } from "react";
 import TruthEngineEditor from "components/TipTap/TruthEngineEditor";
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Button, Flex } from "@chakra-ui/react";
 import UserContext from "helpers/userContext";
 import TE_Routes from "TE_Routes";
 import { FileContent } from "use-file-picker";
-const i18n = require("next-i18next.config");
+import { useAppDispatch } from "Redux/hooks";
+import { setErrors } from "Redux/truthEditorSlice";
+import { parseErrorMsg } from "helpers/serverErrorMessage";
+//@ts-ignore
+import { i18n }from 'next-i18next.config';
 
 //create react hook validation schema for post
 export const postSchema = z.object({
@@ -20,12 +24,14 @@ export const postSchema = z.object({
   media: z.string().optional(),
 });
 
+type postFormSchema = z.infer<typeof postSchema>;
 export const PostCreator = () => {
   const { mutate} = api.posts.createPost.useMutation();
 
   const user = useContext(UserContext);
   const ctx = api.useContext();
   const {t} = useTranslation();
+  const dispatch = useAppDispatch()
 
   const [imageWidth, setImageWidth] = useState(0);
   if (!user) return null;
@@ -49,12 +55,11 @@ export const PostCreator = () => {
       const response = await fetch(base64Str);
       const blob = await response.blob();
 
-      const ss = await axios
+      await axios
         .put(uploadUrl, blob)
         .then((res) => {})
         .catch((e) => {
-          toast(e.message);
-          console.log(e.message);
+          setError(parseErrorMsg(e));
         });
     }
 
@@ -62,7 +67,7 @@ export const PostCreator = () => {
   }
 
   function setError(err: string) {
-    //todo
+    dispatch(setErrors(err));
   }
 
   const handleImageLoad = (
@@ -83,7 +88,7 @@ export const PostCreator = () => {
         keys = await uploadToS3(mediaFiles);
 
     } catch (cause) {
-      setError("图片上传失败，可能是网络问题");
+      setError("图片上传失败" + cause);
       return false;
     }
 
@@ -105,10 +110,9 @@ export const PostCreator = () => {
               toast(t('post_good'));
             },
             onError: (e) => {
-              const errorMessage = e.data?.code;
-              console.log(errorMessage);
+              const errorMessage = e.message;
               if (errorMessage) {
-                toast.error(t(errorMessage));
+                setError(errorMessage);
               }     
               resolve();         
             },
@@ -121,8 +125,7 @@ export const PostCreator = () => {
       return result;
 
     } catch (cause) {
-      console.log(cause);
-      setError("发表信息失败，可能是网络问题");
+      setError(cause + "");
       return false;
     } 
     
@@ -144,8 +147,7 @@ export const PostCreator = () => {
           </Box>
           <Box
             className="float-left w-full"
-            style={{ maxWidth: `calc(100% - ${imageWidth}px)` }}
-          >
+            style={{ maxWidth: `calc(100% - ${imageWidth}px)`}}>
             <TruthEngineEditor editorType={"POST"} onSend={OnSend} />
           </Box>
         </Flex>

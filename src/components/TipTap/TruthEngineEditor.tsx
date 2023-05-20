@@ -23,7 +23,9 @@ import Mention from "@tiptap/extension-mention";
 import CharacterCount from "@tiptap/extension-character-count";
 import Tippy from "components/Tippy";
 import Lucide from "components/Lucide";
-import toast from "react-hot-toast";
+import { selectTruthEditor, setErrors } from 'Redux/truthEditorSlice';
+import { useSelector } from "react-redux";
+import { useAppDispatch } from "Redux/hooks";
 
 //@ts-ignore
 const MenuBar = (props: {
@@ -74,7 +76,7 @@ const MenuBar = (props: {
   }
 
   async function handleSend() {
-    console.log(editor.getText());
+    // console.log(editor.getText());
 
     if (preparedToSend()) {
       editor.setEditable(false);
@@ -267,10 +269,11 @@ interface TruthEngineEditorOnLoadCallback {
   (editor: any): void;
 }
 
+
 interface TruthEngineEditorProps {
   editorType: EditorType;
-  onSend: TruthEngineEditorOnSendCallback;
-  onLoad?: TruthEngineEditorOnLoadCallback;
+  onSend: TruthEngineEditorOnSendCallback;//编辑器发送任何东西的时候会触发这个玩意儿
+  onLoad?: TruthEngineEditorOnLoadCallback;//编辑器出生的时候会触发这个玩意儿
 }
 
 const wordLimit = 500;
@@ -318,6 +321,8 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
   const { t } = useTranslation();
   const mediaFileState = useState<FileContent[]>([]);
   const [mediaFiles, setMediaFiles] = mediaFileState;
+  const errors = useSelector(selectTruthEditor);
+
   const filePicker = useFilePicker({
     readAs: "DataURL",
     accept: "image/*",
@@ -491,6 +496,10 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
             onSend={onSend}
           />
         </Flex>
+        <Flex>
+          <span className="text-red-500 bg-red-100 
+          rounded-md font-chinese p-2">{errors}</span>
+        </Flex>
       </Flex>
     </>
   );
@@ -503,3 +512,39 @@ export const getServerSideProps = async ({ locale }: { locale: string }) => ({
     ...(await serverSideTranslations(locale, ["common", "footer"])),
   },
 });
+
+////paste event for images
+// paste (view, event) {
+//   const hasFiles =
+//       event.clipboardData &&
+//       event.clipboardData.files &&
+//       event.clipboardData.files.length
+
+//   if (!hasFiles) return
+
+//   const images = Array.from(event.clipboardData.files).filter(file => /image/i.test(file.type))
+//   if (images.length === 0) return
+
+//   event.preventDefault()
+//   event.stopImmediatePropagation()
+
+//   images.forEach(image => {
+//       const reader = new FileReader()
+
+//       reader.onload = readerEvent => {
+//           const options = {
+//               src: readerEvent.target.result
+//           }
+
+//           if (isRetina) {
+//               const dimensions = getRetinaDimensions(options.src.substring(options.src.indexOf(',') + 1))
+//               if (dimensions) {
+//                   options.width = dimensions.width
+//               }
+//           }
+
+//           // Do what you want here.
+//       }
+//       reader.readAsDataURL(image)
+//   })
+// }

@@ -395,7 +395,7 @@ export const postsRouter = createTRPCRouter({
 
 
   createPost: privateProcedure.input(
-    postSchema
+    postSchema,
   ).mutation(async ({ctx, input}) => {
     const authorId = ctx.curretnUserId;
     const {success} = await ratelimitPost.limit(authorId);

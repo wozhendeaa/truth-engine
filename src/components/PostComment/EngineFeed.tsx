@@ -42,7 +42,8 @@ import TransparentFeedThreadMenu from "components/menu/TransparentFeedThreadMenu
 import { HSeparator } from "components/separator/Separator";
 import TE_Routes from "TE_Routes";
 import TruthEngineEditor, { gettHtmlFromJson, renderAsHTML } from "components/TipTap/TruthEngineEditor";
-const {i18n} = require('next-i18next.config')
+//@ts-ignore
+import { i18n }from 'next-i18next.config';
 import { FileContent } from "use-file-picker";
 
 
@@ -212,7 +213,6 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
        }
        
     }
-    console.log(element)
     if (!onPostPage) {
         window.open("/post/" + postWithUser.id, "_blank");
     }
