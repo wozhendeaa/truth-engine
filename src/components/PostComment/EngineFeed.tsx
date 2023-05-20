@@ -82,14 +82,15 @@ export function RenderImage(props: {type: string, url: string, index: any, onPos
           className="block w-full flex-grow  rounded-lg 
    bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 
       focus-within:ring-offset-2 focus-within:ring-offset-gray-100
-    hover:opacity-75"
+       hover:shadow-whiteGlow"
         >
-          <Image
-            src={url}
-            alt=""
-            objectFit={'contain'}
-            className="pointer-events-none max-h-[100%] shrink hover:opacity-75"
-          />
+        <Image
+          src={url}
+          alt=""
+          objectFit={'contain'}
+          className="pointer-events-none max-h-[100%] shrink 
+          "
+        />
           <button
             name="image"
             type="button"

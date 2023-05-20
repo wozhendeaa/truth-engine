@@ -4,8 +4,9 @@ export default {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   darkMode: 'class',
   variants: {
-    extend: {
-      stroke: ['group-hover'],
+      extend: {
+        boxShadow: ['hover'],
+        stroke: ['group-hover'],
     },
   },
   theme: {
@@ -15,7 +16,11 @@ export default {
       lg: '1024px',
       xl: '1280px',
     },
+
     extend: {
+      boxShadow: {
+        whiteGlow: '0 0 10px 0 #fff',
+      },
       fontFamily: {
         'chinese': [ 'Noto Sans TC','Noto Sans SC','sans-serif' ],
         roboto: ["Roboto"],
