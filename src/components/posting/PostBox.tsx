@@ -15,8 +15,7 @@ import { FileContent } from "use-file-picker";
 import { useAppDispatch } from "Redux/hooks";
 import { setErrors } from "Redux/truthEditorSlice";
 import { parseErrorMsg } from "helpers/serverErrorMessage";
-//@ts-ignore
-import { i18n }from 'next-i18next.config';
+const i18n = require('next-i18next.config')
 
 //create react hook validation schema for post
 export const postSchema = z.object({

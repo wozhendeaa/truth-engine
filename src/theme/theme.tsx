@@ -28,7 +28,7 @@ const theme = extendTheme({
 		te_dark_bg: '#0a1537',
 		te_dark_ui: '#1f294f',
 		te_dark_ui_bg: '#111d45',
-		te_dark_action: '#7451fe',
+		te_dark_action: '#818cf8',
 		te_dark_green: '#0b986c',
 		te_dark_green_bg: '#263d56',
 		te_dark_red: '#e45a50',

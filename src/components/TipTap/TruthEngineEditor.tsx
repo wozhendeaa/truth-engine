@@ -10,37 +10,47 @@ import { Color } from "@tiptap/extension-color";
 import ListItem from "@tiptap/extension-list-item";
 import TextStyle from "@tiptap/extension-text-style";
 import Placeholder from "@tiptap/extension-placeholder";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Box, Flex } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { HSeparator } from "components/separator/Separator";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import data from "@emoji-mart/data";
 import NimblePicker from "@emoji-mart/react";
-import { FileContent, SelectedFiles, useFilePicker } from "use-file-picker";
+import { FileContent, FileError, FilePickerReturnTypes, SelectedFiles, useFilePicker } from "use-file-picker";
 import DOMPurify from "dompurify";
 import Mention from "@tiptap/extension-mention";
 import CharacterCount from "@tiptap/extension-character-count";
 import Tippy from "components/Tippy";
 import Lucide from "components/Lucide";
-import { selectTruthEditor, setErrors } from 'Redux/truthEditorSlice';
-import { useSelector } from "react-redux";
+import { selectTruthEditor, setErrors} from 'Redux/truthEditorSlice';
+import { useDispatch, useSelector } from "react-redux";
 import { useAppDispatch } from "Redux/hooks";
+import UserContext from "helpers/userContext";
+import { User } from "@prisma/client";
+import { TFunction } from "i18next";
+const truthConfig = require('truth-engine-config.js')
 
-//@ts-ignore
+function isNullOrEmpty(str: string | null | undefined): boolean {
+  return !str || str.trim().length === 0;
+}
+
 const MenuBar = (props: {
   editor: any,
-  openFileSelector: any,
+  picker: FilePickerReturnTypes,
   mediaFileState: any,
+  sendButtonState:[boolean, React.Dispatch<React.SetStateAction<boolean>>],
   editorType: any,
   onSend: any,
 }) => {
-  const { editor, openFileSelector, mediaFileState, editorType, onSend } = props;
+  const { editor, picker, mediaFileState, editorType, onSend } = props;
   const { t } = useTranslation();
   const [showEmoji, setShowEmoji] = useState(false);
-  const [disableSend, setDisableSend] = useState(false);
   const iconRef = useRef<HTMLButtonElement | null>(null);
   const [mediaFiles, setMediaFiles] = mediaFileState;
+  const [openFileSelector, {clear}] = picker;
+  const [disableSend, setDisableSend] = props.sendButtonState;
+
 
   if (!editor) {
     return null;
@@ -57,10 +67,6 @@ const MenuBar = (props: {
       setShowEmoji(false);
     }
   };
-
-  function isNullOrEmpty(str: string | null | undefined): boolean {
-    return !str || str.trim().length === 0;
-  }
 
   function preparedToSend() {
     if (!onSend) return false;
@@ -163,6 +169,7 @@ const MenuBar = (props: {
           {/* image upload */}
           <button
             onClick={() => {
+              clear();
               openFileSelector();
             }}
             className={editor.isActive("code") ? "is-active pl-1" : " pl-1"}
@@ -286,7 +293,7 @@ const WordCountCircle = (props: { percentage: number }) => {
   } else if (percentage >= 70) {
     strokeColor = "yellow"
   } else {
-    strokeColor = "#00b474"
+    strokeColor = "#818cf8"
   }
   return (
     <>
@@ -296,7 +303,7 @@ const WordCountCircle = (props: { percentage: number }) => {
         viewBox="0 0 20 20"
         className="character-count__graph pr-1"
       >
-        <circle r="10" cx="10" cy="10" fill="white"  />
+        <circle r="10" cx="10" cy="10" fill="gray"  />
         <circle
           r="5"
           cx="10"
@@ -307,11 +314,51 @@ const WordCountCircle = (props: { percentage: number }) => {
           strokeDasharray={`calc(${percentage} * 31.4 / 100) 31.4`}
           transform="rotate(-90) translate(-20)"
         />
-        <circle r="6" cx="10" cy="10" fill="lightgray" />
+        <circle r="6" cx="10" cy="10" fill="#111d45" />
       </svg>
     </>
   );
 };
+
+function getConfigForUser(user: User | null | undefined) {
+  const config = truthConfig.uploadSetting.settings;
+  //@ts-ignore
+  const defaultConfig = config.find((u) => u.role === 'SHEEP');
+
+  if (!user) return defaultConfig;
+
+  const userRole = user.role;
+  //@ts-ignore
+  const userConfig = config.find((u) => u.role === userRole);
+
+  return userConfig;
+}
+
+function handleUploaderErrors(
+  errors:FileError[],
+  config:any,
+  t: TFunction<"translation", undefined, "translation">) {
+  if (errors.length && errors.length > 0) {
+    if (errors[0]?.fileSizeTooSmall) {
+      return t('upload_image_too_small');
+    } else if (errors[0]?.fileSizeToolarge) {
+      return  t('upload_image_too_big') + config.maxPictureSize + 'mb';
+    } else if (errors[0]?.readerError) {
+      return  t('upload_reading_error');
+    } else if (errors[0]?.maxLimitExceeded) {
+      return  t('too_many_files') + config.maxPictures;
+    } else if (errors[0]?.imageHeightTooBig || errors[0]?.imageWidthTooBig
+|| errors[0]?.imageWidthTooSmall || errors[0]?.imageHeightTooSmall ) {
+      return  t('upload_wrong_dimension');
+  }else if (errors[0]?.imageNotLoaded) {
+    return  t('too_many_files');
+  }else {
+      return String(errors[0]);
+    }
+  }
+
+  return null;
+}
 
 const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
   editorType,
@@ -322,17 +369,21 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
   const mediaFileState = useState<FileContent[]>([]);
   const [mediaFiles, setMediaFiles] = mediaFileState;
   const errors = useSelector(selectTruthEditor);
+  const user = useContext(UserContext);
+  const uploadConfig = getConfigForUser(user);
+  const dispatch = useDispatch();
+  const sendButtonState = useState(true);
+  const [disableSend, setDisableSend] = sendButtonState;
 
   const filePicker = useFilePicker({
     readAs: "DataURL",
-    accept: "image/*",
+    accept: uploadConfig.acceptType,
     multiple: true,
-    limitFilesConfig: { max: 5 },
-    // minFileSize: 0.1, // in megabytes
-    maxFileSize: 5,
+    limitFilesConfig: { max: uploadConfig.maxPictures },
+    maxFileSize: uploadConfig.maxPictureSize,
     imageSizeRestrictions: {
-      maxHeight: 1080, // in pixels
-      maxWidth: 1920,
+      maxHeight: 1920, // in pixels
+      maxWidth: 1080,
       minHeight: 100,
       minWidth: 200,
     },
@@ -350,8 +401,18 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
     openFileSelector,
     { filesContent, plainFiles, loading, errors: pickerError, clear },
   ] = filePicker;
+  const uploadError = handleUploaderErrors(pickerError, uploadConfig, t);
 
   const editor = useEditor({
+    onUpdate({ editor }) {
+      const disableSendButton = isNullOrEmpty(editor.getText())
+      setDisableSend(disableSendButton);
+    },
+    onFocus({ editor, event }) {
+      //清空错误信息
+      clear();
+      dispatch(setErrors(null));
+    },
     editorProps: {
       attributes: {
         class:
@@ -490,15 +551,18 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
           <HSeparator my={1} />
           <MenuBar
             editor={editor}
-            openFileSelector={openFileSelector}
+            picker={filePicker}
             mediaFileState={mediaFileState}
             editorType={editorType}
+            sendButtonState={sendButtonState}
             onSend={onSend}
           />
         </Flex>
         <Flex>
-          <span className="text-red-500 bg-red-100 
-          rounded-md font-chinese p-2">{errors}</span>
+          {errors && <span className="text-red-500 bg-red-100 
+          rounded-md font-chinese p-2">{errors}</span>}
+          {uploadError && <span className="text-red-500 bg-red-100 
+          rounded-md font-chinese p-2">{uploadError}</span>}
         </Flex>
       </Flex>
     </>

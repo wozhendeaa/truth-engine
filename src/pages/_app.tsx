@@ -16,11 +16,10 @@ import { store } from "Redux/ReduxStore";
 import axios from "axios";
 import TE_Routes from "TE_Routes";
 import { User } from "@prisma/client";
-//@ts-ignore
-import { truthConfig }from 'truth-engine.config.mjs';
-//@ts-ignore
-import { i18n }from 'next-i18next.config';
+
 import { useQuery } from "@tanstack/react-query";
+const truthConfig = require('truth-engine-config.js')
+const i18n = require('next-i18next.config')
 
 
 interface UserLocalStorageItem {

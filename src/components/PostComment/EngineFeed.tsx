@@ -43,7 +43,7 @@ import { HSeparator } from "components/separator/Separator";
 import TE_Routes from "TE_Routes";
 import TruthEngineEditor, { gettHtmlFromJson, renderAsHTML } from "components/TipTap/TruthEngineEditor";
 //@ts-ignore
-import { i18n }from 'next-i18next.config';
+const i18n = require('next-i18next.config')
 import { FileContent } from "use-file-picker";
 
 
@@ -370,7 +370,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
             </span>
             <div className="bg-accent text-accent-content  grid place-content-end justify-center ">
               {/* image display section */}
-              <div className="mt-auto items-end">
+              <div className="mt-2 items-end">
                 <ul
                 role="list"
                   className="grid auto-cols-auto grid-flow-col gap-x-1 gap-y-2 xl:gap-x-1"

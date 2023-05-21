@@ -1,5 +1,5 @@
 
-export const i18n = {
+module.exports = {
   // debug: true,
   i18n: {
     locales: ['zh-CN', 'zh-TW'],
