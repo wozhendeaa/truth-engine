@@ -6,7 +6,7 @@ module.exports = {
     version: '1.0 Beta',
     system: {
         user: {
-            sessionExpirationDuration: 1000 * 60 * 60 * 24 //1 day
+            sessionExpirationDuration: 1000 * 60 * 60 * 2 //2 hours
         }
     },
     uploadSetting :{

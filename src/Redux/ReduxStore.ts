@@ -4,6 +4,8 @@ import userReducer from "./userSlice";
 import truthEditorReducer from "./truthEditorSlice";
 
 export const store = configureStore({
+
+    
     reducer: {
         posts: postReducer,
         user: userReducer,

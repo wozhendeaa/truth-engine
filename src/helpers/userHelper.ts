@@ -10,7 +10,6 @@ export function isUserVerified(user: User | null | undefined) {
 
   let isVerified: boolean = user.role === "ADMIN_VERYFIED_ENGINE" 
   || user.role === "VERYFIED_ENGINE";
-
   return isVerified;
 }
 

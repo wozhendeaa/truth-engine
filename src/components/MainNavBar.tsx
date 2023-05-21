@@ -4,26 +4,29 @@ import { BellIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "react-i18next";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { SignIn, SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
+import { SignIn, SignInButton, SignOutButton, SignedOut, useUser } from "@clerk/nextjs";
 import { TFunction } from "i18next";
 import UserContext from "helpers/userContext";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import TE_Routes from "TE_Routes";
+import { useClerk } from "@clerk/clerk-react";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
+
 
 export const UnLoggedInUserSection = ({
   t,
 }: {
   t: TFunction<"translation">;
 }) => {
+
   return (
     <>
       <div className="flex border-b border-slate-400 p-4">
-        <SignInButton afterSignInUrl="/api/prepareNewUser">
+        <SignInButton afterSignInUrl={TE_Routes.PrepareNewUser.path}>
           <button
             type="button"
             className="-mb-1  -mr-2
@@ -37,7 +40,7 @@ export const UnLoggedInUserSection = ({
           path="/sign-in"
           routing="path"
           signUpUrl="/sign-up"
-          afterSignInUrl={"/api/prepareNewUser"}
+          afterSignInUrl={TE_Routes.PrepareNewUser.path}
         />
       </div>
     </>
@@ -51,7 +54,14 @@ export const LoggedInUserSection = ({
   isSSR: boolean;
   t: TFunction<"translation">;
 }) => {
+
   const user = useContext(UserContext);
+  const { signOut } = useClerk();
+
+  function clearUserStorageOnSignOut() {
+    localStorage.removeItem("user");
+    signOut()
+  }
 
   return (
     <>
@@ -118,18 +128,15 @@ export const LoggedInUserSection = ({
               </Menu.Item>
               <Menu.Item>
                 {({ active }) => (
-                  <SignOutButton>
+                  <button onClick={()=>clearUserStorageOnSignOut()}   className={classNames(
+                    active ? "bg-gray-100 dark:bg-purple-800" : "",
+                    "cursor-pointer block px-4 py-2 text-sm text-gray-700 w-full text-left dark:text-slate-300"
+                  )} >
                     {
-                      <a
-                        className={classNames(
-                          active ? "bg-gray-100 dark:bg-purple-800" : "",
-                          "block px-4 py-2 text-sm text-gray-700 dark:text-slate-300"
-                        )}
-                      >
-                        {!isSSR && t("sign_out")}{" "}
-                      </a>
+                        !isSSR && t("sign_out")
                     }
-                  </SignOutButton>
+                    </button>
+                 
                 )}
               </Menu.Item>
             </Menu.Items>

@@ -1,18 +1,16 @@
-import { useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { PageLayout } from "components/layout";
 import { PostCreator as PostBox } from "components/posting/PostBox";
-import { Box, Flex, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 
 import EngineFeed from "components/PostComment/EngineFeed";
 import { api } from "utils/api";
 import UserContext from "../helpers/userContext";
 import { GetSekleton } from "../helpers/UIHelper";
 import { isUserSignedIn, isUserVerified } from "helpers/userHelper";
-import { Provider } from "react-redux";
 import { HSeparator, VSeparator } from "components/separator/Separator";
 import TruthEngineSideMenuBar from "components/QTruthEngineSideMenubar";
 
@@ -78,11 +76,9 @@ const Home: NextPage = () => {
 
   const user = useContext(UserContext);
   const [tab, setTab] = useState<(typeof tabs)[number]>("VERIFIED_ENGINE");
+  const { t } = useTranslation();
 
   const isVerified = isUserVerified(user);
-  const isSignedIn = isUserSignedIn(user);
-
-  const { t } = useTranslation();
 
   function isAnyTabLoading() {
     if (tab == "VERIFIED_ENGINE") {
