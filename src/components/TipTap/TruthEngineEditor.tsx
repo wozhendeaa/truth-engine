@@ -187,7 +187,7 @@ const MenuBar = (props: {
             </svg>
           </button>
         </li>
-        <li className="pl-1">
+        <li className="pl-1 hidden md:block">
           {/* emoji */}
           <button
             ref={iconRef}
