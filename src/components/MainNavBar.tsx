@@ -4,7 +4,7 @@ import { BellIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "react-i18next";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { SignIn, SignInButton, SignOutButton, SignedOut, useUser } from "@clerk/nextjs";
+import { SignIn, SignInButton, useUser} from "@clerk/nextjs";
 import { TFunction } from "i18next";
 import UserContext from "helpers/userContext";
 import { useRouter } from "next/router";
@@ -205,7 +205,7 @@ export default function MainNavBar() {
                       href={TE_Routes.Index.path}
                       className={`font-Noto+Sans+TC inline-flex items-center px-1  pt-1 text-gray-900 hover:border-gray-300 dark:hover:text-purple-300 ${
                         isActive("/")
-                          ? "border-b-2 border-indigo-500 dark:text-purple-300"
+                          ? "border-b-2 border-indigo-500 dark:text-indigo-400"
                           : "dark:text-slate-100 "
                       }`}
                     >
@@ -215,7 +215,7 @@ export default function MainNavBar() {
                       href={TE_Routes.ProfessorVideos.path}
                       className={`font-Noto+Sans+TC inline-flex items-center px-1  pt-1 text-gray-900 hover:border-gray-300 dark:hover:text-purple-300 ${
                         isActive(TE_Routes.ProfessorVideos.path)
-                          ? "border-b-2 border-indigo-500 dark:text-purple-300"
+                          ? "border-b-2 border-indigo-500 dark:text-indigo-400"
                           : "dark:text-slate-100 "
                       }`}
                     >
@@ -225,7 +225,7 @@ export default function MainNavBar() {
                       href={TE_Routes.NaturalHealing.path}
                       className={`font-Noto+Sans+TC inline-flex items-center px-1  pt-1 text-gray-900 hover:border-gray-300 dark:hover:text-purple-300 ${
                         isActive(TE_Routes.NaturalHealing.path)
-                          ? "border-b-2 border-indigo-500 dark:text-purple-300"
+                          ? "border-b-2 border-indigo-500 dark:text-indigo-400"
                           : "dark:text-slate-100 "
                       }`}
                     >
@@ -235,7 +235,7 @@ export default function MainNavBar() {
                       href={TE_Routes.RedPillAcademy.path}
                       className={`font-Noto+Sans+TC inline-flex items-center px-1  pt-1 text-gray-900 hover:border-gray-300 dark:hover:text-purple-300 ${
                         isActive(TE_Routes.RedPillAcademy.path)
-                          ? "border-b-2 border-indigo-500 dark:text-purple-300"
+                          ? "border-b-2 border-indigo-500 dark:text-indigo-400"
                           : "dark:text-slate-100 "
                       }`}
                     >
@@ -245,7 +245,7 @@ export default function MainNavBar() {
                       href={TE_Routes.FAQ.path}
                       className={`font-Noto+Sans+TC inline-flex items-center px-1  pt-1 text-gray-900 hover:border-gray-300 dark:hover:text-purple-300 ${
                         isActive(TE_Routes.FAQ.path)
-                          ? "border-b-2 border-indigo-500 dark:text-purple-300"
+                          ? "border-b-2 border-indigo-500 dark:text-indigo-400"
                           : "dark:text-slate-100 "
                       }`}
                     >

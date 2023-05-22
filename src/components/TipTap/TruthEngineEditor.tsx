@@ -4,6 +4,7 @@ import {
   EditorContent,
   generateHTML,
   JSONContent,
+  mergeAttributes,
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Color } from "@tiptap/extension-color";
@@ -25,10 +26,15 @@ import Tippy from "components/Tippy";
 import Lucide from "components/Lucide";
 import { selectTruthEditor, setErrors} from 'Redux/truthEditorSlice';
 import { useDispatch, useSelector } from "react-redux";
-import { useAppDispatch } from "Redux/hooks";
+import suggestion from './suggestion'
 import UserContext from "helpers/userContext";
 import { User } from "@prisma/client";
 import { TFunction } from "i18next";
+import { Node } from '@tiptap/core'
+import { Link } from '@tiptap/extension-link'
+
+
+import './styles.scss'
 const truthConfig = require('truth-engine-config.js')
 
 function isNullOrEmpty(str: string | null | undefined): boolean {
@@ -360,6 +366,54 @@ function handleUploaderErrors(
   return null;
 }
 
+// const ReplyToUserDiv = Node.create({
+//   name: 'ReplyToUserDiv',
+//   group: 'block',
+//   content: 'inline*',
+//   atom: true,
+//   reactive: true,
+//   attrs: {
+//     displayName: { default: '' },
+//     username: { default: '' },
+//   },
+//   parseHTML() {
+//     return [
+//       {
+//         tag: 'div.reply-to-user',
+//       },
+//     ];
+//   },
+//   renderHTML({ node, HTMLAttributes }) {
+//     const displayName = node.attrs.displayName;
+//     const username = node.attrs.username;
+//     return [
+//       'div', 
+//       mergeAttributes(HTMLAttributes, { class: 'text-sky-400 reply-to-user' }),
+//       [
+//         'span',
+//         { class: 'bg-slate-200' },
+//         displayName,
+//       ],
+//       [
+//         'a',
+//         { href: `#${username}`, class: 'text-indigo-400 hover:underline' },
+//         username,
+//       ],
+//     ];
+//   },
+//   addCommands() {
+//     return {
+//       insertStyledDiv: attrs => ({ commands }) => {
+//         return commands.insertContent({
+//           type: this.name,
+//           attrs: attrs,
+//         });
+//       },
+//     };
+//   },
+// });
+
+
 const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
   editorType,
   onSend,
@@ -399,10 +453,11 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
 
   const [
     openFileSelector,
-    { filesContent, plainFiles, loading, errors: pickerError, clear },
+    {errors: pickerError, clear },
   ] = filePicker;
   const uploadError = handleUploaderErrors(pickerError, uploadConfig, t);
 
+  
   const editor = useEditor({
     onUpdate({ editor }) {
       const disableSendButton = isNullOrEmpty(editor.getText())
@@ -421,21 +476,22 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
       },
     },
     extensions: [
+      Link,
+      // ReplyToUserDiv,
       Color.configure({ types: [TextStyle.name, ListItem.name] }),
       Placeholder.configure({
         placeholder: getPlaceHolderForEditor(),
-      }),
-      //@ts-ignore
-      TextStyle.configure({ types: [ListItem.name] }),
+      }),      
       Mention.configure({
         HTMLAttributes: {
-          class: "text-red-400",
+          class: "text-red-400 bg-te_dark_ui rounded-lg",
         },
         renderLabel({ options, node }) {
           return `${options.suggestion.char}${
             node.attrs.label ?? node.attrs.id
           }`;
         },
+        suggestion: suggestion
       }),
       CharacterCount.configure({
         limit: wordLimit,
@@ -456,6 +512,7 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
     ],
     content: null,
   });
+
 
   function removePictureFromUploader(name_id: string) {
     let copy = mediaFiles.filter((file) => file.name !== name_id);
@@ -490,6 +547,15 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
   if (onLoad) {
     onLoad(editor);
   }
+
+  // useEffect(() => {
+  //   if (editor) {
+  //     editor.commands.insertStyledDiv({
+  //       displayName: '回复',
+  //       username: '网军账号',
+  //     });
+  //   }
+  // }, [editor]);
 
   if (!editor) return <></>;
 

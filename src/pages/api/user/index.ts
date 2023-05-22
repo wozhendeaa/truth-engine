@@ -1,5 +1,4 @@
 // pages/prepare-new-user.tsx
-import { api } from 'utils/api';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getAuth } from '@clerk/nextjs/server';
 import { prisma } from 'server/db';
@@ -20,6 +19,5 @@ export default async function handler(req:  NextApiRequest, res: NextApiResponse
     return res.redirect(TE_Routes.NewAccountSetup.path)
   }
 
-  const url = process.env.NEXT_PUBLIC_BASE_URL?.toString() + "";
-  return res.redirect(url)
+  return res.redirect(TE_Routes.Index.path)
 }

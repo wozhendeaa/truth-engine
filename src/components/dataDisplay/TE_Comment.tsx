@@ -21,7 +21,6 @@ import { IoEllipsisHorizontal } from "react-icons/io5";
 import TransparentCommentMenu from "components/menu/TransparentCommentMenu";
 import axios from "axios";
 import React from "react";
-import { GetSekleton } from "helpers/UIHelper";
 import { LoadingSpinner } from "components/loading";
 import { HSeparator } from "components/separator/Separator";
 import TE_Routes from "TE_Routes";
@@ -185,6 +184,7 @@ RouterOutputs["comment"]["getUserNewCommentForComment"]["props"]["comment"];
   }
 
   return (
+
     <Flex
       id={commentId}
       mb={isFirstLevel ? 0 : 0.5}
@@ -259,16 +259,16 @@ RouterOutputs["comment"]["getUserNewCommentForComment"]["props"]["comment"];
             {renderAsHTML(props.text)}
           </Flex>
 
-          {/* 点赞按钮 */}
+
           <Flex align="left" justifyItems={"left"}>
-            <Flex mt={2.5} className="text-red">
+            <Flex mt={2.5} className="cursor-pointer"  onClick={handleLikeClick}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke={liked ? "grey" : "white"}
                 className={
-                  "h-6 w-full "+  (liked ? "fill-te_dark_liked " :  "fill-none ") + "hover:animate-ping " 
+                  "h-6 w-full hover:animate-ping "+  (liked ? "fill-te_dark_liked " :  "fill-none ") + "hover:animate-ping " 
                   + (liked ? "te_dark_liked" : "") }>
                 <path
                   strokeLinecap="round"  

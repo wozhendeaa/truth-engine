@@ -8,16 +8,11 @@ import {
   CardHeader,
   Flex,
   Heading,
-  IconButton,
-  Text,
   Image,
-  Input,
+  Text,
   Icon,
-  InputGroup,
-  InputRightElement,
-  Spinner,
 } from "@chakra-ui/react";
-import React, { ChangeEvent, useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { api } from "utils/api";
 import { Post, User } from "@prisma/client";
@@ -37,14 +32,12 @@ import { useUser } from "@clerk/nextjs";
 import { IoEllipsisHorizontal } from "react-icons/io5";
 import { useInfiniteScroll } from "helpers/InfiniteScroll";
 import Link from "next/link";
-import UserContext from "helpers/userContext";
 import TransparentFeedThreadMenu from "components/menu/TransparentFeedThreadMenu";
 import { HSeparator } from "components/separator/Separator";
 import TE_Routes from "TE_Routes";
 import TruthEngineEditor, { gettHtmlFromJson, renderAsHTML } from "components/TipTap/TruthEngineEditor";
 //@ts-ignore
 const i18n = require('next-i18next.config')
-import { FileContent } from "use-file-picker";
 
 
 type PostsWithUserData = Post & {
@@ -122,8 +115,6 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   const onPostPage = singlePostData.onPostPage;
   const mediaFilesString = singlePostData.postWithUser.media;
   const loadingCompleteCallBack = singlePostData.loadingCompleteCallBack;
-  const user = useContext(UserContext);
-  const ctx = api.useContext();
   const { isSignedIn } = useUser();
   const hasReaction = postWithUser.reactions.length > 0;
   const [liked, setLiked] = useState(hasReaction);
@@ -131,7 +122,6 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   const [showComments, setShowComments] = useState(onPostPage);
   const { t, i18n } = useTranslation(['common', 'footer'], { bindI18n: 'languageChanged loaded' })
   const [mouseDownPos, setMouseDownPos] = useState<MousePosition>({ x: 0, y: 0 });
-
 
   // bindI18n: loaded is needed because of the reloadResources call
   // if all pages use the reloadResources mechanism, the bindI18n option can also be defined in next-i18next.config.js
@@ -144,7 +134,6 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
       }, 2000)
   }, [])
 
-  const {mutate, isLoading} = api.comment.createPostComment.useMutation();
   const likePostMutation = api.posts.likePost.useMutation({
     onSuccess: () => {},
     onError: (error: any) => {
@@ -179,8 +168,6 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
     if (onPostPage) return;
     setShowComments(!showComments);
   }
-
-
 
   const handleLike = (post: PostsWithUserData) => {
     likePostMutation.mutate({ postId: post.id });
@@ -233,66 +220,6 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
     toast(t('link_copied'));
   };
 
-  function setError(err: string) {
-
-  }
-
-  //being called by the editor when uploading content
-  async function OnSend(
-    editor: any,
-    mediaFiles:FileContent[],
-    setDisableSend: React.Dispatch<React.SetStateAction<boolean>>
-    ) {
-      if (!isSignedIn) {
-        toast("login_before_comment");
-        return false;
-      }
-
-      try {
-        // const keys = await uploadToS3();
-      } catch (cause) {
-        setError("图片上传失败，可能是网络问题");
-      }
-      try {
-         let result = false
-        const promise = new Promise<void>((resolve) => {
-          mutate(
-            {
-              content: JSON.stringify(editor.getJSON()),
-              replyToPostId: postWithUser.id
-            },
-            {
-              onSuccess: () => {
-                void ctx.comment.getCommentsForPost.invalidate();
-                editor.commands.setContent(null);
-                editor.setEditable(true);
-                result = true;
-                resolve();
-                toast(t('post_good'));
-              },
-              onError: (e) => {
-                const errorMessage = e.data?.code;
-                console.log(errorMessage);
-                if (errorMessage) {
-                  toast.error(t(errorMessage));
-                }     
-                resolve();         
-              },
-            }
-          );
-        });
-  
-        await promise;
-        setDisableSend(false)
-        return result;
-  
-      } catch (cause) {
-        console.log(cause);
-        setError("发表信息失败，可能是网络问题");
-        return false;
-      } 
-      
-    }
 
   return (
     <>
@@ -514,23 +441,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
                 onPostPage={onPostPage}
               />
             </Box>
-            {user && (
-              <Flex className="pt-3">
-              <Box flex="none">
-              <Image
-                src={user.profileImageUrl ?? "/images/default_profile.png"}
-                alt=""
-                width={"50px"}
-                height={"50px"}
-                className="flex-none shrink-0 rounded-full p-2"
-              />
-              </Box>
-              <Box className="float-left w-full" style={{ maxWidth: `calc(100% - 50px)` }}>
-                <TruthEngineEditor editorType={"COMMENT"} onSend={OnSend}  />
-              </Box>
-              </Flex>
-
-            )}
+         
             {!onPostPage && (
               <Flex
                 justify={"center"}
