@@ -9,33 +9,10 @@ import { PageLayout } from "components/layout";
 import React, { useState } from "react";
 import { Box, Button, Flex, FormLabel } from "@chakra-ui/react";
 import _ from "lodash";
-import Lucide from "components/Lucide";
-import Menu from "components/Headless/Menu";
-import { FormInput, FormSwitch } from "components/Form";
-import Tab from "components/Headless/Tab";
-import clsx from "clsx";
-import Tippy from "components/Tippy";
-import fakerData from "helpers/faker";
-import TomSelect from "components/TomSelect";
-import dynamic from "next/dynamic";
-import TruthEngineEditor from "components/TipTap/TruthEngineEditor";
-import { PostCreator as PostBox} from "components/posting/PostBox";
 import { HSeparator } from "components/separator/Separator";
 import TruthEngineSideMenuBar from "components/QTruthEngineSideMenubar";
 const i18n = require("next-i18next.config");
 
-const Litepicker = dynamic(() => import("components/Litepicker"), {
-  ssr: false,
-  loading: () => <p>Loading ...</p>,
-});
-
-const ClassicEditor = dynamic(
-  () => import("components/Ckeditor/ClassicEditor"),
-  {
-    ssr: false,
-    loading: () => <p>Loading ...</p>,
-  }
-);
 
 export const getStaticProps: GetStaticProps = async (
   context: GetStaticPropsContext

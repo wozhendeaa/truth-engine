@@ -60,6 +60,7 @@
  "make_simple_comment" : "随便点评一下...",
  "comment_too_long":"评论太长了，言简意赅，不要超过200字",
  "see_all_comments":"看所有评论",
+ "error_on_page":"好像出了点错误...",
 
  "reply_comment":"回复",
  "login_before_like":"登录后才能点赞",

@@ -37,6 +37,7 @@ model Post {
   @@index([originalAuthorId])
   @@index([authorId])
   @@index([id])
+  @@unique([createdAt, id])
 }
 
 enum PostType {

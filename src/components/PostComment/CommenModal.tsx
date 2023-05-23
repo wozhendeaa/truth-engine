@@ -15,6 +15,7 @@ import { api } from "utils/api";
 import { parseErrorMsg } from "helpers/serverErrorMessage";
 import TruthEngineEditor from "components/TipTap/TruthEngineEditor";
 import { FileContent } from "use-file-picker";
+import { renderAsHTML } from 'components/TipTap/TruthEngineEditor';
 
 
 export default function CommentModal(props: {
@@ -46,17 +47,13 @@ export default function CommentModal(props: {
       toast("login_before_comment");
       return false;
     }
-    try {
-      // const keys = await uploadToS3();
-    } catch (cause) {
-      setError("图片上传失败，可能是网络问题");
-    }
+
     try {
       let result = false;
       const promise = new Promise<void>((resolve) => {
         mutate(
           {
-            content: JSON.stringify(editor.getJSON()),
+            content: editor.renderAsHTML(),
             replyToCommentId: replyToCommentId,
           },
           {
@@ -95,7 +92,6 @@ export default function CommentModal(props: {
   function OnLoad(editor: any) {
     if (!editor) return;
      editor.chain().focus().run();
-    
   }
 
   return (

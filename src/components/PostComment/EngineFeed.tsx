@@ -22,8 +22,7 @@ import toast from "react-hot-toast";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import CommentThread from "./CommentFeed";
 import { useUser } from "@clerk/nextjs";
-import { IoEllipsisHorizontal } from "react-icons/io5";
-import { useInfiniteScroll } from "helpers/InfiniteScroll";
+import InfiniteScroll from "react-infinite-scroll-component";
 import Link from "next/link";
 import TransparentFeedThreadMenu from "components/menu/TransparentFeedThreadMenu";
 import { HSeparator } from "components/separator/Separator";
@@ -34,6 +33,8 @@ import TruthEngineEditor, {
 } from "components/TipTap/TruthEngineEditor";
 import FeedActionMenu from "./FeedActionMenu";
 import { GetTime } from "helpers/UIHelper";
+import { LoadingSpinner } from "components/loading";
+import { XMarkIcon } from '@heroicons/react/20/solid'
 
 //@ts-ignore
 const i18n = require("next-i18next.config");
@@ -53,6 +54,10 @@ interface SingleFeedProps {
 
 export interface FeedProps {
   posts: PostsWithUserData[];
+  isLoading: boolean;
+  isError: boolean;
+  hasMore: boolean | undefined;
+  fetchNewFeed: () => Promise<unknown>;
 }
 
 export function RenderImage(props: {
@@ -549,11 +554,33 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   );
 }
 
-export const EngineFeed = (props: { postData: FeedProps }) => {
-  const { t } = useTranslation();
-  const posts = props.postData.posts;
-  const observerRef = useInfiniteScroll(() => {});
+ function EndingMessage(message:string) {
+  return (
+    <div className="rounded-md bg-te_dark_ui p-4 z-40">
+      <div className="flex">
+      
+        <div className="ml-3">
+          <p className="text-sm font-medium text-slate-50">{message}</p>
+        </div>
+        <div className="ml-auto pl-3">
+          <div className="-mx-1.5 -my-1.5">
+         
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
+export const EngineFeed = ({
+  posts,
+  isError,
+  isLoading,
+  fetchNewFeed,
+  hasMore = false,
+}: FeedProps) => {
+  const { t } = useTranslation();
+  // const observerRef = useInfiniteScroll(() => {});
   if (!posts || posts.length === 0) {
     return (
       <div className="w-full text-center text-slate-200">
@@ -562,14 +589,34 @@ export const EngineFeed = (props: { postData: FeedProps }) => {
     );
   }
 
+  if (isError) {
+    return (
+      <div className="w-full text-center text-slate-200">
+        {t("error_on_page")}
+      </div>
+    );
+  }
+
   return (
-    <div>
-      {posts.map((p) => {
+    <div >
+      <InfiniteScroll
+      className="hide-scrollbar"
+        dataLength={posts.length}
+        next={fetchNewFeed}
+        hasMore={hasMore}
+        loader={<LoadingSpinner />}
+        endMessage={
+          EndingMessage(t('end_of_scroll'))
+         }
+      >
+       {posts.map((p) => {
         return <SingleFeed key={p.id} postWithUser={p} onPostPage={false} />;
       })}
-      <div ref={observerRef} id="end_of_thread" className="text-slate-200">
+      </InfiniteScroll>
+    
+      {/* <div ref={observerRef} id="end_of_thread" className="text-slate-200">
         <span></span>
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -1,26 +1,28 @@
 import { TRPCError } from "@trpc/server";
 import { any, z } from "zod";
 
-import { createTRPCRouter, privateProcedure, publicProcedure } from "server/api/trpc";
+import {
+  createTRPCRouter,
+  privateProcedure,
+  publicProcedure,
+} from "server/api/trpc";
 
 import { Ratelimit } from "@upstash/ratelimit"; // for deno: see above
 import { Redis } from "@upstash/redis";
 import { postSchema } from "components/posting/PostBox";
 import { ReactionType } from "@prisma/client";
 
-
-
 const ratelimitPost = new Ratelimit({
-    redis: Redis.fromEnv(),
-    limiter: Ratelimit.slidingWindow(60, "60 s"),
-    analytics: true,
-    /**
-     * Optional prefix for the keys used in redis. This is useful if you want to share a redis
-     * instance with other applications and want to avoid key collisions. The default prefix is
-     * "@upstash/ratelimit"
-     */ 
-    prefix: "@upstash/ratelimit",
-  });
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(60, "60 s"),
+  analytics: true,
+  /**
+   * Optional prefix for the keys used in redis. This is useful if you want to share a redis
+   * instance with other applications and want to avoid key collisions. The default prefix is
+   * "@upstash/ratelimit"
+   */
+  prefix: "@upstash/ratelimit",
+});
 
 function classifyMedia(filename: string): "image" | "video" | undefined {
   const imageExtensions = ["jpg", "jpeg", "png", "gif", "bmp", "webp"];
@@ -38,116 +40,125 @@ function classifyMedia(filename: string): "image" | "video" | undefined {
 }
 
 export const postsRouter = createTRPCRouter({
-  getCommentsForPost: publicProcedure.input(z.object({id: z.string(), limit:  z.number()}))
-  .query(async ({ctx, input}) => {
-     const comments = await ctx.prisma.comment.findMany({
-      where:{
-        replyToPostId: input.id,
-      },
-      include: {
-        author: true,
-        comments: {
-          take: 1,
-           orderBy: [
-    {
-      createdAt: 'desc',
-    },
-    {
-      likes: 'desc',
-    },
-  ],
-          where : {
-             author: {
-                id: ctx.userId ?? ""
-             }
-          }
-        }     
-      },
-      orderBy:[
-        {pinned: "asc",},
-        {likes: "desc",},
-        {createdAt: "desc",}
-      ],
-      take: input.limit
-    })
+  getCommentsForPost: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        limit: z.number().optional(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const comments = await ctx.prisma.comment.findMany({
+        where: {
+          replyToPostId: input.id,
+        },
+        include: {
+          author: true,
+          comments: {
+            take: 1,
+            orderBy: [
+              {
+                createdAt: "desc",
+              },
+              {
+                likes: "desc",
+              },
+            ],
+            where: {
+              author: {
+                id: ctx.userId ?? "",
+              },
+            },
+          },
+        },
+        orderBy: [{ pinned: "asc" }, { likes: "desc" }, { createdAt: "desc" }],
+        take: input.limit,
+      });
 
-    return comments;
-  }),
+      return comments;
+    }),
 
-
-  getPostById: publicProcedure.input(z.object({id: z.string()}))
-  .query(async ({ctx, input}) => {
-    
-   const post = await ctx.prisma.post.findUnique({
-        where:{
-            id: input.id
+  getPostById: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const post = await ctx.prisma.post.findUnique({
+        where: {
+          id: input.id,
         },
         include: {
           author: true,
           reactions: {
-            where:{
-                userId: ctx.user?.id
+            where: {
+              userId: ctx.user?.id,
             },
             select: {
-              userId: true
-            }
+              userId: true,
+            },
           },
           comments: {
             take: 1,
-             orderBy: [
-    {
-      createdAt: 'desc',
-    },
-    {
-      likes: 'desc',
-    },
-  ],
-            where : {
-               author: {
-                  id: ctx.userId ?? ""
-               }
-            }
-          }     
-        }
-    })
-    
+            orderBy: [
+              {
+                createdAt: "desc",
+              },
+              {
+                likes: "desc",
+              },
+            ],
+            where: {
+              author: {
+                id: ctx.userId ?? "",
+              },
+            },
+          },
+        },
+      });
 
-    if (!post) throw new TRPCError({code: "NOT_FOUND", message: "没有找到文章"});
-    if (post.MarkAsDelete) throw new TRPCError({code: "NOT_FOUND", message: "post_deleted"});
-    return post;
-  }
-  ),
+      if (!post)
+        throw new TRPCError({ code: "NOT_FOUND", message: "没有找到文章" });
+      if (post.MarkAsDelete)
+        throw new TRPCError({ code: "NOT_FOUND", message: "post_deleted" });
+      return post;
+    }),
 
- likePost: privateProcedure.input(z.object({postId: z.string()}))
-    .mutation(async ({ctx, input}) => {
-     
-    const userId = ctx.curretnUserId;
-    const {success} = await ratelimitPost.limit(userId);
-    if (!success) throw new TRPCError({code: "TOO_MANY_REQUESTS", message: "too many requests"})
-  
-    const post = await ctx.prisma.post.findUnique({
-          where:{
-              id: input.postId
-          },   
+  likePost: privateProcedure
+    .input(z.object({ postId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.curretnUserId;
+      const { success } = await ratelimitPost.limit(userId);
+      if (!success)
+        throw new TRPCError({
+          code: "TOO_MANY_REQUESTS",
+          message: "too many requests",
+        });
 
-          include: {
-            reactions: {
-              where :{
-                 userId: userId,
-                 postId: input.postId
-              }
-            }
-          }
-      })
+      const post = await ctx.prisma.post.findUnique({
+        where: {
+          id: input.postId,
+        },
 
-      if (!post) throw new TRPCError({code: "NOT_FOUND", message: "点赞时没有找到要点赞的帖子id"});
+        include: {
+          reactions: {
+            where: {
+              userId: userId,
+              postId: input.postId,
+            },
+          },
+        },
+      });
+
+      if (!post)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "点赞时没有找到要点赞的帖子id",
+        });
 
       if (post.reactions?.length > 0) {
         const deleteUser = await ctx.prisma.reaction.delete({
           where: {
             id: post.reactions[0]?.id,
           },
-        })
+        });
 
         const updatedPost = await ctx.prisma.post.update({
           where: {
@@ -156,10 +167,9 @@ export const postsRouter = createTRPCRouter({
           data: {
             likes: {
               decrement: 1,
-            },            
+            },
           },
         });
-        
       } else {
         const newReaction = await ctx.prisma.reaction.create({
           data: {
@@ -176,141 +186,33 @@ export const postsRouter = createTRPCRouter({
           data: {
             likes: {
               increment: 1,
-            },            
+            },
           },
         });
         return updatedPost;
       }
 
-    return post.likes;
-  }
-  ),
+      return post.likes;
+    }),
 
-  getPublicTimelineFeed: publicProcedure.query(async ({ ctx }) => {
-      const feed = await ctx.prisma.post.findMany({
-        where:{
-            author: {
-              role: 'ADMIN_VERYFIED_ENGINE' || 'VERYFIED_ENGINE'
-            }
-        },
-        include: {
-          comments: {
-            take: 1,
-             orderBy: [
-    {
-      createdAt: 'desc',
-    },
-    {
-      likes: 'desc',
-    },
-  ],
-            where : {
-               author: {
-                  id: ctx.userId ?? ""
-               }
-            }
-          }
-        },
-        orderBy: {createdAt: "desc"},
-        take: 100,
-      }
+  getVerifiedEngineFeed: publicProcedure
+    .input(
+      z.object({
+        cursor: z.object({ id: z.string(), createdAt: z.date() }).optional(),
+        limit: z.number().optional(),
+      })
     )
-    return feed;
-  }),
+    .query(async ({ ctx, input: { limit = 50, cursor } }) => {
 
-  getVerifiedEngineFeed: publicProcedure.query(async ({ ctx }) => {
-    const posts = await ctx.prisma.post.findMany({
-        take:100,   
-        orderBy: [{createdAt: "desc"}],
+      const posts = await ctx.prisma.post.findMany({
+        take: limit + 1,
+        cursor: cursor ? { createdAt_id: cursor } : undefined,
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
         where: {
-          author:{
-            role: {in: ['ADMIN_VERYFIED_ENGINE','VERYFIED_ENGINE']}
+          author: {
+            role: { in: ["ADMIN_VERYFIED_ENGINE", "VERYFIED_ENGINE"] },
           },
-          MarkAsDelete: false
-        } ,       
-        include: {
-          author: true,     
-          reactions: {
-            where: {
-              userId: ctx.user?.id,              
-            },
-            select:{
-              userId: true
-            }
-          },
-          comments: {
-            take: 1,
-             orderBy: [
-    {
-      createdAt: 'desc',
-    },
-    {
-      likes: 'desc',
-    },
-  ],
-            where : {
-               author: {
-                  id: ctx.userId ?? ""
-               }
-            }
-          }     
-        },
-    });
-
-    return {
-        posts,
-    };
-  }),
-
-  getCommunityEngineFeed: publicProcedure.query(async ({ ctx }) => {
-    const posts = await ctx.prisma.post.findMany({
-        take:100,   
-        orderBy: [{createdAt: "desc"}],
-        where: {
-          author:{
-            role: {not : {in: ['ADMIN_VERYFIED_ENGINE','VERYFIED_ENGINE']}}
-          },
-          MarkAsDelete: false
-        } ,       
-        include: {
-          author: true,     
-          reactions: {
-            where: {
-              userId: ctx.user?.id,              
-            },
-            select:{
-              userId: true
-            }
-          }  ,
-          comments: {
-            take: 1,
-             orderBy: [
-    {
-      createdAt: 'desc',
-    },
-    {
-      likes: 'desc',
-    },
-  ],
-            where : {
-               author: {
-                  id: ctx.userId ?? ""
-               }
-            }
-          }        
-        },
-    });
-    return {
-        posts,
-    };
-  }),
-
-  getAll: publicProcedure.query(async ({ ctx }) => {
-    const posts = await ctx.prisma.post.findMany({
-        take:100,   
-        orderBy: [{createdAt: "desc"}],
-        where:{
-          MarkAsDelete: false
+          MarkAsDelete: false,
         },
         include: {
           author: true,
@@ -319,112 +221,214 @@ export const postsRouter = createTRPCRouter({
               userId: ctx.user?.id,
             },
             select: {
-              userId: true
-            }
-          }     ,
+              userId: true,
+            },
+          },
           comments: {
             take: 1,
-             orderBy: [
-    {
-      createdAt: 'desc',
-    },
-    {
-      likes: 'desc',
-    },
-  ],
-            where : {
-               author: {
-                  id: ctx.userId ?? ""
-               }
-            }
-          }     
+            orderBy: [
+              {
+                createdAt: "desc",
+              },
+              {
+                likes: "desc",
+              },
+            ],
+            where: {
+              author: {
+                id: ctx.userId ?? "",
+              },
+            },
+          },
+        },
+      });
+
+      let nextCursor: typeof cursor | undefined;
+      if (posts.length > limit) {
+        const nextItem = posts.pop();
+        if (nextItem) {
+          nextCursor = { id: nextItem.id, createdAt: nextItem.createdAt };
         }
+      }
+
+      return { posts, nextCursor };
+    }),
+
+  getCommunityEngineFeed: publicProcedure
+    .input(
+      z.object({
+        cursor: z.object({ id: z.string(), createdAt: z.date() }).optional(),
+        limit: z.number().optional(),
+      })
+    )
+    .query(async ({ ctx, input: { limit = 50, cursor } }) => {
+      const posts = await ctx.prisma.post.findMany({
+        take: limit + 1,
+        cursor: cursor ? { createdAt_id: cursor } : undefined,
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+        where: {
+          author: {
+            role: { not: { in: ["ADMIN_VERYFIED_ENGINE", "VERYFIED_ENGINE"] } },
+          },
+          MarkAsDelete: false,
+        },
+        include: {
+          author: true,
+          reactions: {
+            where: {
+              userId: ctx.user?.id,
+            },
+            select: {
+              userId: true,
+            },
+          },
+          comments: {
+            take: 1,
+            orderBy: [
+              {
+                createdAt: "desc",
+              },
+              {
+                likes: "desc",
+              },
+            ],
+            where: {
+              author: {
+                id: ctx.userId ?? "",
+              },
+            },
+          },
+        },
+      });
+      let nextCursor: typeof cursor | undefined;
+      if (posts.length > limit) {
+        const nextItem = posts.pop();
+        if (nextItem) {
+          nextCursor = { id: nextItem.id, createdAt: nextItem.createdAt };
+        }
+      }
+
+      return { posts, nextCursor };
+    }),
+
+  getAll: publicProcedure.query(async ({ ctx }) => {
+    const posts = await ctx.prisma.post.findMany({
+      take: 100,
+      orderBy: [{ createdAt: "desc" }],
+      where: {
+        MarkAsDelete: false,
+      },
+      include: {
+        author: true,
+        reactions: {
+          where: {
+            userId: ctx.user?.id,
+          },
+          select: {
+            userId: true,
+          },
+        },
+        comments: {
+          take: 1,
+          orderBy: [
+            {
+              createdAt: "desc",
+            },
+            {
+              likes: "desc",
+            },
+          ],
+          where: {
+            author: {
+              id: ctx.userId ?? "",
+            },
+          },
+        },
+      },
     });
 
     return posts;
- 
   }),
 
   //a public trpc procedure that gets all posts by author id(user id)
-  getPostsByUserId: publicProcedure.input(z.object({userId: z.string()}))
-  .query(async ({ctx, input}) => {
-    const posts = await ctx.prisma.post.findMany({
-      take:100,   
-      orderBy: [{createdAt: "desc"}],
-      where: {
-        author: {
-          id: input.userId
-        },
-        MarkAsDelete: false
-      } ,       
-      include: {
-        author: true,     
-        reactions: {
-          where: {
-            userId: ctx.user?.id,              
+  getPostsByUserId: publicProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const posts = await ctx.prisma.post.findMany({
+        take: 100,
+        orderBy: [{ createdAt: "desc" }],
+        where: {
+          author: {
+            id: input.userId,
           },
-          select:{
-            userId: true
-          }
-        }  ,
-        comments: {
-          take: 1,
-           orderBy: [
-    {
-      createdAt: 'desc',
-    },
-    {
-      likes: 'desc',
-    },
-  ],
-          where : {
-             author: {
-                id: ctx.userId ?? ""
-             }
-          }
-        }        
-      },
-  });
+          MarkAsDelete: false,
+        },
+        include: {
+          author: true,
+          reactions: {
+            where: {
+              userId: ctx.user?.id,
+            },
+            select: {
+              userId: true,
+            },
+          },
+          comments: {
+            take: 1,
+            orderBy: [
+              {
+                createdAt: "desc",
+              },
+              {
+                likes: "desc",
+              },
+            ],
+            where: {
+              author: {
+                id: ctx.userId ?? "",
+              },
+            },
+          },
+        },
+      });
 
-  return {
-      posts,
-  };
+      return {
+        posts,
+      };
+    }),
+  createPost: privateProcedure
+    .input(postSchema)
+    .mutation(async ({ ctx, input }) => {
+      const authorId = ctx.curretnUserId;
+      const { success } = await ratelimitPost.limit(authorId);
+      if (!success)
+        throw new TRPCError({
+          code: "TOO_MANY_REQUESTS",
+          message: "too many requests",
+        });
 
-  })
-    ,
-
-
-  createPost: privateProcedure.input(
-    postSchema,
-  ).mutation(async ({ctx, input}) => {
-    const authorId = ctx.curretnUserId;
-    const {success} = await ratelimitPost.limit(authorId);
-    if (!success) throw new TRPCError({code: "TOO_MANY_REQUESTS", message: "too many requests"});
-
-    let mediaString = "";
-    if (input.media) {
-      let files = JSON.parse(input.media);
-      let processedFiles = [];
-      for  (let file of files) {
-        const ext = file.key.split(".").pop();
-        const type = classifyMedia(ext);
-         processedFiles.push({type: type, 
-          url: process.env.AWS_S3_IMAGE_BUCKET_URL + file.key}
-         );
-      }
-     mediaString = JSON.stringify(processedFiles);
-    }
-
-    const post = await ctx.prisma.post.create({
-        data:{
-            authorId,
-            content: input.content,
-            media: mediaString,
+      let mediaString = "";
+      if (input.media) {
+        let files = JSON.parse(input.media);
+        let processedFiles = [];
+        for (let file of files) {
+          const ext = file.key.split(".").pop();
+          const type = classifyMedia(ext);
+          processedFiles.push({
+            type: type,
+            url: process.env.AWS_S3_IMAGE_BUCKET_URL + file.key,
+          });
         }
-    });
-    return post;
-  }),
+        mediaString = JSON.stringify(processedFiles);
+      }
 
-
-  
+      const post = await ctx.prisma.post.create({
+        data: {
+          authorId,
+          content: input.content,
+          media: mediaString,
+        },
+      });
+      return post;
+    }),
 });

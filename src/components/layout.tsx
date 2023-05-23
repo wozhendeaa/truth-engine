@@ -11,7 +11,7 @@ export const PageLayout = (props: PropsWithChildren) => {
     <>
         <MainNavBar />
         <TruthEngineMobileSideBar />
-        <main className="dark relative flex min-h-screen w-full justify-center bg-te_dark_bg">
+        <main className="dark relative hide-scrollbar flex min-h-screen w-full justify-center bg-te_dark_bg">
           <div className="pointer-events-none absolute inset-0 z-0 bg-site-bg bg-cover bg-fixed bg-center bg-repeat-y opacity-[5%]"></div>
           {props.children}
         </main>

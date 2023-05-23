@@ -10,7 +10,7 @@ import EngineFeed from "components/PostComment/EngineFeed";
 import { api } from "utils/api";
 import UserContext from "../helpers/userContext";
 import { GetSekleton } from "../helpers/UIHelper";
-import { isUserSignedIn, isUserVerified } from "helpers/userHelper";
+import { isUserVerified } from "helpers/userHelper";
 import { HSeparator, VSeparator } from "components/separator/Separator";
 import TruthEngineSideMenuBar from "components/QTruthEngineSideMenubar";
 
@@ -33,7 +33,6 @@ export function Tabs() {
   const { tab: selectedTab, setTab } = useContext(selectedTabContext);
 
   function changeTab(tab: (typeof tabs)[number]) {
-    console.log(tab);
     setTab(tab);
   }
 
@@ -67,15 +66,24 @@ export function Tabs() {
   );
 }
 
+
 const Home: NextPage = () => {
-  const { data: verifiedFeed, isLoading: isVerifiedLoading } =
-    api.posts.getVerifiedEngineFeed.useQuery();
-
-  const { data: communityFeed, isLoading: isCommunityLoading } =
-    api.posts.getCommunityEngineFeed.useQuery();
-
-  const user = useContext(UserContext);
   const [tab, setTab] = useState<(typeof tabs)[number]>("VERIFIED_ENGINE");
+
+  const engineFeedQuery = api.posts.getVerifiedEngineFeed.useInfiniteQuery({}, {
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    enabled: tab == "VERIFIED_ENGINE"
+  });
+
+  const communityFeedQuery = api.posts.getCommunityEngineFeed.useInfiniteQuery({limit:1}, {
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    enabled: tab == "COMMUNITY"
+  });
+
+  const { isLoading: isVerifiedLoading } = engineFeedQuery;
+  const {isLoading: isCommunityLoading } = communityFeedQuery
+  
+  const user = useContext(UserContext);
   const { t } = useTranslation();
 
   const isVerified = isUserVerified(user);
@@ -117,7 +125,7 @@ const Home: NextPage = () => {
         </Flex>
 
         <Flex
-          className="w-[100%] md:w-[80%] lg:w-[50%]"
+          className="w-[100%] md:w-[80%] lg:w-[50%] "
           direction="column"
         >
           {isCurrentTabLoading("VERIFIED_ENGINE") ? (
@@ -139,12 +147,16 @@ const Home: NextPage = () => {
                   </Box>
                 </Box>
                 <Box>
-                  <Box className={tab == "VERIFIED_ENGINE" ? "" : "hidden"}>
+                  <div className={tab == "VERIFIED_ENGINE" ? "" : "hidden" } >
                     {
                       //@ts-ignore
-                      <EngineFeed postData={verifiedFeed} />
+                      <EngineFeed posts={engineFeedQuery.data?.pages.flatMap((page) => page.posts)} 
+                      fetchNewFeed={engineFeedQuery.fetchNextPage}
+                      hasMore={engineFeedQuery.hasNextPage}
+                      isLoading={engineFeedQuery.isLoading}
+                       />
                     }
-                  </Box>
+                  </div>
                 </Box>
 
                 <Flex direction={"column"}>
@@ -157,8 +169,12 @@ const Home: NextPage = () => {
                     </Flex>
                     <Flex>
                       {
-                        //@ts-ignore
-                        <EngineFeed postData={communityFeed} />
+                      //@ts-ignore
+                      <EngineFeed posts={communityFeedQuery.data?.pages.flatMap((page) => page.posts)} 
+                      fetchNewFeed={communityFeedQuery.fetchNextPage}
+                      hasMore={communityFeedQuery.hasNextPage}
+                      isLoading={communityFeedQuery.isLoading}
+                       />
                       }
                     </Flex>
                   </Box>
