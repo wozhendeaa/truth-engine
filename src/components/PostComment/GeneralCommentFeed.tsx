@@ -1,5 +1,4 @@
-import { Box, Flex, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React from "react";
 
 import { RouterOutputs, api } from "utils/api";
 import relativetTime from "dayjs/plugin/relativeTime";
@@ -9,10 +8,7 @@ dayjs.extend(relativetTime);
 
 import { useTranslation } from "react-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import Link from "next/link";
-import TE_Routes from "TE_Routes";
 import TEComment from "components/dataDisplay/TE_Comment";
-import { useRouter } from "next/router";
 
 type commentsData = RouterOutputs["comment"]["getCommentsForUser"];
 
@@ -50,6 +46,7 @@ export const GeneralCommentThread = (props: {
           likes={c.likes}
           commentNum={c.commentCount}
           likedByUser={c.reactions}
+          authorId={c.authorId}
           isFirstLevel={true}      
 			  	onPostPage={false}
         />

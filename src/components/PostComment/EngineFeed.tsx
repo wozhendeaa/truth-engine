@@ -36,6 +36,7 @@ import TransparentFeedThreadMenu from "components/menu/TransparentFeedThreadMenu
 import { HSeparator } from "components/separator/Separator";
 import TE_Routes from "TE_Routes";
 import TruthEngineEditor, { gettHtmlFromJson, renderAsHTML } from "components/TipTap/TruthEngineEditor";
+import FeedActionMenu from "./FeedActionMenu";
 //@ts-ignore
 const i18n = require('next-i18next.config')
 
@@ -115,7 +116,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   const onPostPage = singlePostData.onPostPage;
   const mediaFilesString = singlePostData.postWithUser.media;
   const loadingCompleteCallBack = singlePostData.loadingCompleteCallBack;
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
   const hasReaction = postWithUser.reactions.length > 0;
   const [liked, setLiked] = useState(hasReaction);
   const [likeNumber, setNumber] = useState(postWithUser.likes);
@@ -146,7 +147,6 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
       setLiked(!liked);
     },
   });
-
 
   let mediaFiles = mediaFilesString ? Array.from(JSON.parse(mediaFilesString)) : [];
 
@@ -188,17 +188,15 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
     if (!isClick) return;
 
     //检查他妈的点中的到底是什么东西
-    const element = event.target as any;
-    let isBody = false;
-    if (element.name) {
-      const n = element.name;
+    const element = event.target as HTMLSelectElement;    
+    const name = element.getAttribute('name')
+    if (name) {
       const clickableNames =  ["image",
        "name","username", "feedMenu", "avatar","close"]
-       if (clickableNames.some((n2)=> n2 === n)) {
-          if (n === "image") element.click();
+       if (clickableNames.some((n2)=> n2 === name)) {
+          if (name === "image") element.click();
           return;
        }
-       
     }
     if (!onPostPage) {
         window.open("/post/" + postWithUser.id, "_blank");
@@ -243,7 +241,8 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
             <Flex alignItems={"top"} className="-my-4">
               <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
                {//@ts-ignore
-              <Link name="avatar" href={TE_Routes.userById.path + postWithUser.author.username} className="hover:underline" onClick={(e)=>e.stopPropagation()}>
+              <Link name="avatar" href={TE_Routes.userById.path + postWithUser.author.username} 
+              className="hover:underline" onClick={(e)=>e.stopPropagation()}>
                 <Avatar
                   src={
                     postWithUser.author.profileImageUrl ??
@@ -273,14 +272,15 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
                   {dayjs(postWithUser.createdAt).fromNow()}
                 </Text>
               </Flex>
-              <Box className="group/action">
+              <div className="group/action" 
+                onMouseDown={(e) => e.stopPropagation()}
+                onMouseUp={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
+              >
               {
-              //@ts-ignore
-              <TransparentFeedThreadMenu name="feedMenu"
-                canDelete={true}   
-                icon={<Flex className="px-2 group-hover/action:bg-te_dark_font rounded-md"><Icon as={IoEllipsisHorizontal} w="34px" h="34px" /></Flex>}
-              />}
-              </Box>
+                user && <FeedActionMenu  postId={postWithUser.id} canDeleteOrEdit={user.id === postWithUser.author.id} />
+              }
+              </div>
             </Flex>
           </CardHeader>
           <CardBody
@@ -295,12 +295,14 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
             <span className="font-chinese text-xl font-bold text-slate-100 shadow-none ">
              {renderAsHTML(postWithUser.content)}
             </span>
-            <div className="bg-accent text-accent-content  grid place-content-end justify-center ">
+            <div className="text-accent-content 
+             grid place-content-end justify-center ">
               {/* image display section */}
               <div className="mt-2 items-end">
                 <ul
                 role="list"
-                  className="grid auto-cols-auto grid-flow-col gap-x-1 gap-y-2 xl:gap-x-1"
+                  className="grid auto-cols-auto grid-flow-col 
+                  gap-x-1 gap-y-2 xl:gap-x-1"
                 >
                   {mediaFiles.map((file, index) => {
                     //@ts-ignore

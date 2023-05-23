@@ -21,7 +21,6 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
-
 export const accountSetupSchema = z.object({
   username: z.string().regex(/^[a-zA-Z0-9_]+$/, 'username_hint')
   .min(8,"username_error_length")
@@ -59,7 +58,6 @@ export function AccountSetupSection( props: {user: UserResource}) {
       },
     })
 
-    const watchAllFields = watch();
     const onSubmit: SubmitHandler<AccountSetupSchema> = async (data) => {
       axios.post(TE_Routes.Register.path, 
             data

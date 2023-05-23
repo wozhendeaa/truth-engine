@@ -25,8 +25,8 @@ model Post {
   likes       Int         @default(0)
   dislikes    Int         @default(0)
   ViewCount   Int         @default(0)
-  repost      Int         @default(0)
-  reported    Int         @default(0)
+  repostCount      Int         @default(0)
+  reportCount    Int         @default(0)
   commentCount    Int     @default(0)
   MarkAsDelete Boolean @default(false)
   comments    Comment[]
@@ -34,7 +34,6 @@ model Post {
   categories  Category[]
   reports     Report[]
   
-
   @@index([originalAuthorId])
   @@index([authorId])
   @@index([id])
@@ -90,7 +89,8 @@ model User {
   reports         Report[]
   premiumStatus   Boolean   @default(false)
   reactions       Reaction[]
-  notifications   Notification[] 
+  receivedNotifications Notification[] @relation("receiverToNotification")
+  sentNotifications   Notification[] @relation("senderToNotification")
   @@index([id])
   @@index([username])
 }
@@ -136,7 +136,6 @@ model Reaction {
 
 model Comment {
   id          String        @id @default(cuid())
-  
   pinned      Boolean   @default(false)
   content     String      @db.Text
   authorId    String
@@ -148,8 +147,9 @@ model Comment {
   comments Comment[] @relation(name: "CommentToComment")
   media       String?
   reactions   Reaction[] 
-  reports     Report[]
   likes       Int         @default(0)
+  reportCount     Int     @default(0)
+  reports    Report[]
   commentCount  Int         @default(0)
   reEnginedCount Int     @default(0)
   MarkAsDelete Boolean @default(false)
@@ -165,32 +165,42 @@ model Comment {
 
 model Report {
   id          String    @id @default(cuid())
-  reporterId    String
-  reporter      User      @relation(fields: [reporterId], references: [id])
+  reporterId  String
+  reporter    User      @relation(fields: [reporterId], references: [id])
   postId      String?
   post        Post?       @relation(fields: [postId], references: [id])
-  commentId      String?
-  comment        Comment?       @relation(fields: [commentId], references: [id])
-
+  commentId   String?
+  comment     Comment?       @relation(fields: [commentId], references: [id])
   createdAt   DateTime   @default(now())
-
+  reportType  String     @default("other")
+  content     String?     @db.VarChar(255)
   @@index([reporterId])
   @@index([commentId])
   @@index([postId])
+
+  @@unique([reporterId, postId])
+  @@unique([reporterId, commentId])
 }
 
+
+
 model Notification{
-  id          String    @id @default(cuid())
+  id         Int    @id @default(autoincrement())
+  senderId  String 
+  sender    User        @relation(name:"senderToNotification", fields: [senderId], references: [id])
   recieverId  String 
-  reciever    User      @relation(fields: [recieverId], references: [id])
+  reciever    User      @relation(name:"receiverToNotification", fields: [recieverId], references: [id])
   conent      String 
   createdAt   DateTime   @default(now())
+  hasRead   Boolean @default(false)
   notificationType NotificationType 
   @@index([recieverId])
+  @@index([senderId])
 }
 
 enum NotificationType {
   PUBLIC_ANNOUNCEMENT
+  SYSTEM
   COMMENT
   LIKE
   UPDATE_NOTIFICATION
@@ -204,6 +214,15 @@ enum ReactionType {
   WOW
   SAD
   ANGRY
+}
+
+enum ReportType {
+  SPAM
+  IRRLEVANT
+  PORN_VIOLENCE
+  FRAUD
+  EARMY
+  OTHER  
 }
 
 

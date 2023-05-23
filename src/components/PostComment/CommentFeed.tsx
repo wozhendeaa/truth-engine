@@ -36,7 +36,6 @@ export const CommentThread = (props: {
   const dispatch = useAppDispatch();
   const ctx = api.useContext();
   const user = useContext(UserContext);
-  console.log(user)
   let limit = props.topCommentsOnly ? 3 : 50;
 
   const { data, isLoading } = api.comment.getCommentsForPost.useQuery({
@@ -71,8 +70,6 @@ const CommentBox = ()=> {
       </>
     ) 
 }
-
-
 
   //being called by the editor when uploading content
   async function OnSend(
@@ -166,7 +163,8 @@ const CommentBox = ()=> {
           likes={c.likes}
           commentNum={c.commentCount}
           likedByUser={c.reactions}
-          isFirstLevel={true}      
+          isFirstLevel={true}     
+          authorId={c.authorId} 
           replyToPostId={c.replyToPostId ?? ""}
 			  	onPostPage={props.onPostPage}
         />

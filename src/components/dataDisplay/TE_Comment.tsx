@@ -25,6 +25,8 @@ import { LoadingSpinner } from "components/loading";
 import { HSeparator } from "components/separator/Separator";
 import TE_Routes from "TE_Routes";
 import { renderAsHTML } from "components/TipTap/TruthEngineEditor";
+import FeedActionMenu from "components/PostComment/FeedActionMenu";
+import CommentActionMenu from "components/PostComment/CommentActionMenu";
 
 type replyType = 
 RouterOutputs["comment"]["getCommentsForComment"]["props"]["comments"];
@@ -34,6 +36,7 @@ export default function TEComment(props: {
   avatar: string;
   name: string;
   username: string;
+  authorId: string;
   commentId: string;
   text: string;
   tags?: string[];
@@ -52,6 +55,7 @@ export default function TEComment(props: {
     tags,
     time,
     likes,
+    authorId,
     commentNum,
     commentId,
     likedByUser,
@@ -66,7 +70,7 @@ export default function TEComment(props: {
   const textColorSecondary = useColorModeValue("secondaryGray.600","white");
   const textGray = useColorModeValue("#68769F", "secondaryGray.600");
   const { t } = useTranslation();
-  const userId = useAuth().userId;
+  const {userId, isSignedIn} = useAuth();
 
   const hasReaction = likedByUser.some(
     (reaction) => reaction.commentID === commentId
@@ -193,10 +197,10 @@ RouterOutputs["comment"]["getUserNewCommentForComment"]["props"]["comment"];
       rounded={"xl"}
       p={2}
       bgColor={isFirstLevel ? "" : "te_dark_ui"}
+    
     >
-      <Flex
-        mt={isFirstLevel ? 0 : 2}
-        className="overflow-hidden overflow-ellipsis"
+     
+      <Flex mt={isFirstLevel ? 0 : 2}
       >
         <Avatar src={avatar} w="30px" h="30px" me="15px" />
         <Text color={textColor} fontWeight="700" fontSize="md">
@@ -221,17 +225,13 @@ RouterOutputs["comment"]["getUserNewCommentForComment"]["props"]["comment"];
             {time}
           </Text>
         </Flex>
-        <Flex ml={"auto"}>
-          <TransparentCommentMenu
-            icon={
-              <Icon
-                as={IoEllipsisHorizontal}
-                w="24px"
-                h="24px"
-                color={"te_dark_fonts"}
-              />
-            }
-          />
+        
+        <Flex ml={"auto"} >
+        {
+           <CommentActionMenu 
+            commentId={commentId} 
+             canDeleteOrEdit={userId === authorId} />
+        }
         </Flex>
       </Flex>
       <Flex direction="column">
@@ -255,10 +255,10 @@ RouterOutputs["comment"]["getUserNewCommentForComment"]["props"]["comment"];
         </Flex>
 
         <Flex align="left" direction={"column"}>
-          <Flex mt={2} px={isFirstLevel ? 0 : 3} fontSize={"md"} className={"text-" + textColor}>
+          <Flex mt={2} px={isFirstLevel ? 0 : 3} fontSize={"md"}
+           className={"text-" + textColor}>
             {renderAsHTML(props.text)}
           </Flex>
-
 
           <Flex align="left" justifyItems={"left"}>
             <Flex mt={2.5} className="cursor-pointer"  onClick={handleLikeClick}>
@@ -345,14 +345,17 @@ RouterOutputs["comment"]["getUserNewCommentForComment"]["props"]["comment"];
                   likes={c.likes}
                   likedByUser={c.reactions}
                   isFirstLevel={false}
+                  authorId={c.authorId}
                   replyToPostId={c.replyToPostId ?? ""}
                   onPostPage={onPostPage}
                 />
               ))}
           </Flex>
         </Flex>
+        
       </Flex>
       {isFirstLevel && <HSeparator />}
+      
     </Flex>
   );
 }
