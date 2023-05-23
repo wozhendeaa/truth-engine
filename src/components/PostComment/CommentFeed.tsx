@@ -1,6 +1,5 @@
 import { Box, Flex, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
 import React, { useContext, useState } from "react";
-
 import { RouterOutputs, api } from "utils/api";
 import { setErrors } from "Redux/truthEditorSlice";
 
@@ -86,7 +85,7 @@ const CommentBox = ()=> {
           const promise = new Promise<void>((resolve) => {
           mutate(
             {
-              content: JSON.stringify(editor.getJSON()),
+              content: editor.getHTML(),
               replyToPostId: props.postId
             },
             {

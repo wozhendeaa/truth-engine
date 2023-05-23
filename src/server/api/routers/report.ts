@@ -5,6 +5,7 @@ import { createTRPCRouter, privateProcedure, publicProcedure } from "server/api/
 
 import { Ratelimit } from "@upstash/ratelimit"; // for deno: see above
 import { Redis } from "@upstash/redis";
+import { inputStyles } from "theme/components/input";
 
 const ratelimitPost = new Ratelimit({
     redis: Redis.fromEnv(),
@@ -122,13 +123,24 @@ getReportsForComment: publicProcedure.input(z.object({commentId: z.string(),
     if (existingReport) {
       throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'already_reported' });
     }
-  
+    
+    await ctx.prisma.post.update({
+      where:{
+        id: input.postId
+      },
+      data:{
+        reportCount:{
+          increment: 1
+        }
+      }
+    });
+
     const newReport = await ctx.prisma.report.create({
       data: {
         postId: input.postId,
         content: input.content,
         reporterId: userId,
-        reportType: input.type
+    
       },
     });    
   }
@@ -157,6 +169,18 @@ getReportsForComment: publicProcedure.input(z.object({commentId: z.string(),
     if (existingReport) {
       throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'already_reported' });
     }
+        
+    await ctx.prisma.comment.update({
+      where:{
+        id: input.commentId
+      },
+      data:{
+        reportCount:{
+          increment: 1
+        }
+      }
+    });
+
     const newReport = await ctx.prisma.report.create({
       data: {
         commentId: input.commentId,

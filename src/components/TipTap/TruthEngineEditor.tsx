@@ -253,13 +253,11 @@ export function gettHtmlFromJson(json: JSONContent): string {
 }
 
 export function renderAsHTML(content: string) {
-  let result: string = "";
-
+  let result = "";
   try {
-    result = gettHtmlFromJson(JSON.parse(content));
-    result = DOMPurify.sanitize(result);
+    result = DOMPurify.sanitize(content);
   } catch (cause) {
-    result = content;
+    console.log("渲染html出错：", content)
   }
 
   return (

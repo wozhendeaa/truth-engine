@@ -17,6 +17,12 @@ const TE_Routes = {
 		// icon: <Icon as={MdHome} width='20px' height='20px' color='inherit' />,
 	},
 
+	trackViews: {
+		name:'',
+		path: '/api/PostComment/trackViews',
+		// icon: <Icon as={MdHome} width='20px' height='20px' color='inherit' />,
+	},
+
 	//---users -----
 	myProfile: {
 		name:"profile_page",

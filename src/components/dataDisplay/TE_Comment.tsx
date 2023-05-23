@@ -150,7 +150,7 @@ RouterOutputs["comment"]["getUserNewCommentForComment"]["props"]["comment"];
   const likeCommentMutation = api.comment.likeComment.useMutation({
     onSuccess: () => {},
     onError: (error: any) => {
-      toast("点赞失败");
+      toast.error("驱动失败");
       if (liked) {
         setNumber(likeNumber - 1);
       } else {

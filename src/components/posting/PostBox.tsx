@@ -96,7 +96,7 @@ export const PostCreator = () => {
       const promise = new Promise<void>((resolve) => {
         mutate(
           {
-            content: JSON.stringify(editor.getJSON()),
+            content: editor.getHTML(),
             media: JSON.stringify(keys)         
           },
           {

@@ -53,7 +53,7 @@ export default function CommentModal(props: {
       const promise = new Promise<void>((resolve) => {
         mutate(
           {
-            content: editor.renderAsHTML(),
+            content: editor.getHTML(),
             replyToCommentId: replyToCommentId,
           },
           {

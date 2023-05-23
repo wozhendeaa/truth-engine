@@ -9,7 +9,7 @@ import appRoutes from 'TE_Routes';
 import TESidebar from "components/sidebar/TESidebar";
 
 const AdminPage: NextPage = () => {
-  const {data,  isLoading} = api.posts.getVerifiedEngineFeed.useQuery();
+  // const {data,  isLoading} = api.posts.getVerifiedEngineFeed.useQuery();
 
   // let isVerified = isUserVerified(null);
   

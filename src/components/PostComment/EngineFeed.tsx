@@ -35,6 +35,7 @@ import FeedActionMenu from "./FeedActionMenu";
 import { GetTime } from "helpers/UIHelper";
 import { LoadingSpinner } from "components/loading";
 import { XMarkIcon } from '@heroicons/react/20/solid'
+import { intersectionObserver, useViewTracker } from "helpers/intersectionObserver";
 
 //@ts-ignore
 const i18n = require("next-i18next.config");
@@ -49,6 +50,7 @@ type PostsWithUserData = Post & {
 interface SingleFeedProps {
   postWithUser: PostsWithUserData;
   onPostPage: boolean;
+  trackViewsCallback?:(id:string) => void;
   loadingCompleteCallBack?: () => void;
 }
 
@@ -112,7 +114,6 @@ export function RenderImage(props: {
     return null;
   }
 }
-
 interface MousePosition {
   x: number;
   y: number;
@@ -123,6 +124,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   const onPostPage = singlePostData.onPostPage;
   const mediaFilesString = singlePostData.postWithUser.media;
   const loadingCompleteCallBack = singlePostData.loadingCompleteCallBack;
+  const trackViewsCallBack = singlePostData.trackViewsCallback;
   const { isSignedIn, user } = useUser();
   const hasReaction = postWithUser.reactions.length > 0;
   const [liked, setLiked] = useState(hasReaction);
@@ -131,10 +133,18 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   const { t, i18n } = useTranslation(["common", "footer"], {
     bindI18n: "languageChanged loaded",
   });
+
   const [mouseDownPos, setMouseDownPos] = useState<MousePosition>({
     x: 0,
     y: 0,
   });
+
+  const observerRef = intersectionObserver(() => {
+    if (trackViewsCallBack) {
+        trackViewsCallBack(postWithUser.id)
+    }
+  });
+
 
   // bindI18n: loaded is needed because of the reloadResources call
   // if all pages use the reloadResources mechanism, the bindI18n option can also be defined in next-i18next.config.js
@@ -218,6 +228,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
         return;
       }
     }
+
     if (!onPostPage) {
       window.open("/post/" + postWithUser.id, "_blank");
     }
@@ -332,6 +343,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
             </Flex>
           </CardHeader>
           <CardBody
+            ref={observerRef} 
             as="div"
             pb={"0px"}
             pt={2}
@@ -394,25 +406,19 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
               onClick={handleLikeClick}
             >
               <div className="flex items-center justify-center space-x-3">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill={liked ? "currentColor " : "none"}
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke={liked ? "grey" : "white"}
-                  className={
-                    "h-6 w-full hover:animate-ping " +
-                    (liked
-                      ? "fill-te_dark_liked"
-                      : "group-hover/feedbuton:stroke-indigo-500")
-                  }
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 10.203 4.167 9.75 5 9.75h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665c0 1.194.232 2.333.654 3.375z"
-                  />
-                </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="35" height="35"
+                strokeWidth={1}
+                fill={liked ? "currentColor " : "none"}
+                stroke={liked ? "none" : "white"}
+                className={
+                  "w-full pt-0.6 hover:stroke-indigo-500 " +
+                  (liked
+                    ? "fill-te_dark_liked"
+                    : "group-hover/feedbuton:stroke-indigo-500")
+                }
+              >
+                <path d="M12.0001 4.83594L5.79297 11.043L7.20718 12.4573L12.0001 7.66436L16.793 12.4573L18.2072 11.043L12.0001 4.83594ZM12.0001 10.4858L5.79297 16.6929L7.20718 18.1072L12.0001 13.3143L16.793 18.1072L18.2072 16.6929L12.0001 10.4858Z">
+                </path></svg>
                 <span className="group-hover/feedbuton:text-indigo-500">
                   {likeNumber > 0 ? likeNumber : ""}
                 </span>
@@ -486,23 +492,13 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
               pointerEvents={"none"}
             >
               <div>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="hover: h-6 w-6 "
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"
-                  />
-                </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+              className="fill-slate-100"
+               width="28" height="28">
+                <path d="M2 12H4V21H2V12ZM5 14H7V21H5V14ZM16 8H18V21H16V8ZM19 10H21V21H19V10ZM9 2H11V21H9V2ZM12 4H14V21H12V4Z"></path></svg>
               </div>
               <div>
-                {postWithUser.ViewCount > 0 ? postWithUser.ViewCount : "17"}
+                {postWithUser.ViewCount}
               </div>
             </Button>
           </CardFooter>
@@ -580,7 +576,8 @@ export const EngineFeed = ({
   hasMore = false,
 }: FeedProps) => {
   const { t } = useTranslation();
-  // const observerRef = useInfiniteScroll(() => {});
+  const { addViewedId } = useViewTracker();
+
   if (!posts || posts.length === 0) {
     return (
       <div className="w-full text-center text-slate-200">
@@ -610,13 +607,11 @@ export const EngineFeed = ({
          }
       >
        {posts.map((p) => {
-        return <SingleFeed key={p.id} postWithUser={p} onPostPage={false} />;
+        return <SingleFeed key={p.id} postWithUser={p} onPostPage={false} trackViewsCallback={addViewedId} />;
       })}
       </InfiniteScroll>
     
-      {/* <div ref={observerRef} id="end_of_thread" className="text-slate-200">
-        <span></span>
-      </div> */}
+
     </div>
   );
 };

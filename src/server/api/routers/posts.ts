@@ -78,6 +78,28 @@ export const postsRouter = createTRPCRouter({
       return comments;
     }),
 
+  addTrackedViews: publicProcedure
+    .input(
+      z.object({
+        ids: z.array(z.string()),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      void await ctx.prisma.post.updateMany({
+        where: {
+          id: {
+            in: input.ids,
+          }
+        },
+        data:{
+          ViewCount: {
+            increment: 1
+          }
+        }
+      });
+     
+    }),
+
   getPostById: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {

@@ -22,9 +22,9 @@ model Post {
   reactions   Reaction[]
   media       String?    @db.MediumText
   postType    PostType   @default(POST)
-  likes       Int         @default(0)
+  likes       Int         @default(1)
   dislikes    Int         @default(0)
-  ViewCount   Int         @default(0)
+  ViewCount   Int         @default(1)
   repostCount      Int         @default(0)
   reportCount    Int         @default(0)
   commentCount    Int     @default(0)
