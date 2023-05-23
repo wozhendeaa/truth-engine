@@ -6,7 +6,7 @@ import { createTRPCRouter, privateProcedure, publicProcedure } from "server/api/
 import { Ratelimit } from "@upstash/ratelimit"; // for deno: see above
 import { Redis } from "@upstash/redis";
 import { Reaction, ReactionType } from "@prisma/client";
-
+const truthConfig = require('truth-engine-config')
 
 
 const ratelimitPost = new Ratelimit({
@@ -245,6 +245,7 @@ getCommentsForComment: publicProcedure.input(z.object({commentId: z.string(),
 
       if (!comment) throw new TRPCError({code: "NOT_FOUND", 
       message: "点赞时没有找到要点赞的评论id"});
+      const niubi = truthConfig.economy.recieveComment as number;
 
       if (comment.reactions?.length > 0) {
         const deleteUser = await ctx.prisma.reaction.delete({
@@ -260,9 +261,17 @@ getCommentsForComment: publicProcedure.input(z.object({commentId: z.string(),
           data: {
             likes: {
               decrement: 1,
-            },            
+            },          
+            author:{
+              update:{
+                NiuBi:{
+                  decrement: niubi
+                }
+              }
+            }  
           },
         });
+
         
       } else {
         const newReaction = await ctx.prisma.reaction.create({
@@ -280,7 +289,14 @@ getCommentsForComment: publicProcedure.input(z.object({commentId: z.string(),
           data: {
             likes: {
               increment: 1,
-            },            
+            },     
+            author:{
+              update:{
+                NiuBi:{
+                  increment: niubi
+                }
+              }
+            }         
           },
         });
         return updatedComment;
@@ -295,15 +311,15 @@ getCommentsForComment: publicProcedure.input(z.object({commentId: z.string(),
       content: z.string().min(1, {message: "post_too_short"}).max(200, {message: "comment_too_long"})
   }))
   .mutation(async ({ctx, input}) => {
-    const authorId = ctx.curretnUserId;
-    const {success} = await ratelimitPost.limit(authorId);
+    const commentorId = ctx.curretnUserId;
+    const {success} = await ratelimitPost.limit(commentorId);
     if (!success) throw new TRPCError({code: "TOO_MANY_REQUESTS", message: "TOO_MANY_REQUESTS"});
 
     const comment = await ctx.prisma.comment.create({
         data:{
             content: input.content,
             replyToPostId: input.replyToPostId,
-            authorId: authorId,
+            authorId: commentorId,
         }
     });
 
@@ -317,6 +333,18 @@ getCommentsForComment: publicProcedure.input(z.object({commentId: z.string(),
         id: input.replyToPostId
       }
     })
+
+      //增加牛币
+  const authorNiubi = truthConfig.economy.recieveComment as number;
+  const result = await ctx.prisma.$executeRaw`
+    UPDATE User
+    SET NiuBi = NiuBi + ${authorNiubi}
+    WHERE id = (
+        SELECT authorId
+        FROM Post
+        WHERE id = ${input.replyToPostId} AND ${commentorId} != User.id
+
+    )`;
 
     return comment;
   }),
@@ -363,6 +391,8 @@ createCommentReply: privateProcedure.input(z.object({replyToCommentId: z.string(
       id: commentData.replyToCommentId
     }
   })
+
+
 
   return newComment;
 }),

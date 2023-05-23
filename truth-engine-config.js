@@ -9,6 +9,13 @@ module.exports = {
             sessionExpirationDuration: 1000 * 60 * 60 * 2 //2 hours
         }
     },
+    economy: {
+        makePost: 10,
+        makeComment:1,
+        recieveComment:2,
+        makeLike: 0.2,
+        recieveLike:1,
+    },
     uploadSetting :{
         roles: ['SHEEP', 'ENGIINE', 'VERYFIED_ENGINE', 'ADMIN'],
         imageTypes: '.jpg,.png,.gif,.jpeg,.webp',

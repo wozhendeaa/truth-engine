@@ -11,6 +11,8 @@ import { Ratelimit } from "@upstash/ratelimit"; // for deno: see above
 import { Redis } from "@upstash/redis";
 import { postSchema } from "components/posting/PostBox";
 import { ReactionType } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime";
+const truthConfig = require('truth-engine-config');
 
 const ratelimitPost = new Ratelimit({
   redis: Redis.fromEnv(),
@@ -169,6 +171,8 @@ export const postsRouter = createTRPCRouter({
         },
       });
 
+      const authorNiubi = truthConfig.economy.recieveLike as number;
+
       if (!post)
         throw new TRPCError({
           code: "NOT_FOUND",
@@ -190,6 +194,13 @@ export const postsRouter = createTRPCRouter({
             likes: {
               decrement: 1,
             },
+            author:{
+              update:{
+                NiuBi:{
+                  decrement: authorNiubi
+                }
+              }
+            }  
           },
         });
       } else {
@@ -209,6 +220,13 @@ export const postsRouter = createTRPCRouter({
             likes: {
               increment: 1,
             },
+            author:{
+              update:{
+                NiuBi:{
+                  increment: authorNiubi
+                }
+              }
+            }  
           },
         });
         return updatedPost;
@@ -450,6 +468,13 @@ export const postsRouter = createTRPCRouter({
           content: input.content,
           media: mediaString,
         },
+      });
+
+      //增加牛币
+      const niubi = truthConfig.economy.makePost as number;
+      void await ctx.prisma.user.update({
+        where: { id: authorId },
+        data: { NiuBi: { increment: niubi } },
       });
       return post;
     }),

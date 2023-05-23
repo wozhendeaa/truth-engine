@@ -36,6 +36,8 @@ import { GetTime } from "helpers/UIHelper";
 import { LoadingSpinner } from "components/loading";
 import { XMarkIcon } from '@heroicons/react/20/solid'
 import { intersectionObserver, useViewTracker } from "helpers/intersectionObserver";
+import { useRouter } from "next/router";
+import { useIntl } from "react-intl";
 
 //@ts-ignore
 const i18n = require("next-i18next.config");
@@ -133,6 +135,8 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   const { t, i18n } = useTranslation(["common", "footer"], {
     bindI18n: "languageChanged loaded",
   });
+  const intl = useIntl();
+  const formatter = Intl.NumberFormat(intl.locale,{notation: 'compact'})
 
   const [mouseDownPos, setMouseDownPos] = useState<MousePosition>({
     x: 0,
@@ -160,7 +164,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   const likePostMutation = api.posts.likePost.useMutation({
     onSuccess: () => {},
     onError: (error: any) => {
-      toast("点赞失败");
+      toast.error("点赞失败");
       if (liked) {
         setNumber(likeNumber - 1);
       } else {
@@ -176,7 +180,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
 
   function handleLikeClick() {
     if (!isSignedIn) {
-      toast("login_before_like");
+      toast.error("login_before_like");
       return;
     }
     handleLike(postWithUser);
@@ -420,7 +424,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
                 <path d="M12.0001 4.83594L5.79297 11.043L7.20718 12.4573L12.0001 7.66436L16.793 12.4573L18.2072 11.043L12.0001 4.83594ZM12.0001 10.4858L5.79297 16.6929L7.20718 18.1072L12.0001 13.3143L16.793 18.1072L18.2072 16.6929L12.0001 10.4858Z">
                 </path></svg>
                 <span className="group-hover/feedbuton:text-indigo-500">
-                  {likeNumber > 0 ? likeNumber : ""}
+                {likeNumber > 0 ? formatter.format(likeNumber) : ""}
                 </span>
               </div>
             </Button>
@@ -450,7 +454,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
                 <span className="-mt-1 group-hover/feedbuton:text-indigo-500">
                   {" "}
                   {postWithUser.commentCount > 0
-                    ? postWithUser.commentCount
+                    ? formatter.format(postWithUser.commentCount) 
                     : ""}
                 </span>
               </div>
@@ -498,7 +502,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
                 <path d="M2 12H4V21H2V12ZM5 14H7V21H5V14ZM16 8H18V21H16V8ZM19 10H21V21H19V10ZM9 2H11V21H9V2ZM12 4H14V21H12V4Z"></path></svg>
               </div>
               <div>
-                {postWithUser.ViewCount}
+                {formatter.format(postWithUser.ViewCount) }
               </div>
             </Button>
           </CardFooter>
