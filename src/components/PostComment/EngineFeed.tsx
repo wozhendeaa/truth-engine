@@ -16,13 +16,6 @@ import React, { useEffect, useState } from "react";
 
 import { api } from "utils/api";
 import { Post, User } from "@prisma/client";
-import relativetTime from "dayjs/plugin/relativeTime";
-import dayjs from "dayjs";
-
-require("dayjs/locale/zh-cn");
-dayjs.locale("zh-cn");
-dayjs.extend(relativetTime);
-
 import ImageModal from "./ImageModal";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
@@ -35,11 +28,15 @@ import Link from "next/link";
 import TransparentFeedThreadMenu from "components/menu/TransparentFeedThreadMenu";
 import { HSeparator } from "components/separator/Separator";
 import TE_Routes from "TE_Routes";
-import TruthEngineEditor, { gettHtmlFromJson, renderAsHTML } from "components/TipTap/TruthEngineEditor";
+import TruthEngineEditor, {
+  gettHtmlFromJson,
+  renderAsHTML,
+} from "components/TipTap/TruthEngineEditor";
 import FeedActionMenu from "./FeedActionMenu";
-//@ts-ignore
-const i18n = require('next-i18next.config')
+import { GetTime } from "helpers/UIHelper";
 
+//@ts-ignore
+const i18n = require("next-i18next.config");
 
 type PostsWithUserData = Post & {
   reactions: {
@@ -58,9 +55,14 @@ export interface FeedProps {
   posts: PostsWithUserData[];
 }
 
-export function RenderImage(props: {type: string, url: string, index: any, onPostPage: boolean}) {
+export function RenderImage(props: {
+  type: string;
+  url: string;
+  index: any;
+  onPostPage: boolean;
+}) {
   const [open, setOpen] = useState(false);
-  const {type, url, index} = props;
+  const { type, url, index } = props;
 
   const showModal = () => {
     setOpen(true);
@@ -79,13 +81,13 @@ export function RenderImage(props: {type: string, url: string, index: any, onPos
       focus-within:ring-offset-2 focus-within:ring-offset-gray-100
        hover:shadow-whiteGlow"
         >
-        <Image
-          src={url}
-          alt=""
-          objectFit={'contain'}
-          className="pointer-events-none max-h-[100%] shrink 
+          <Image
+            src={url}
+            alt=""
+            objectFit={"contain"}
+            className="pointer-events-none max-h-[100%] shrink 
           "
-        />
+          />
           <button
             name="image"
             type="button"
@@ -121,19 +123,24 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   const [liked, setLiked] = useState(hasReaction);
   const [likeNumber, setNumber] = useState(postWithUser.likes);
   const [showComments, setShowComments] = useState(onPostPage);
-  const { t, i18n } = useTranslation(['common', 'footer'], { bindI18n: 'languageChanged loaded' })
-  const [mouseDownPos, setMouseDownPos] = useState<MousePosition>({ x: 0, y: 0 });
+  const { t, i18n } = useTranslation(["common", "footer"], {
+    bindI18n: "languageChanged loaded",
+  });
+  const [mouseDownPos, setMouseDownPos] = useState<MousePosition>({
+    x: 0,
+    y: 0,
+  });
 
   // bindI18n: loaded is needed because of the reloadResources call
   // if all pages use the reloadResources mechanism, the bindI18n option can also be defined in next-i18next.config.js
   useEffect(() => {
-     void i18n.reloadResources(i18n.resolvedLanguage, ['common', 'footer'])
-      setTimeout(()=>{
-        if (loadingCompleteCallBack) {
-          loadingCompleteCallBack();
-       }
-      }, 2000)
-  }, [])
+    void i18n.reloadResources(i18n.resolvedLanguage, ["common", "footer"]);
+    setTimeout(() => {
+      if (loadingCompleteCallBack) {
+        loadingCompleteCallBack();
+      }
+    }, 2000);
+  }, []);
 
   const likePostMutation = api.posts.likePost.useMutation({
     onSuccess: () => {},
@@ -148,7 +155,9 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
     },
   });
 
-  let mediaFiles = mediaFilesString ? Array.from(JSON.parse(mediaFilesString)) : [];
+  let mediaFiles = mediaFilesString
+    ? Array.from(JSON.parse(mediaFilesString))
+    : [];
 
   function handleLikeClick() {
     if (!isSignedIn) {
@@ -188,21 +197,26 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
     if (!isClick) return;
 
     //检查他妈的点中的到底是什么东西
-    const element = event.target as HTMLSelectElement;    
-    const name = element.getAttribute('name')
+    const element = event.target as HTMLSelectElement;
+    const name = element.getAttribute("name");
     if (name) {
-      const clickableNames =  ["image",
-       "name","username", "feedMenu", "avatar","close"]
-       if (clickableNames.some((n2)=> n2 === name)) {
-          if (name === "image") element.click();
-          return;
-       }
+      const clickableNames = [
+        "image",
+        "name",
+        "username",
+        "feedMenu",
+        "avatar",
+        "close",
+      ];
+      if (clickableNames.some((n2) => n2 === name)) {
+        if (name === "image") element.click();
+        return;
+      }
     }
     if (!onPostPage) {
-        window.open("/post/" + postWithUser.id, "_blank");
+      window.open("/post/" + postWithUser.id, "_blank");
     }
   };
-
 
   const copyPostLink = async () => {
     let link = window.location.href;
@@ -211,19 +225,18 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
       link = link.slice(0, hashIndex);
     }
     try {
-       await navigator.clipboard.writeText(link);
-    }catch (err) {
-        toast(t('link_copied'));
+      await navigator.clipboard.writeText(link);
+    } catch (err) {
+      toast(t("link_copied"));
     }
-    toast(t('link_copied'));
+    toast(t("link_copied"));
   };
-
 
   return (
     <>
       <Card
         size={"md"}
-        className="flex-grow my-1 font-chinese"
+        className="my-1 flex-grow font-chinese"
         boxShadow={"lg"}
         bgColor={"te_dark_ui_bg"}
         textColor={"white"}
@@ -232,54 +245,84 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
         pb="0"
       >
         <div className="group ">
-          <CardHeader  
-            as="div" 
-            className="cursor-pointer group-hover:bg-te_dark_ui -pt-[30px] "
+          <CardHeader
+            as="div"
+            className="-pt-[30px] cursor-pointer group-hover:bg-te_dark_ui "
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
           >
             <Flex alignItems={"top"} className="-my-4">
-              <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
-               {//@ts-ignore
-              <Link name="avatar" href={TE_Routes.userById.path + postWithUser.author.username} 
-              className="hover:underline" onClick={(e)=>e.stopPropagation()}>
-                <Avatar
-                  src={
-                    postWithUser.author.profileImageUrl ??
-                    "/images/default_profile.png"
+              <Flex flex="1" gap="4" alignItems="center" flexWrap="nowrap">
+                <div>
+                  {
+                    <Link
+                    //@ts-ignore
+                      name="avatar"
+                      href={
+                        TE_Routes.userById.path + postWithUser.author.username
+                      }
+                      className="hover:underline"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Avatar
+                        className="transition-all duration-200 ease-in-out hover:border-4 hover:border-purple-500 rounded-full"
+                        src={
+                          postWithUser.author.profileImageUrl ??
+                          "/images/default_profile.png"
+                        }
+                      />
+                    </Link>
                   }
-                />
-                </Link>
-                } 
-                <Flex>
-                  <Heading size="md">
-                      {//@ts-ignore
-                    <Link name="name" href={TE_Routes.userById.path + postWithUser.author.username} 
-                    className="hover:underline">
-                      {postWithUser.author.displayname}
-                    </Link>}
-                  </Heading>
-                    {//@ts-ignore
-                  <Link name="username" href={TE_Routes.userById.path + postWithUser.author.username} 
-                    className="border-b-2 border-transparent hover:border-gray-400">
-                  <Text textColor={"gray.400"} ml={2}>                    
-                    {"@" + postWithUser.author.username}
-                  </Text>
-                  </Link>
-}
+                </div>
+                <Flex className="flex flex-row overflow-hidden overflow-ellipsis whitespace-nowrap">
+                  <div className="ml-2 text-slate-50">
+                    <Heading size="md">
+                      {
+                        <Link
+                        //@ts-ignore
+                        name="name"
+                          href={
+                            TE_Routes.userById.path +
+                            postWithUser.author.username
+                          }
+                          className="hover:underline"
+                        >
+                          {postWithUser.author.displayname}
+                        </Link>
+                      }
+                    </Heading>
+                  </div>
+                  {
+                    <Link
+                    //@ts-ignore
+                      name="username"
+                      href={
+                        TE_Routes.userById.path + postWithUser.author.username
+                      }
+                      className="border-b-2 border-transparent hover:border-gray-400"
+                    >
+                      <div className="ml-2 text-slate-300">
+                        {"@" + postWithUser.author.username}
+                      </div>
+                    </Link>
+                  }{" "}
+                  <div className=" ml-3 min-w-full truncate overflow-ellipsis whitespace-nowrap text-slate-300 sm:w-auto">
+                    {GetTime({ date: postWithUser.createdAt })}
+                  </div>
                 </Flex>
-                <Text textColor={"gray.400"} mt={0.5}>
-                  {dayjs(postWithUser.createdAt).fromNow()}
-                </Text>
               </Flex>
-              <div className="group/action" 
+              <div
+                className="group/action"
                 onMouseDown={(e) => e.stopPropagation()}
                 onMouseUp={(e) => e.stopPropagation()}
                 onClick={(e) => e.stopPropagation()}
               >
-              {
-                user && <FeedActionMenu  postId={postWithUser.id} canDeleteOrEdit={user.id === postWithUser.author.id} />
-              }
+                {user && (
+                  <FeedActionMenu
+                    postId={postWithUser.id}
+                    canDeleteOrEdit={user.id === postWithUser.author.id}
+                  />
+                )}
               </div>
             </Flex>
           </CardHeader>
@@ -287,26 +330,38 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
             as="div"
             pb={"0px"}
             pt={2}
-            className="cursor-pointer group-hover:bg-te_dark_ui overflow-hidden"
+            className="cursor-pointer overflow-hidden group-hover:bg-te_dark_ui"
             maxH={onPostPage ? "full" : "250px"}
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
           >
             <span className="font-chinese text-xl font-bold text-slate-100 shadow-none ">
-             {renderAsHTML(postWithUser.content)}
+              {renderAsHTML(postWithUser.content)}
             </span>
-            <div className="text-accent-content 
-             grid place-content-end justify-center ">
+            <div
+              className="grid 
+             place-content-end justify-center text-accent-content "
+            >
               {/* image display section */}
               <div className="mt-2 items-end">
                 <ul
-                role="list"
+                  role="list"
                   className="grid auto-cols-auto grid-flow-col 
                   gap-x-1 gap-y-2 xl:gap-x-1"
                 >
                   {mediaFiles.map((file, index) => {
                     //@ts-ignore
-                    return <RenderImage key={crypto.randomUUID()} type={file.type} url={file.url} index={index} onPostPage={onPostPage} />
+                    return (
+                      <RenderImage
+                        key={crypto.randomUUID()}
+                    //@ts-ignore
+                        type={file.type}
+                    //@ts-ignore
+                        url={file.url}
+                        index={index}
+                        onPostPage={onPostPage}
+                      />
+                    );
                   })}
                 </ul>
               </div>
@@ -328,9 +383,9 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
           >
             <Button
               flex="1"
-              className="shrink p-0 group/feedbuton"
+              className="group/feedbuton shrink p-0"
               variant="ghost"
-              _hover={{ bg: "none", rounded: 'none'}}
+              _hover={{ bg: "none", rounded: "none" }}
               onClick={handleLikeClick}
             >
               <div className="flex items-center justify-center space-x-3">
@@ -342,7 +397,9 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
                   stroke={liked ? "grey" : "white"}
                   className={
                     "h-6 w-full hover:animate-ping " +
-                    (liked ? "fill-te_dark_liked" : "group-hover/feedbuton:stroke-indigo-500")
+                    (liked
+                      ? "fill-te_dark_liked"
+                      : "group-hover/feedbuton:stroke-indigo-500")
                   }
                 >
                   <path
@@ -351,14 +408,16 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
                     d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 10.203 4.167 9.75 5 9.75h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665c0 1.194.232 2.333.654 3.375z"
                   />
                 </svg>
-                <span className="group-hover/feedbuton:text-indigo-500">{likeNumber > 0 ? likeNumber : ""}</span>
+                <span className="group-hover/feedbuton:text-indigo-500">
+                  {likeNumber > 0 ? likeNumber : ""}
+                </span>
               </div>
             </Button>
             <Button
               flex="1"
-              className="shrink group/feedbuton"
+              className="group/feedbuton shrink"
               variant="ghost"
-              _hover={{ bg: "none", rounded: 'none'}}
+              _hover={{ bg: "none", rounded: "none" }}
               onClick={() => showCommentClick()}
             >
               <div className="flex items-center justify-center space-x-3 ">
@@ -388,16 +447,26 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
 
             <Button
               flex="1"
-              className="shrink group/feedbuton"
+              className="group/feedbuton shrink"
               variant="ghost"
-              _hover={{ bg: "none", rounded: 'none'}}
+              _hover={{ bg: "none", rounded: "none" }}
               onClick={() => copyPostLink()}
             >
               <div className="flex items-center justify-center space-x-3 ">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" 
-              viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-6 w-6 group-hover/feedbuton:stroke-indigo-500">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
-              </svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="h-6 w-6 group-hover/feedbuton:stroke-indigo-500"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
+                  />
+                </svg>
               </div>
             </Button>
 
@@ -418,7 +487,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
                   viewBox="0 0 24 24"
                   strokeWidth="1.5"
                   stroke="currentColor"
-                  className="h-6 w-6 hover: "
+                  className="hover: h-6 w-6 "
                 >
                   <path
                     strokeLinecap="round"
@@ -443,7 +512,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
                 onPostPage={onPostPage}
               />
             </Box>
-         
+
             {!onPostPage && (
               <Flex
                 justify={"center"}
@@ -480,24 +549,23 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   );
 }
 
-export const EngineFeed = (props: {postData: FeedProps}) => {
+export const EngineFeed = (props: { postData: FeedProps }) => {
   const { t } = useTranslation();
   const posts = props.postData.posts;
-  const observerRef = useInfiniteScroll(() => {
-  });
+  const observerRef = useInfiniteScroll(() => {});
 
   if (!posts || posts.length === 0) {
     return (
-      <div className="text-center text-slate-200 w-full">
+      <div className="w-full text-center text-slate-200">
         {t("no_data_found")}
-        </div>
+      </div>
     );
   }
 
   return (
     <div>
       {posts.map((p) => {
-       return  <SingleFeed key={p.id} postWithUser={p} onPostPage={false} />
+        return <SingleFeed key={p.id} postWithUser={p} onPostPage={false} />;
       })}
       <div ref={observerRef} id="end_of_thread" className="text-slate-200">
         <span></span>
@@ -510,6 +578,6 @@ export default EngineFeed;
 
 export const getServerSideProps = async ({ locale }: { locale: string }) => ({
   props: {
-    ...(await serverSideTranslations(locale, ['common', 'footer'], i18n)),
+    ...(await serverSideTranslations(locale, ["common", "footer"], i18n)),
   },
 });

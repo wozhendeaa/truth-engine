@@ -2,11 +2,9 @@ import { Box, Flex, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
 import React, { useContext, useState } from "react";
 
 import { RouterOutputs, api } from "utils/api";
-import relativetTime from "dayjs/plugin/relativeTime";
-import dayjs from "dayjs";
 import { setErrors } from "Redux/truthEditorSlice";
 
-dayjs.extend(relativetTime);
+
 
 import { useTranslation } from "react-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -20,6 +18,7 @@ import toast from "react-hot-toast";
 import UserContext from "helpers/userContext";
 import Image from 'next/image'
 import TruthEngineEditor from "components/TipTap/TruthEngineEditor";
+import { GetTime } from "helpers/UIHelper";
 
 type CommentsWithUserData = RouterOutputs["comment"]["getCommentsForPost"];
 
@@ -159,7 +158,7 @@ const CommentBox = ()=> {
           username={c.author.username!}
           name={c.author.displayname!}
           text={c.content}
-          time={dayjs(c.createdAt).fromNow()}
+          time={c.createdAt}
           likes={c.likes}
           commentNum={c.commentCount}
           likedByUser={c.reactions}
@@ -170,7 +169,7 @@ const CommentBox = ()=> {
         />
       ))}
       {
-        !props.onPostPage &&
+        !props.onPostPage && comments.length > 3 && 
         <Flex justify={"center"} mt={-10} className=" ">
           <div className="flex gap-x-2 text-lg cursor-pointer hover:text-te_dark_action">
             <Link target="_blank" href={TE_Routes.postbyid.path + props.postId} > 

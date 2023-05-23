@@ -35,6 +35,7 @@ import { Link } from '@tiptap/extension-link'
 
 
 import './styles.scss'
+import theme from 'theme/charkraTheme';
 const truthConfig = require('truth-engine-config.js')
 
 function isNullOrEmpty(str: string | null | undefined): boolean {
@@ -215,6 +216,7 @@ const MenuBar = (props: {
             {showEmoji && (
               <NimblePicker
                 locale={"zh"}
+                theme={"dark"}
                 data={data}
                 onEmojiSelect={(e: any) => {
                   editor.commands.insertContent(e.native);
@@ -569,7 +571,7 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
             className="w-[100%] pr-2 text-slate-50"
           />
         </Flex>
-        <Flex className="items-end justify-end pr-6 font-chinese">
+        <Flex className="items-end justify-end pr-6 font-chinese text-slate-100">
           <WordCountCircle percentage={newPercentage} />
           {editor.storage.characterCount.characters()}/{wordLimit}
           {editor.storage.characterCount.characters() === wordLimit && (

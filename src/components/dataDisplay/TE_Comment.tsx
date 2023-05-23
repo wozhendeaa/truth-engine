@@ -2,35 +2,32 @@ import {
   Avatar,
   Button,
   Flex,
-  Icon,
-  Link,
+  Heading,
   Text,
   useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react";
 import { useAuth } from "@clerk/nextjs";
 import { Reaction } from "@prisma/client";
-import dayjs from "dayjs";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { RouterOutputs, api } from "utils/api";
 import CommentModal from "components/PostComment/CommenModal";
-import { IoEllipsisHorizontal } from "react-icons/io5";
-import TransparentCommentMenu from "components/menu/TransparentCommentMenu";
 import axios from "axios";
 import React from "react";
 import { LoadingSpinner } from "components/loading";
 import { HSeparator } from "components/separator/Separator";
 import TE_Routes from "TE_Routes";
 import { renderAsHTML } from "components/TipTap/TruthEngineEditor";
-import FeedActionMenu from "components/PostComment/FeedActionMenu";
 import CommentActionMenu from "components/PostComment/CommentActionMenu";
+import { GetTime } from "helpers/UIHelper";
+import avatar from 'assets/img/avatars/avatar4.png';
+import Link from "next/link";
 
 type replyType = 
 RouterOutputs["comment"]["getCommentsForComment"]["props"]["comments"];
-
 // Custom components
 export default function TEComment(props: {
   avatar: string;
@@ -40,7 +37,7 @@ export default function TEComment(props: {
   commentId: string;
   text: string;
   tags?: string[];
-  time: string;
+  time: Date;
   likes: number;
   commentNum: number;
   replyToPostId?: string; // 一般不需要传这个参数，这是在为了获取用户刚刚发表的评论的时候加的。需要知道回复的是哪个帖子，然后获取发评论的用户的最新回复然后展示出来
@@ -56,6 +53,7 @@ export default function TEComment(props: {
     time,
     likes,
     authorId,
+    username,
     commentNum,
     commentId,
     likedByUser,
@@ -199,32 +197,68 @@ RouterOutputs["comment"]["getUserNewCommentForComment"]["props"]["comment"];
       bgColor={isFirstLevel ? "" : "te_dark_ui"}
     
     >
-     
-      <Flex mt={isFirstLevel ? 0 : 2}
+      <Flex mt={isFirstLevel ? 0 : 2}  flexWrap="nowrap" className="-mb-[20px]"
       >
-        <Avatar src={avatar} w="30px" h="30px" me="15px" />
-        <Text color={textColor} fontWeight="700" fontSize="md">
-          <Link href={"/user/" + props.username}>
-            {name}
-          </Link>
-        </Text>
-        <Flex className="overflow-hidden overflow-ellipsis">
-          <Flex
-            color={textColorSecondary}
-            className="ml-2 overflow-hidden overflow-ellipsis"
-          >
-            {"@" + props.username}
+          <div>
+          {
+            <Link
+            //@ts-ignore
+              name="avatar"
+              href={
+                TE_Routes.userById.path + props.username
+              }
+              className="hover:underline"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Avatar
+                width={"30px"}
+                height={"30px"}
+                className="transition-all duration-200 ease-in-out hover:border-2 hover:border-purple-500 rounded-full"
+                src={
+                  avatar ??
+                  "/images/default_profile.png"
+                }
+              />
+            </Link>
+          }
+        </div>
+        <Flex className="flex flex-row overflow-hidden 
+        overflow-ellipsis whitespace-nowrap">
+            <div className="ml-2 text-slate-50">
+              <Heading size="sm mt-4">
+                {
+                  <Link
+                  //@ts-ignore
+                  name="name"
+                    href={
+                      TE_Routes.userById.path +
+                      username
+                    }
+                    className="hover:underline" 
+                  >
+                    {name}
+                  </Link>
+                }
+              </Heading>
+            </div>
+            {
+              <Link
+              //@ts-ignore
+                name="username"
+                href={
+                  TE_Routes.userById.path + username
+                }
+                className="hover:underline"
+              >
+                <div className="ml-2 text-slate-300 hover:underline ">
+                  {"@" + username}
+                </div>
+              </Link>
+            }
+            <div className=" ml-3 min-w-full truncate overflow-ellipsis whitespace-nowrap text-slate-300 sm:w-auto">
+              {GetTime({ date: time })}
+            </div>
           </Flex>
-          <Text
-            fontSize="md"
-            mt={0.2}
-            color={textColorSecondary}
-            fontWeight="500"
-            className="ml-2 overflow-hidden overflow-ellipsis"
-          >
-            {time}
-          </Text>
-        </Flex>
         
         <Flex ml={"auto"} >
         {
@@ -234,28 +268,9 @@ RouterOutputs["comment"]["getUserNewCommentForComment"]["props"]["comment"];
         }
         </Flex>
       </Flex>
-      <Flex direction="column">
-        <Flex>
-          {tags
-            ? tags.map((tag, key) => {
-                return (
-                  <Link
-                    href={`#${tag}`}
-                    me="4px"
-                    key={key}
-                    color="secondaryGray.600"
-                    fontSize="md"
-                    fontWeight="400"
-                  >
-                    <>#{tag}</>
-                  </Link>
-                );
-              })
-            : null}
-        </Flex>
-
+      <Flex>
         <Flex align="left" direction={"column"}>
-          <Flex mt={2} px={isFirstLevel ? 0 : 3} fontSize={"md"}
+          <Flex mt={2} px={isFirstLevel ? 0 : 3} fontSize={"lg" }
            className={"text-" + textColor}>
             {renderAsHTML(props.text)}
           </Flex>
@@ -341,8 +356,8 @@ RouterOutputs["comment"]["getUserNewCommentForComment"]["props"]["comment"];
                   username={c.author.username!}
                   name={c.author.displayname!}
                   text={c.content}
-                  time={dayjs(c.createdAt).fromNow()}
-                  likes={c.likes}
+                  time={c.createdAt}
+                  likes={c.likes} 
                   likedByUser={c.reactions}
                   isFirstLevel={false}
                   authorId={c.authorId}

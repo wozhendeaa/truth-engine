@@ -1,4 +1,11 @@
 import { Box, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
+import dayjs from "dayjs";
+import relativeTime from 'dayjs/plugin/relativeTime';
+import 'dayjs/locale/zh-cn'; 
+
+dayjs.locale('zh-cn'); // set locale to Chinese
+dayjs.extend(relativeTime);
+
 
 export function GetSekleton (props: {number: number}) {
     const boxes = [];
@@ -14,4 +21,22 @@ export function GetSekleton (props: {number: number}) {
     return <div className="flex flex-col items-center w-full">{boxes}</div>;
   }
   
-export default  GetSekleton
+
+  export function GetTime (props: {date: Date}) {
+    let date = dayjs(props.date);
+    let now = dayjs();
+    let differenceInHours = now.diff(date, 'hour');
+    let formattedDate;
+    if (differenceInHours >= 24) {
+      // format date as year/month/day if difference is 24 hours or more
+      formattedDate = date.format('YYYY/MM/DD hh:mm A');
+    } else {
+      // otherwise, use relative time
+      formattedDate = date.fromNow();
+    }
+  
+    return formattedDate;
+  }
+  
+
+  

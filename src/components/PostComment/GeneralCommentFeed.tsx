@@ -1,11 +1,6 @@
 import React from "react";
 
 import { RouterOutputs, api } from "utils/api";
-import relativetTime from "dayjs/plugin/relativeTime";
-import dayjs from "dayjs";
-
-dayjs.extend(relativetTime);
-
 import { useTranslation } from "react-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import TEComment from "components/dataDisplay/TE_Comment";
@@ -42,7 +37,7 @@ export const GeneralCommentThread = (props: {
           username={c.author.username!}
           name={c.author.displayname!}
           text={c.content}
-          time={dayjs(c.createdAt).fromNow()}
+          time={c.createdAt}
           likes={c.likes}
           commentNum={c.commentCount}
           likedByUser={c.reactions}
