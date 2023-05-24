@@ -74,6 +74,7 @@ async function getLoggedInUser(): Promise<User | null> {
 const QTruthEngine: AppType  = ({ Component, pageProps }) => {
   const locale = useRouter().locale ?? "ch-ZH";
   const {t} = useTranslation();
+  
 
   //获取用户数据存到本地，存2小时
   //为什么不用nextauth session？
@@ -88,6 +89,7 @@ const QTruthEngine: AppType  = ({ Component, pageProps }) => {
     queryKey: ["user"],
     queryFn: () => getLoggedInUser(),
   }).data;
+
   
   return (    
     <ChakraProvider  theme={theme }>

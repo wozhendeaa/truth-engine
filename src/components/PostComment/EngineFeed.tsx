@@ -135,9 +135,9 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   const { t, i18n } = useTranslation(["common", "footer"], {
     bindI18n: "languageChanged loaded",
   });
+
   const intl = useIntl();
   const formatter = Intl.NumberFormat(intl.locale,{notation: 'compact'})
-
   const [mouseDownPos, setMouseDownPos] = useState<MousePosition>({
     x: 0,
     y: 0,
@@ -271,7 +271,6 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
           >
-            <Flex alignItems={"top"} className="-my-4">
               <Flex flex="1" gap="4" alignItems="center" flexWrap="nowrap">
                 <div>
                   {
@@ -330,9 +329,8 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
                     {GetTime({ date: postWithUser.createdAt })}
                   </div>
                 </Flex>
-              </Flex>
               <div
-                className="group/action"
+                className="group/action ml-auto"
                 onMouseDown={(e) => e.stopPropagation()}
                 onMouseUp={(e) => e.stopPropagation()}
                 onClick={(e) => e.stopPropagation()}
@@ -495,15 +493,14 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
               _hover={{}}
               pointerEvents={"none"}
             >
-              <div>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-              className="fill-slate-100"
-               width="28" height="28">
-                <path d="M2 12H4V21H2V12ZM5 14H7V21H5V14ZM16 8H18V21H16V8ZM19 10H21V21H19V10ZM9 2H11V21H9V2ZM12 4H14V21H12V4Z"></path></svg>
+              <div className="flex flex-row fill-slate-400" >
+              <svg viewBox="0 0 24 24" aria-hidden="true" className="" width="30" height="30" 
+              ><g><path d="M8.75 21V3h2v18h-2zM18 21V8.5h2V21h-2zM4 21l.004-10h2L6 21H4zm9.248 0v-7h2v7h-2z"></path></g></svg>
+              <div className="pt-2 pl-1 text-slate-200">
+              {formatter.format(postWithUser.ViewCount) }
               </div>
-              <div>
-                {formatter.format(postWithUser.ViewCount) }
               </div>
+
             </Button>
           </CardFooter>
         </div>

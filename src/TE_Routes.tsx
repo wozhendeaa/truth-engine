@@ -99,7 +99,7 @@ const TE_Routes = {
 		name:'notification',
 		path:'/notification/',
 		icon: <BellIcon className='md:w-10 md:h-10 lg:h-7 lg:w-7' color='inherit' />,
-
+		hasBadge:true,
 	},
 
 	WriteLongPost: {

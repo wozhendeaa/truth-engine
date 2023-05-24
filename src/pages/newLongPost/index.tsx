@@ -343,51 +343,6 @@ const NewLongPostPage: NextPage = (
       {/* END: Post Info */}
       {/* </div> */}
       {/* </PageLayout> */}
-      <PageLayout>
-          <Flex className="hidden sm:block">
-              <>
-                <TruthEngineSideMenuBar />
-              </>
-          </Flex>
-          <Flex
-            className="w-[100%] md:w-[80%] lg:w-[60%] xl:w-[50%]"
-            direction="column"
-          >
-            {(
-              <>
-                  <Box>
-                    <Box
-                      className={
-                        true
-                          ? ""
-                          : "hidden"
-                      }
-                    >
-                      <PostBox />
-                      <Box>
-                        <HSeparator className="mt-2" />
-                      </Box>
-                    </Box>
-                  </Box>
-                  <Box>
-                    <Box
-                      className={false ? "" : "hidden"}
-                    >
-                      {
-                        //@ts-ignore
-                      }
-                    </Box>
-                  </Box>
-
-              </>
-            )}
-          </Flex>
-
-          <Flex className="hidden lg:block ">
-              <>
-              </>
-          </Flex>
-      </PageLayout>
     </>
   );
 };
