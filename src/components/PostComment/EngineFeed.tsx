@@ -34,8 +34,11 @@ import TruthEngineEditor, {
 import FeedActionMenu from "./FeedActionMenu";
 import { GetTime } from "helpers/UIHelper";
 import { LoadingSpinner } from "components/loading";
-import { XMarkIcon } from '@heroicons/react/20/solid'
-import { intersectionObserver, useViewTracker } from "helpers/intersectionObserver";
+import { XMarkIcon } from "@heroicons/react/20/solid";
+import {
+  intersectionObserver,
+  useViewTracker,
+} from "helpers/intersectionObserver";
 import { useRouter } from "next/router";
 import { useIntl } from "react-intl";
 
@@ -52,7 +55,7 @@ type PostsWithUserData = Post & {
 interface SingleFeedProps {
   postWithUser: PostsWithUserData;
   onPostPage: boolean;
-  trackViewsCallback?:(id:string) => void;
+  trackViewsCallback?: (id: string) => void;
   loadingCompleteCallBack?: () => void;
 }
 
@@ -85,7 +88,7 @@ export function RenderImage(props: {
     return (
       <li key={crypto.randomUUID()} className="relative">
         <div
-          className="block w-full flex-grow  rounded-lg 
+          className="pointer-events-auto block w-full  flex-grow rounded-lg
    bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 
       focus-within:ring-offset-2 focus-within:ring-offset-gray-100
        hover:shadow-whiteGlow"
@@ -101,7 +104,10 @@ export function RenderImage(props: {
             name="image"
             type="button"
             className="absolute inset-0 focus:outline-none"
-            onClick={showModal}
+            onClick={(e) => {
+              e.stopPropagation();
+              showModal();
+            }}
           >
             <span className="sr-only">open image</span>
           </button>
@@ -137,7 +143,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   });
 
   const intl = useIntl();
-  const formatter = Intl.NumberFormat(intl.locale,{notation: 'compact'})
+  const formatter = Intl.NumberFormat(intl.locale, { notation: "compact" });
   const [mouseDownPos, setMouseDownPos] = useState<MousePosition>({
     x: 0,
     y: 0,
@@ -145,10 +151,9 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
 
   const observerRef = intersectionObserver(() => {
     if (trackViewsCallBack) {
-        trackViewsCallBack(postWithUser.id)
+      trackViewsCallBack(postWithUser.id);
     }
   });
-
 
   // bindI18n: loaded is needed because of the reloadResources call
   // if all pages use the reloadResources mechanism, the bindI18n option can also be defined in next-i18next.config.js
@@ -268,67 +273,64 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
           <CardHeader
             as="div"
             className="-pt-[30px] cursor-pointer group-hover:bg-te_dark_ui "
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
           >
-              <Flex flex="1" gap="4" alignItems="center" flexWrap="nowrap">
-                <div>
-                  {
-                    <Link
+            <Flex flex="1" gap="4" alignItems="center" flexWrap="nowrap">
+              <div>
+                {
+                  <Link
                     //@ts-ignore
-                      name="avatar"
-                      href={
-                        TE_Routes.userById.path + postWithUser.author.username
+                    name="avatar"
+                    href={
+                      TE_Routes.userById.path + postWithUser.author.username
+                    }
+                    className="hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Avatar
+                      className="rounded-full transition-all duration-200 ease-in-out hover:border-4 hover:border-purple-500"
+                      src={
+                        postWithUser.author.profileImageUrl ??
+                        "/images/default_profile.png"
                       }
-                      className="hover:underline"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Avatar
-                        className="transition-all duration-200 ease-in-out hover:border-4 hover:border-purple-500 rounded-full"
-                        src={
-                          postWithUser.author.profileImageUrl ??
-                          "/images/default_profile.png"
-                        }
-                      />
-                    </Link>
-                  }
-                </div>
-                <Flex className="flex flex-row overflow-hidden overflow-ellipsis whitespace-nowrap">
-                  <div className="ml-2 text-slate-50">
-                    <Heading size="md">
-                      {
-                        <Link
+                    />
+                  </Link>
+                }
+              </div>
+              <Flex className="flex flex-row overflow-hidden overflow-ellipsis whitespace-nowrap">
+                <div className="ml-2 text-slate-50">
+                  <Heading size="md">
+                    {
+                      <Link
                         //@ts-ignore
                         name="name"
-                          href={
-                            TE_Routes.userById.path +
-                            postWithUser.author.username
-                          }
-                          className="hover:underline"
-                        >
-                          {postWithUser.author.displayname}
-                        </Link>
-                      }
-                    </Heading>
-                  </div>
-                  {
-                    <Link
+                        href={
+                          TE_Routes.userById.path + postWithUser.author.username
+                        }
+                        className="hover:underline"
+                      >
+                        {postWithUser.author.displayname}
+                      </Link>
+                    }
+                  </Heading>
+                </div>
+                {
+                  <Link
                     //@ts-ignore
-                      name="username"
-                      href={
-                        TE_Routes.userById.path + postWithUser.author.username
-                      }
-                      className="border-b-2 border-transparent hover:border-gray-400"
-                    >
-                      <div className="ml-2 text-slate-300">
-                        {"@" + postWithUser.author.username}
-                      </div>
-                    </Link>
-                  }{" "}
-                  <div className=" ml-3 min-w-full truncate overflow-ellipsis whitespace-nowrap text-slate-300 sm:w-auto">
-                    {GetTime({ date: postWithUser.createdAt })}
-                  </div>
-                </Flex>
+                    name="username"
+                    href={
+                      TE_Routes.userById.path + postWithUser.author.username
+                    }
+                    className="border-b-2 border-transparent hover:border-gray-400"
+                  >
+                    <div className="ml-2 text-slate-300">
+                      {"@" + postWithUser.author.username}
+                    </div>
+                  </Link>
+                }{" "}
+                <div className=" ml-3 min-w-full truncate overflow-ellipsis whitespace-nowrap text-slate-300 sm:w-auto">
+                  {GetTime({ date: postWithUser.createdAt })}
+                </div>
+              </Flex>
               <div
                 className="group/action ml-auto"
                 onMouseDown={(e) => e.stopPropagation()}
@@ -345,7 +347,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
             </Flex>
           </CardHeader>
           <CardBody
-            ref={observerRef} 
+            ref={observerRef}
             as="div"
             pb={"0px"}
             pt={2}
@@ -362,7 +364,12 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
              place-content-end justify-center text-accent-content "
             >
               {/* image display section */}
-              <div className="mt-2 items-end">
+              <div
+                className="mt-2 items-end"
+                onMouseDown={(e) => e.stopPropagation()}
+                onMouseUp={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
+              >
                 <ul
                   role="list"
                   className="grid auto-cols-auto grid-flow-col 
@@ -373,9 +380,9 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
                     return (
                       <RenderImage
                         key={crypto.randomUUID()}
-                    //@ts-ignore
+                        //@ts-ignore
                         type={file.type}
-                    //@ts-ignore
+                        //@ts-ignore
                         url={file.url}
                         index={index}
                         onPostPage={onPostPage}
@@ -408,21 +415,25 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
               onClick={handleLikeClick}
             >
               <div className="flex items-center justify-center space-x-3">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="35" height="35"
-                strokeWidth={1}
-                fill={liked ? "currentColor " : "none"}
-                stroke={liked ? "none" : "white"}
-                className={
-                  "w-full pt-0.6 hover:stroke-indigo-500 " +
-                  (liked
-                    ? "fill-te_dark_liked"
-                    : "group-hover/feedbuton:stroke-indigo-500")
-                }
-              >
-                <path d="M12.0001 4.83594L5.79297 11.043L7.20718 12.4573L12.0001 7.66436L16.793 12.4573L18.2072 11.043L12.0001 4.83594ZM12.0001 10.4858L5.79297 16.6929L7.20718 18.1072L12.0001 13.3143L16.793 18.1072L18.2072 16.6929L12.0001 10.4858Z">
-                </path></svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="35"
+                  height="35"
+                  strokeWidth={1}
+                  fill={liked ? "currentColor " : "none"}
+                  stroke={liked ? "none" : "white"}
+                  className={
+                    "pt-0.6 w-full hover:stroke-indigo-500 " +
+                    (liked
+                      ? "fill-te_dark_liked"
+                      : "group-hover/feedbuton:stroke-indigo-500")
+                  }
+                >
+                  <path d="M12.0001 4.83594L5.79297 11.043L7.20718 12.4573L12.0001 7.66436L16.793 12.4573L18.2072 11.043L12.0001 4.83594ZM12.0001 10.4858L5.79297 16.6929L7.20718 18.1072L12.0001 13.3143L16.793 18.1072L18.2072 16.6929L12.0001 10.4858Z"></path>
+                </svg>
                 <span className="group-hover/feedbuton:text-indigo-500">
-                {likeNumber > 0 ? formatter.format(likeNumber) : ""}
+                  {likeNumber > 0 ? formatter.format(likeNumber) : ""}
                 </span>
               </div>
             </Button>
@@ -452,7 +463,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
                 <span className="-mt-1 group-hover/feedbuton:text-indigo-500">
                   {" "}
                   {postWithUser.commentCount > 0
-                    ? formatter.format(postWithUser.commentCount) 
+                    ? formatter.format(postWithUser.commentCount)
                     : ""}
                 </span>
               </div>
@@ -493,14 +504,22 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
               _hover={{}}
               pointerEvents={"none"}
             >
-              <div className="flex flex-row fill-slate-400" >
-              <svg viewBox="0 0 24 24" aria-hidden="true" className="" width="30" height="30" 
-              ><g><path d="M8.75 21V3h2v18h-2zM18 21V8.5h2V21h-2zM4 21l.004-10h2L6 21H4zm9.248 0v-7h2v7h-2z"></path></g></svg>
-              <div className="pt-2 pl-1 text-slate-200">
-              {formatter.format(postWithUser.ViewCount) }
+              <div className="flex flex-row fill-slate-400">
+                <svg
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  className=""
+                  width="30"
+                  height="30"
+                >
+                  <g>
+                    <path d="M8.75 21V3h2v18h-2zM18 21V8.5h2V21h-2zM4 21l.004-10h2L6 21H4zm9.248 0v-7h2v7h-2z"></path>
+                  </g>
+                </svg>
+                <div className="pl-1 pt-2 text-slate-200">
+                  {formatter.format(postWithUser.ViewCount)}
+                </div>
               </div>
-              </div>
-
             </Button>
           </CardFooter>
         </div>
@@ -551,22 +570,19 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   );
 }
 
- function EndingMessage(message:string) {
+function EndingMessage(message: string) {
   return (
-    <div className="rounded-md bg-te_dark_ui p-4 z-40">
+    <div className="z-40 rounded-md bg-te_dark_ui p-4">
       <div className="flex">
-      
         <div className="ml-3">
           <p className="text-sm font-medium text-slate-50">{message}</p>
         </div>
         <div className="ml-auto pl-3">
-          <div className="-mx-1.5 -my-1.5">
-         
-          </div>
+          <div className="-mx-1.5 -my-1.5"></div>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export const EngineFeed = ({
@@ -596,23 +612,26 @@ export const EngineFeed = ({
   }
 
   return (
-    <div >
+    <div>
       <InfiniteScroll
-      className="hide-scrollbar"
+        className="hide-scrollbar"
         dataLength={posts.length}
         next={fetchNewFeed}
         hasMore={hasMore}
         loader={<LoadingSpinner />}
-        endMessage={
-          EndingMessage(t('end_of_scroll'))
-         }
+        endMessage={EndingMessage(t("end_of_scroll"))}
       >
-       {posts.map((p) => {
-        return <SingleFeed key={p.id} postWithUser={p} onPostPage={false} trackViewsCallback={addViewedId} />;
-      })}
+        {posts.map((p) => {
+          return (
+            <SingleFeed
+              key={p.id}
+              postWithUser={p}
+              onPostPage={false}
+              trackViewsCallback={addViewedId}
+            />
+          );
+        })}
       </InfiniteScroll>
-    
-
     </div>
   );
 };

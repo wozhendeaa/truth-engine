@@ -143,7 +143,6 @@ export const LoggedInUserSection = ({
     </>
   );
 };
-
 export default function MainNavBar() {
   const [isSSR, setIsSSR] = useState(true);
   const { isSignedIn } = useUser();
@@ -160,6 +159,7 @@ export default function MainNavBar() {
   useEffect(() => {
     setIsSSR(false);
   }, []);
+
   const { t } = useTranslation();
   return (
     <>

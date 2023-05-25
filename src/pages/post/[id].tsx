@@ -14,7 +14,7 @@ import { GetSekleton } from "helpers/UIHelper";
 import React from "react";
 import { SingleFeed } from "components/PostComment/EngineFeed";
 import { ArrowBackIcon } from "@chakra-ui/icons";
-const i18n = require('next-i18next.config');
+const i18n = require("next-i18next.config");
 
 export const getStaticProps: GetStaticProps = async (
   context: GetStaticPropsContext
@@ -41,48 +41,51 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-function toElement(){
-  if (typeof window !== 'undefined') {
-      // Get the fragment identifier from the URL
-      const fragment: string = window.location.hash;
-      if (fragment) {
-        // Find the element with the matching id
-        const element: HTMLElement | null = document.querySelector(fragment);
-        if (element) {
-          element.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
+function toElement() {
+  if (typeof window !== "undefined") {
+    // Get the fragment identifier from the URL
+    const fragment: string = window.location.hash;
+    if (fragment) {
+      // Find the element with the matching id
+      const element: HTMLElement | null = document.querySelector(fragment);
+      if (element) {
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
         });
-        }
       }
-}
+    }
+  }
 }
 
 const SinglePostPage: NextPage = (
   props: InferGetStaticPropsType<typeof getStaticProps>
 ) => {
-
   const { data, isLoading, isError } = api.posts.getPostById.useQuery({
     id: props.id,
   });
 
-  if (!data) return <GetSekleton number={1} />
-  
+  if (!data) return <GetSekleton number={1} />;
+
   return (
     <>
       <PageLayout>
-        <Flex className="col-span-4 w-full justify-center">
-          <Box alignSelf={"flex-start"} >
+        <Flex className="w-full justify-center">
+          <Box alignSelf={"flex-start"}>
             {/* <Link> */}
-              {/* <ArrowBackIcon color={"whatsapp.200"} onClick={()=>toElement()} /> */}
+            {/* <ArrowBackIcon color={"whatsapp.200"} onClick={()=>toElement()} /> */}
             {/* </Link> */}
           </Box>
-          <Flex className="w-2/4">
+          <Flex className="w-full md:w-3/4 lg:w-2/4">
             {isLoading ? (
-             <GetSekleton number={1} />
+              <GetSekleton number={1} />
             ) : (
-              <SingleFeed key={data.id} postWithUser={data} onPostPage={true} 
-              loadingCompleteCallBack={toElement} />
+              <SingleFeed
+                key={data.id}
+                postWithUser={data}
+                onPostPage={true}
+                loadingCompleteCallBack={toElement}
+              />
             )}
           </Flex>
         </Flex>

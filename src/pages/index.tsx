@@ -141,8 +141,8 @@ const HomeMiddleContent = ({ loadingState }: TabLoadingState) => {
             <Box>
               <div className={tab == "VERIFIED_ENGINE" ? "" : "hidden"}>
                 {
-                  //@ts-ignore
                   <EngineFeed
+                    //@ts-ignore
                     posts={engineFeedQuery.data?.pages.flatMap(
                       (page) => page.posts
                     )}
@@ -164,8 +164,8 @@ const HomeMiddleContent = ({ loadingState }: TabLoadingState) => {
                 </Flex>
                 <Flex>
                   {
-                    //@ts-ignore
                     <EngineFeed
+                      //@ts-ignore
                       posts={communityFeedQuery.data?.pages.flatMap(
                         (page) => page.posts
                       )}
@@ -211,13 +211,13 @@ const Home: NextPage = () => {
         </Flex>
         {/* 页面中间 */}
         <Flex
-          className="-mr-1 w-[100%] pl-[65px] md:mr-0 md:w-[80%] lg:w-[50%] "
+          className="-mr-1 w-[100%] pl-[65px] md:float-right md:mr-0 md:w-[80%] md:pl-0  lg:w-[50%] "
           direction="column"
         >
           <HomeMiddleContent loadingState={tabLoadingState} />
         </Flex>
         {/* 页面右边 */}
-        <Flex className="hidden md:pl-0 lg:block">
+        <Flex className="hidden lg:block">
           {!isAnyTabLoading && (
             <>
               <VSeparator mr={1} />
