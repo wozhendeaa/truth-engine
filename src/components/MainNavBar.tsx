@@ -4,7 +4,7 @@ import { BellIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "react-i18next";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { SignIn, SignInButton, useUser} from "@clerk/nextjs";
+import { SignIn, SignInButton, useUser } from "@clerk/nextjs";
 import { TFunction } from "i18next";
 import UserContext from "helpers/userContext";
 import { useRouter } from "next/router";
@@ -16,13 +16,11 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-
 export const UnLoggedInUserSection = ({
   t,
 }: {
   t: TFunction<"translation">;
 }) => {
-
   return (
     <>
       <div className="flex border-b border-slate-400 p-4">
@@ -54,13 +52,12 @@ export const LoggedInUserSection = ({
   isSSR: boolean;
   t: TFunction<"translation">;
 }) => {
-
   const user = useContext(UserContext);
   const { signOut } = useClerk();
 
   function clearUserStorageOnSignOut() {
     localStorage.removeItem("user");
-    signOut()
+    signOut();
   }
 
   return (
@@ -74,7 +71,7 @@ export const LoggedInUserSection = ({
           <BellIcon className="h-6 w-6" aria-hidden="true" />
         </button>
         {/* Profile dropdown */}
-        <Menu as="div" className="relative ml-4 flex-shrink-0 z-87 ">
+        <Menu as="div" className="z-87 relative ml-4 flex-shrink-0 ">
           <div>
             <Menu.Button
               className="hover:focus:outline-solid flex rounded-full bg-white text-sm focus:outline-none
@@ -97,15 +94,15 @@ export const LoggedInUserSection = ({
             enterTo="transform opacity-100 scale-100"
             leave="transition ease-in duration-75"
             leaveFrom="transform opacity-100 scale-100"
-            leaveTo="transform opacity-0 scale-95"            
+            leaveTo="transform opacity-0 scale-95"
           >
-            <Menu.Items className="absolute right-0 z-70 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800">
+            <Menu.Items className="z-70 absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800">
               <Menu.Item>
                 {({ active }) => (
                   <a
                     href={TE_Routes.myProfile.path + user?.id!}
                     className={classNames(
-                      active ? "bg-gray-100 dark:bg-purple-800 z-51" : "",
+                      active ? "z-51 bg-gray-100 dark:bg-purple-800" : "",
                       "block px-4 py-2 text-sm text-gray-700 dark:text-slate-300"
                     )}
                   >
@@ -128,15 +125,15 @@ export const LoggedInUserSection = ({
               </Menu.Item>
               <Menu.Item>
                 {({ active }) => (
-                  <button onClick={()=>clearUserStorageOnSignOut()}   className={classNames(
-                    active ? "bg-gray-100 dark:bg-purple-800" : "",
-                    "cursor-pointer block px-4 py-2 text-sm text-gray-700 w-full text-left dark:text-slate-300"
-                  )} >
-                    {
-                        !isSSR && t("sign_out")
-                    }
-                    </button>
-                 
+                  <button
+                    onClick={() => clearUserStorageOnSignOut()}
+                    className={classNames(
+                      active ? "bg-gray-100 dark:bg-purple-800" : "",
+                      "block w-full cursor-pointer px-4 py-2 text-left text-sm text-gray-700 dark:text-slate-300"
+                    )}
+                  >
+                    {!isSSR && t("sign_out")}
+                  </button>
                 )}
               </Menu.Item>
             </Menu.Items>
@@ -168,9 +165,9 @@ export default function MainNavBar() {
     <>
       <Disclosure
         as="nav"
-        className="sticky top-0 z-50  border-b-4 
-    border-b-gray-800 bg-white font-chinese text-4xl shadow-xl
-     dark:bg-te_dark_ui"
+        className="sticky top-0 z-50  hidden border-b-4 border-b-gray-800
+    bg-white font-chinese text-4xl shadow-xl dark:bg-te_dark_ui
+     md:block"
       >
         {({ open }) => (
           <>
@@ -180,7 +177,7 @@ export default function MainNavBar() {
                   <div className="flex flex-shrink-0 items-center">
                     <Link href={TE_Routes.Index.path}>
                       <Image
-                        className="block h-8 w-auto lg:hidden hover:cursor-pointer"
+                        className="block h-8 w-auto hover:cursor-pointer lg:hidden"
                         src="/images/QtruthEngineLogo.png"
                         width={60}
                         height={60}
@@ -190,7 +187,7 @@ export default function MainNavBar() {
                     </Link>
                     <Link href={TE_Routes.Index.path}>
                       <Image
-                        className="hidden h-8 w-auto lg:block hover:cursor-pointer"
+                        className="hidden h-8 w-auto hover:cursor-pointer lg:block"
                         src="/images/QtruthEngineLogo.png"
                         width={60}
                         height={60}
