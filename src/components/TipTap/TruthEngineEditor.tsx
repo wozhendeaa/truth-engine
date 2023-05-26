@@ -271,6 +271,14 @@ export function renderAsHTML(content: string) {
   );
 }
 
+export function renderAsHTMLWithoutSanitization(content: string) {
+  return (
+    <>
+      <span dangerouslySetInnerHTML={{ __html: content }}></span>
+    </>
+  );
+}
+
 const types = ["POST", "LONG_POST", "COMMENT", "COMMENT_TALL"] as const;
 type EditorType = (typeof types)[number];
 

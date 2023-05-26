@@ -34,6 +34,8 @@
   "username_taken": "你运气不好，这个用户名早就被用了",
   "displayname": "给别人看的名称",
   "displayname_hint": "不要写肮脏的词汇，小心被举报",
+  "profile_image_url": "头像地址",
+  "profile_image_url_null": "头像地址一定要有的",
   "email": "电邮地址",
   "email_taken": "这个邮件地址已经有人用了",
   "email_error": "不要乱写邮件地址",
@@ -64,7 +66,10 @@
   "see_all_comments": "看所有评论",
   "error_on_page": "好像出了点错误...",
 
+  "reply": "回复你说：",
   "reply_comment": "回复",
+  "promoted_post": "推了你的信息",
+  "like_comment": "赞了你的评论",
   "login_before_like": "登录后才能点赞",
   "login_before_report": "登录后才能举报",
   "show_replies": "查看回復",
@@ -102,5 +107,6 @@
   "pics_only_default_text": "[分享图片]",
   "post_good": "传递信息成功",
   "action_failed": "发送失败，这都是命啊",
+  "end_of_scroll": "已经到底了",
   "empty": ""
 }

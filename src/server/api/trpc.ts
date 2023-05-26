@@ -32,8 +32,8 @@ type CreateContextOptions = Record<string, never>;
  */
 export const createInnerTRPCContext = (_opts: CreateContextOptions) => {
   return {
-    req:_opts.req,
-    res:_opts.res,
+    req: _opts.req,
+    res: _opts.res,
   };
 };
 
@@ -44,23 +44,24 @@ export const createInnerTRPCContext = (_opts: CreateContextOptions) => {
  * @see https://trpc.io/docs/context
  */
 export const createTRPCContext = async (opts: CreateNextContextOptions) => {
-  const {req,res} = opts;
-
+  const { req, res } = opts;
 
   const _session = getAuth(req);
-  const userId = _session.userId
-  const user = userId? await prisma.user.findUnique({
-    where :{
-      id: userId
-    }
-  }) : null;
+  const userId = _session.userId;
+  const user = userId
+    ? await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      })
+    : null;
 
   return {
-      req: req as NextApiRequest | null,
-      res: res as NextApiResponse | null,
-      prisma,
-      user,
-      userId,
+    req: req as NextApiRequest | null,
+    res: res as NextApiResponse | null,
+    prisma,
+    user,
+    userId,
   };
 };
 
@@ -75,9 +76,9 @@ import { TRPCError, initTRPC, router } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { clerkClient, getAuth } from "@clerk/nextjs/server";
-import { redirect } from 'next/navigation';
+import { redirect } from "next/navigation";
 import { openStdin } from "process";
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 import { NextApiRequest, NextApiResponse } from "next";
 import { userRouter } from "./routers/user";
 
@@ -89,9 +90,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
       data: {
         ...shape.data,
         zodError:
-        error.cause instanceof ZodError
-          ? error.cause.flatten()
-          : null,
+          error.cause instanceof ZodError ? error.cause.flatten() : null,
       },
     };
   },
@@ -105,9 +104,7 @@ const t2 = initTRPC.context<typeof createInnerTRPCContext>().create({
       data: {
         ...shape.data,
         zodError:
-        error.cause instanceof ZodError
-          ? error.cause.flatten()
-          : null,
+          error.cause instanceof ZodError ? error.cause.flatten() : null,
       },
     };
   },
@@ -137,21 +134,16 @@ export const createApiRouter = t2.router;
  */
 export const publicProcedure = t.procedure;
 
-const enforceUserIsAuthed = t.middleware(async ({ctx, next}) => {
-  if(!ctx.userId) {
-    throw new TRPCError(
-      {code: "UNAUTHORIZED"}
-    );    
+const enforceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
+  if (!ctx.userId) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
   }
-  
-  return next({ctx: {
-    curretnUserId:ctx.userId,
-   } });
-}
-  
-)
 
+  return next({
+    ctx: {
+      curretnUserId: ctx.userId,
+    },
+  });
+});
 
 export const privateProcedure = t.procedure.use(enforceUserIsAuthed);
-
-

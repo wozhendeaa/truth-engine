@@ -10,6 +10,7 @@ import {
 import { Ratelimit } from "@upstash/ratelimit"; // for deno: see above
 import { Redis } from "@upstash/redis";
 import { inputStyles } from "theme/components/input";
+import { Select } from "@chakra-ui/react";
 
 const ratelimitPost = new Ratelimit({
   redis: Redis.fromEnv(),
@@ -25,18 +26,22 @@ const ratelimitPost = new Ratelimit({
 
 export const notificationRouter = createTRPCRouter({
   getNotificationForUser: privateProcedure
-    .input(z.object({ postId: z.string(), limit: z.number().default(50) }))
-    .query(async ({ ctx, input }) => {
-      let reports = await ctx.prisma.report.findMany({
+    .input(
+      z.object({
+        cursor: z.object({ id: z.number(), createdAt: z.date() }).optional(),
+        limit: z.number().optional(),
+      })
+    )
+    .query(async ({ ctx, input: { limit = 30, cursor } }) => {
+      let notifications = await ctx.prisma.postCommentNotification.findMany({
         where: {
-          postId: input.postId,
-          post: {
-            MarkAsDelete: false,
-          },
+          receiverId: ctx.curretnUserId,
+          hasRead: false,
         },
-        take: input.limit,
+        cursor: cursor ? { id_createdAt: cursor } : undefined,
+        take: limit,
         include: {
-          reporter: {
+          sender: {
             select: {
               id: true,
               username: true,
@@ -46,17 +51,31 @@ export const notificationRouter = createTRPCRouter({
               displayname: true,
             },
           },
+          comment: {
+            select: {
+              content: true,
+            },
+          },
+          post: {
+            select: {
+              content: true,
+            },
+          },
         },
         orderBy: {
           createdAt: "desc",
         },
       });
-      if (!reports) reports = [];
 
-      return {
-        props: {
-          reports: reports,
-        },
-      };
+      if (!notifications) notifications = [];
+
+      let nextCursor: typeof cursor | undefined;
+      if (notifications.length > limit) {
+        const nextItem = notifications.pop();
+        if (nextItem) {
+          nextCursor = { id: nextItem.id, createdAt: nextItem.createdAt };
+        }
+      }
+      return { notifications, nextCursor };
     }),
 });

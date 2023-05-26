@@ -1,12 +1,8 @@
-import { type NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Box, Flex } from "@chakra-ui/react";
-import EngineFeed from "components/PostComment/EngineFeed";
 import { api } from "utils/api";
-import { isUserVerified } from "helpers/userHelper";
-import { HSeparator, VSeparator } from "components/separator/Separator";
 import UserContext from "helpers/userContext";
 import { GetSekleton } from "helpers/UIHelper";
 import NotificationFeed from "./NotificationFeed";
@@ -66,47 +62,44 @@ export function Tabs() {
 const HomeNotification = () => {
   const [tab, setTab] = useState<(typeof tabs)[number]>("COMMENTS_LIKES");
 
-  const engineFeedQuery = api.posts.getVerifiedEngineFeed.useInfiniteQuery(
-    {},
-    {
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
-      enabled: tab == "COMMENTS_LIKES",
-    }
-  );
+  const notificationFeedQuery =
+    api.Notification.getNotificationForUser.useInfiniteQuery(
+      {},
+      {
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
+        enabled: tab == "COMMENTS_LIKES",
+      }
+    );
 
-  const communityFeedQuery = api.posts.getCommunityEngineFeed.useInfiniteQuery(
-    { limit: 1 },
-    {
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
-      enabled: tab == "ENGINE_UPDATES",
-    }
-  );
+  const updateFeedQuery =
+    api.Notification.getNotificationForUser.useInfiniteQuery(
+      {},
+      {
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
+        enabled: tab == "ENGINE_UPDATES",
+      }
+    );
 
-  const { isLoading: isVerifiedLoading } = engineFeedQuery;
-  const { isLoading: isCommunityLoading } = communityFeedQuery;
-  const communityPosts = communityFeedQuery.data?.pages.flatMap(
-    (page) => page.posts
-  );
-
-  const enginePosts = engineFeedQuery.data?.pages.flatMap((page) => page.posts);
+  const { isLoading: isNotificationLoading } = notificationFeedQuery;
+  const { isLoading: isUpdateNotificationLoading } = updateFeedQuery;
 
   const user = useContext(UserContext);
   const { t } = useTranslation();
 
   function isAnyTabLoading() {
     if (tab == "COMMENTS_LIKES") {
-      return isVerifiedLoading;
+      return isNotificationLoading;
     } else if (tab == "ENGINE_UPDATES") {
-      return isCommunityLoading;
+      return isUpdateNotificationLoading;
     }
     return false;
   }
 
   function isCurrentTabLoading(currTab: (typeof tabs)[number]) {
     if (currTab == "COMMENTS_LIKES") {
-      return isVerifiedLoading;
+      return isNotificationLoading;
     } else if (currTab == "ENGINE_UPDATES") {
-      return isCommunityLoading;
+      return isUpdateNotificationLoading;
     }
 
     return false;
@@ -123,13 +116,23 @@ const HomeNotification = () => {
               <Tabs />
               <Box>
                 <div className={tab == "COMMENTS_LIKES" ? "" : "hidden"}>
-                  {<NotificationFeed />}
+                  {
+                    <NotificationFeed
+                      data={notificationFeedQuery.data?.pages.flatMap(
+                        (page) => page.notifications
+                      )}
+                      fetchNewFeed={notificationFeedQuery.fetchNextPage}
+                      hasMore={notificationFeedQuery.hasNextPage}
+                      isLoading={notificationFeedQuery.isLoading}
+                      isError={notificationFeedQuery.isError}
+                    />
+                  }
                 </div>
               </Box>
 
               <Flex direction={"column"}>
                 <Box className={tab == "ENGINE_UPDATES" ? "" : " hidden "}>
-                  <Flex>{<NotificationFeed />}</Flex>
+                  {/* <Flex>{<NotificationFeed />}</Flex> */}
                 </Box>
               </Flex>
             </selectedTabContext.Provider>

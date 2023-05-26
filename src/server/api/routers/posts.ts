@@ -229,6 +229,20 @@ export const postsRouter = createTRPCRouter({
             },
           },
         });
+
+        if (ctx.curretnUserId !== post.authorId) {
+          //通知
+          await ctx.prisma.postCommentNotification.create({
+            data: {
+              senderId: ctx.curretnUserId,
+              receiverId: post.authorId,
+              type: "PROMOTED_POST",
+              content: "",
+              postId: post.id,
+            },
+          });
+        }
+
         return updatedPost;
       }
 

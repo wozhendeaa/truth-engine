@@ -4,8 +4,6 @@ import UserContext from "helpers/userContext";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import TE_Routes from "TE_Routes";
-import { Link } from "lucide-react";
-import { usePathname } from "next/navigation";
 
 const navigation = [
   TE_Routes.Index,

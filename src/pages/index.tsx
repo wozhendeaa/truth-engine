@@ -47,7 +47,7 @@ export function Tabs() {
 
   return (
     <div
-      className="sticky top-0 z-50 bg-te_dark_bg bg-opacity-80
+      className="sticky top-0 z-30 bg-te_dark_bg bg-opacity-80
     backdrop-blur-md  md:top-[68px]"
     >
       <div className="sm:bloc font-chinese">
@@ -87,7 +87,7 @@ const HomeMiddleContent = () => {
   );
 
   const communityFeedQuery = api.posts.getCommunityEngineFeed.useInfiniteQuery(
-    { limit: 1 },
+    {},
     {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
       enabled: tab == "COMMUNITY",

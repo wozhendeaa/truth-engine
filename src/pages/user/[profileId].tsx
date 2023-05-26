@@ -169,8 +169,10 @@ export function Posts() {
     <>
       {isLoading && <LoadingSpinner />}
       <Box className={true ? "" : ""}>
-        {/* //@ts-ignore */}
-        <EngineFeed postData={data} />
+        {
+          //@ts-ignore
+          <EngineFeed postData={data} />
+        }
       </Box>
     </>
   );

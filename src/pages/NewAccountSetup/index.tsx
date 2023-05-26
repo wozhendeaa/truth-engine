@@ -1,106 +1,109 @@
 // pages/prepare-new-user.tsx
-import { GetServerSideProps, NextPage, GetStaticProps } from 'next';
+import { GetServerSideProps, NextPage, GetStaticProps } from "next";
 import { useRouter } from "next/router";
-import { getAuth } from '@clerk/nextjs/server';
-import { UserResource } from '@clerk/types';
-import { useTranslation } from 'react-i18next';
-import { Switch } from '@headlessui/react';
-import { Controller, FieldErrors, SubmitHandler, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import axios from 'axios';
-import { prisma } from 'server/db';
-import { useSession, useUser } from '@clerk/nextjs';
-import TE_Routes from 'TE_Routes';
-import { parseErrorMsg } from 'helpers/serverErrorMessage';
-import { redirect } from 'next/navigation';
-import { toast } from 'react-hot-toast';
+import { getAuth } from "@clerk/nextjs/server";
+import { UserResource } from "@clerk/types";
+import { useTranslation } from "react-i18next";
+import { Switch } from "@headlessui/react";
+import {
+  Controller,
+  FieldErrors,
+  SubmitHandler,
+  useForm,
+} from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import axios from "axios";
+import { prisma } from "server/db";
+import { useUser } from "@clerk/nextjs";
+import TE_Routes from "TE_Routes";
+import { useContext, useState } from "react";
+import { api } from "utils/api";
+import toast from "react-hot-toast";
 
 function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ");
 }
 
 export const accountSetupSchema = z.object({
-  username: z.string().regex(/^[a-zA-Z0-9_]+$/, 'username_hint')
-  .min(8,"username_error_length")
-  .max(15, "username_error_length"),
+  username: z
+    .string()
+    .regex(/^[a-zA-Z0-9_]+$/, "username_hint")
+    .min(8, "username_error_length")
+    .max(15, "username_error_length"),
 
-  userId:z.string(),
+  userId: z.string(),
 
-  profileImageUrl: z.string().default("/images/default_avatar.png"),
+  profileImageUrl: z.string().min(10).default("/images/default_avatar.png"),
 
-  displayName: z.string()
-  .min(2,"displayname_error_length")
-  .max(15,"displayname_error_length"),
+  displayName: z
+    .string()
+    .min(2, "displayname_error_length")
+    .max(15, "displayname_error_length"),
 
-  email: z.string().email({ message: "email_hint"}),
-  receiveNotification: z.boolean().default(true)
+  email: z.string().email({ message: "email_hint" }),
+  receiveNotification: z.boolean().default(true),
 });
 
 export type AccountSetupSchema = z.infer<typeof accountSetupSchema>;
 
-export function AccountSetupSection( props: {user: UserResource}) {
-  const {t} = useTranslation()
+export function AccountSetupSection(props: { user: UserResource }) {
+  const { t } = useTranslation();
 
-  const { user } = props; 
-  const {register,
+  const { user } = props;
+  const {
+    register,
     control,
     watch,
     handleSubmit,
     setError,
-    formState: { errors, isSubmitting }} = useForm<AccountSetupSchema>({
-      resolver: zodResolver(accountSetupSchema),
-      defaultValues: {
-        displayName: user.firstName + " " + user.lastName,
-        email: user.primaryEmailAddress?.emailAddress,
-        profileImageUrl:  user.profileImageUrl,
-      },
-    })
+    formState: { errors, isSubmitting },
+  } = useForm<AccountSetupSchema>({
+    resolver: zodResolver(accountSetupSchema),
+    defaultValues: {
+      displayName: user.lastName + " " + user.firstName,
+      email: user.primaryEmailAddress?.emailAddress,
+      profileImageUrl: user.profileImageUrl,
+    },
+  });
+  const [profileUrl, setProfileUrl] = useState(user.profileImageUrl);
 
-    const onSubmit: SubmitHandler<AccountSetupSchema> = async (data) => {
-      axios.post(TE_Routes.Register.path, 
-            data
-        )
-        .then(function (response) {
-           window.location.href = TE_Routes.Index.path;
-        })
-        .catch(function (e) {
-          const errors = e.response.data.errors;
-          console.log(errors);
-          if (errors.username) {
+  const onSubmit: SubmitHandler<AccountSetupSchema> = async (data) => {
+    axios
+      .post(TE_Routes.Register.path, data)
+      .then(function (response) {
+        window.location.href = TE_Routes.Index.path;
+      })
+      .catch(function (e) {
+        const errors = e.response.data.errors;
+        console.log(errors);
+        if (errors.username) {
+          setError("username", {
+            type: "custom",
+            message: errors.username,
+          });
+        } else if (errors.email) {
+          setError("email", {
+            type: "custom",
+            message: errors.email,
+          });
+        } else {
+          console.log(e.response.data);
+          toast.error(e.message);
+        }
+      });
+  };
 
-            setError('username', {
-              type: "custom",
-              message: errors.username,
-            });
-          }
-
-         else if (errors.email) {
-            setError('email', {
-              type: "custom",
-              message: errors.email,
-            });
-          }
-          else {
-            console.log(e.response.data);
-          }
-
-        });
-      }
-
-
-    const onError = async (errors: FieldErrors) => {
-       
-    }
+  const onError = async (errors: FieldErrors) => {};
 
   return (
-    <section className="isolate overflow-hidden bg-white px-6 lg:px-8 grow">
+    <section className="isolate grow overflow-hidden bg-white px-6 dark:bg-te_dark_bg lg:px-8">
       <div className="relative mx-auto max-w-2xl py-24 sm:py-32 lg:max-w-4xl">
         <div className="absolute left-1/2 top-0 -z-10 h-[50rem] w-[90rem] -translate-x-1/2 bg-[radial-gradient(50%_100%_at_top,theme(colors.indigo.100),white)] opacity-20 lg:left-36" />
-        <div className="absolute inset-y-0 right-1/2 -z-10 mr-12 w-[150vw] origin-bottom-left skew-x-[-30deg] bg-white shadow-xl shadow-indigo-600/10 ring-1 ring-indigo-50 sm:mr-20 md:mr-0 lg:right-full lg:-mr-36 lg:origin-center" />
+        <div className="absolute inset-y-0 right-1/2 -z-10 mr-12 w-[150vw] origin-bottom-left skew-x-[-30deg] bg-white shadow-xl shadow-indigo-600/10 ring-1 ring-indigo-50 dark:bg-te_dark_ui sm:mr-20 md:mr-0 lg:right-full lg:-mr-36 lg:origin-center" />
         <figure className="grid grid-cols-1 items-center gap-x-6 gap-y-8 lg:gap-x-10">
-          <div className="relative col-span-2 lg:col-start-1 lg:row-start-2">
+          <div className="relative col-span-2 font-chinese lg:col-start-1 lg:row-start-2">
             <svg
               viewBox="0 0 162 128"
               fill="none"
@@ -113,166 +116,229 @@ export function AccountSetupSection( props: {user: UserResource}) {
               />
               <use href="#b56e9dab-6ccb-4d32-ad02-6b4bb5d9bbeb" x={86} />
             </svg>
-  
-        <form className="space-y-0 pt-8" action={TE_Routes.Register.path} method="post" onSubmit={handleSubmit(onSubmit, onError)}>
-        <Controller
-          name="userId"
-          control={control}
-          defaultValue={user.id}
-          
-          render={({ field }) => <input type="hidden" {...field} />}
-      />
-        <div className="flex items-center">
-          <div className="flex-grow ">
-            <label htmlFor="username" className="block text-sm font-medium text-slate-700">{t('username')}</label>
-            <input
-              type="text"
-              id="username"
-              placeholder={t('username_hint').toString()}
-              {...register('username')}
-              disabled={isSubmitting}
-              className="input input-bordered input-primary w-full max-w-xs mt-1 text-slate-950"
-            />
-          {errors.username && 
-          <span className="text-sm text-red-500 ml-2">{t(String(errors.username.message))}</span>}
-          </div>
-        </div>
 
-  <div className="flex items-center">
-    <div className="flex-grow">
-      <label htmlFor="displayName" className="block text-sm font-medium text-slate-700">{t('displayname')}</label>
-      <input
-         {...register('displayName')}
-         disabled={isSubmitting}
-        type="text"
-        id="displayName"
-        placeholder={t('displayname_hint').toString()}
-        className="input input-bordered input-primary w-full max-w-xs mt-1 text-slate-950"
-      />
-   {errors.displayName && <span className="text-sm text-red-500 ml-2">
-   {t(String(errors.displayName.message))}</span>}
-    </div>
-  </div>
-  
-  <div className="flex items-center">
-    <div className="flex-grow">
-      <label htmlFor="emailAddress" className="block text-sm font-medium text-slate-700">{t('email')}</label>
-      <input
-        type="email"
-        {...register('email')}
-        disabled={isSubmitting}
-        id="emailAddress"
-        className="input input-bordered input-primary w-full max-w-xs mt-1 text-slate-950"
-      />
-{   errors.email && <span className="text-sm text-red-500 ml-2">{t(String(errors.email.message))}</span>
-}    </div>
-  </div>
-
-  <div className="flex items-center w-[20rem]">
-  <Controller
-        name="receiveNotification"
-        control={control}
-        defaultValue={true}
-        render={({ field: { onChange, value } }) => (
-          <Switch.Group as="div" className="flex items-center justify-between grow ">
-            <span className="flex flex-grow flex-col">
-              <Switch.Label as="span" className="text-sm font-medium leading-6 text-gray-900" passive>
-                {t('receive_notification')}
-              </Switch.Label>
-              <Switch.Description as="span" className="text-sm text-gray-500">
-              {t('receive_notification_desc')}
-              </Switch.Description>
-            </span>
-            <Switch
-              checked={Boolean(value)}
-              onChange={onChange}
-              className={`${
-                value ? 'bg-indigo-600' : 'bg-gray-200'
-              } relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2`}
+            <form
+              className="space-y-0 pt-8"
+              action={TE_Routes.Register.path}
+              method="post"
+              onSubmit={handleSubmit(onSubmit, onError)}
             >
-              <span
-                aria-hidden="true"
-                className={`${
-                  value ? 'translate-x-5' : 'translate-x-0'
-                } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
+              <Controller
+                name="userId"
+                control={control}
+                defaultValue={user.id}
+                render={({ field }) => <input type="hidden" {...field} />}
               />
-            </Switch>
-          </Switch.Group>
-        )}
-      />
-  </div>
+              <div className="flex items-center">
+                <div className="flex-grow ">
+                  <label
+                    htmlFor="username"
+                    className="block text-sm font-medium text-slate-100"
+                  >
+                    {t("username")}
+                  </label>
+                  <input
+                    type="text"
+                    id="username"
+                    placeholder={t("username_hint").toString()}
+                    {...register("username")}
+                    disabled={isSubmitting}
+                    className="input-bordered input-primary input mt-1 w-full max-w-xs bg-te_dark_darker text-slate-950 placeholder:text-slate-400 dark:text-slate-100"
+                  />
+                  {errors.username && (
+                    <span className="ml-2 text-sm text-red-500">
+                      {t(String(errors.username.message))}
+                    </span>
+                  )}
+                </div>
+              </div>
 
-  <button  type="submit" disabled={isSubmitting} className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold 
+              <div className="flex items-center">
+                <div className="flex-grow pt-1">
+                  <label
+                    htmlFor="displayName"
+                    className="block text-sm font-medium text-slate-700 dark:text-slate-100"
+                  >
+                    {t("displayname")}
+                  </label>
+                  <input
+                    {...register("displayName")}
+                    disabled={isSubmitting}
+                    type="text"
+                    id="displayName"
+                    placeholder={t("displayname_hint").toString()}
+                    className="input-bordered input-primary input mt-1 w-full max-w-xs bg-te_dark_darker
+                     text-slate-950 dark:text-slate-100 dark:placeholder:text-slate-400"
+                  />
+                  {errors.displayName && (
+                    <span className="ml-2 text-sm text-red-500">
+                      {t(String(errors.displayName.message))}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center">
+                <div className="flex-grow">
+                  <label
+                    htmlFor="emailAddress"
+                    className="block text-sm font-medium text-slate-700 dark:text-slate-100"
+                  >
+                    {t("email")}
+                  </label>
+                  <input
+                    type="email"
+                    {...register("email")}
+                    disabled={isSubmitting}
+                    id="emailAddress"
+                    className="input-bordered input-primary input mt-1 w-full max-w-xs bg-te_dark_darker text-slate-950 dark:text-slate-100 dark:placeholder:text-slate-400"
+                  />
+                  {errors.email && (
+                    <span className="ml-2 text-sm text-red-500">
+                      {t(String(errors.email.message))}
+                    </span>
+                  )}{" "}
+                </div>
+              </div>
+
+              <div className="flex items-center">
+                <div className="flex-grow">
+                  <label
+                    htmlFor="emailAddress"
+                    className="block text-sm font-medium text-slate-700 dark:text-slate-100"
+                  >
+                    {t("profile_image_url")}
+                  </label>
+                  <input
+                    type="text"
+                    {...register("profileImageUrl")}
+                    onChange={(e) => setProfileUrl(e.target.value)}
+                    disabled={isSubmitting}
+                    id="profileImageUrl"
+                    className="input-bordered input-primary input mt-1 w-full max-w-xs bg-te_dark_darker text-slate-950 dark:text-slate-100 dark:placeholder:text-slate-400"
+                  />
+                  {errors.profileImageUrl && (
+                    <span className="ml-2 text-sm text-red-500">
+                      {t("profile_image_url_null")}
+                    </span>
+                  )}{" "}
+                </div>
+              </div>
+
+              {/* <div className="flex w-[20rem] items-center">
+                <Controller
+                  name="receiveNotification"
+                  control={control}
+                  defaultValue={true}
+                  render={({ field: { onChange, value } }) => (
+                    <Switch.Group
+                      as="div"
+                      className="flex grow items-center justify-between "
+                    >
+                      <span className="flex flex-grow flex-col">
+                        <Switch.Label
+                          as="span"
+                          className="text-sm font-medium leading-6 text-gray-900"
+                          passive
+                        >
+                          {t("receive_notification")}
+                        </Switch.Label>
+                        <Switch.Description
+                          as="span"
+                          className="text-sm text-gray-500"
+                        >
+                          {t("receive_notification_desc")}
+                        </Switch.Description>
+                      </span>
+                      <Switch
+                        checked={Boolean(value)}
+                        onChange={onChange}
+                        className={`${
+                          value ? "bg-indigo-600" : "bg-gray-200"
+                        } relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2`}
+                      >
+                        <span
+                          aria-hidden="true"
+                          className={`${
+                            value ? "translate-x-5" : "translate-x-0"
+                          } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
+                        />
+                      </Switch>
+                    </Switch.Group>
+                  )}
+                />
+              </div> */}
+
+              <div className="pt-4">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className=" rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold 
   text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2
-  focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-    {t('save_changes')}
-  </button>
-  {/* <pre className='text-slate-800'>{JSON.stringify(watchAllFields, null, 2)}</pre> */}
-
-</form>
+  focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                >
+                  {t("save_changes")}
+                </button>
+              </div>
+            </form>
           </div>
-          <div className="col-end-1 w-16 lg:row-span-4 lg:w-72 relative">
+          <div className="relative col-end-1 mt-0 w-16 lg:row-span-4 lg:w-72">
             <img
               className="rounded-xl bg-indigo-50 lg:rounded-3xl"
-              src={props.user.profileImageUrl || "/images/avatar.svg"}
-              alt=""/>
-          <div className="overlay-content absolute bottom-0 left-0 w-full h-1/3 md:h-1/6 bg-opacity-50 bg-slate-300 hover:bg-indigo-500 transition-colors duration-300 flex justify-center items-center rounded-b-xl lg:rounded-b-3xl cursor-pointer">
-            <span className="text-slate-800 text-sm">{t('change_avatar')}</span>
+              src={profileUrl}
+              alt=""
+            />
           </div>
-          </div>
-        
         </figure>
       </div>
     </section>
-    
-  )
+  );
 }
 
 const PrepareNewUser: NextPage = () => {
-  
-  const {user} = useUser();
+  const { user } = useUser();
+
   if (!user) {
-    return null
+    return null;
   }
-  
+
   return (
-    <div className='w-full min-h-screen bg-AccountSetup flex items-center justify-center '>
-      <AccountSetupSection user={user}/>
+    <div className="flex min-h-screen w-full items-center justify-center bg-te_dark_darker ">
+      <AccountSetupSection user={user} />
     </div>
   );
 };
 
-
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const {res, req, locale } = ctx;
+  const { res, req, locale } = ctx;
   const user = getAuth(req);
 
   const exist = await prisma.user.findFirst({
     select: {
-      id:true
+      id: true,
     },
     where: {
       id: user.userId ?? "",
-   }
- })
+    },
+  });
 
   if (exist != null) {
     return {
       redirect: {
         permanent: false,
-        destination: "/"
-      }
-    }
+        destination: "/",
+      },
+    };
   }
 
   return {
     props: {
-      ...await serverSideTranslations(locale?.toString() ?? 'ch-ZH', ['common', 'footer']),
+      ...(await serverSideTranslations(locale?.toString() ?? "ch-ZH", [
+        "common",
+        "footer",
+      ])),
     },
-  }
-}
+  };
+};
 
 export default PrepareNewUser;
-
-
-
