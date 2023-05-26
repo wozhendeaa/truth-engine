@@ -15,8 +15,7 @@ import { api } from "utils/api";
 import { parseErrorMsg } from "helpers/serverErrorMessage";
 import TruthEngineEditor from "components/TipTap/TruthEngineEditor";
 import { FileContent } from "use-file-picker";
-import { renderAsHTML } from 'components/TipTap/TruthEngineEditor';
-
+import { renderAsHTML } from "components/TipTap/TruthEngineEditor";
 
 export default function CommentModal(props: {
   replyToCommentId: string;
@@ -24,23 +23,19 @@ export default function CommentModal(props: {
   disc: UseDisclosureProps;
   commentCallback: (onPostPage: boolean, postId: string) => Promise<void>;
 }) {
-
   const { replyToCommentId, disc } = props;
   const { isOpen, onOpen, onClose } = disc;
   const { t } = useTranslation();
   const { isSignedIn } = useUser();
   const ctx = api.useContext();
-  const {mutate, data} = api.comment.createCommentReply.useMutation({});
+  const { mutate, data } = api.comment.createCommentReply.useMutation({});
 
-  function setError(err: string) {
-
-
-  }
+  function setError(err: string) {}
 
   //being called by the editor when uploading content
   async function OnSend(
     editor: any,
-    mediaFiles:FileContent[],
+    mediaFiles: FileContent[],
     setDisableSend: React.Dispatch<React.SetStateAction<boolean>>
   ) {
     if (!isSignedIn) {
@@ -66,9 +61,8 @@ export default function CommentModal(props: {
               toast(t("post_good"));
             },
             onError: (e) => {
-              const err = parseErrorMsg(e);
-              console.log(e);
-              toast.error(t(err));
+              console.log(e.message);
+              toast.error(t("action_failed"));
               resolve();
             },
           }
@@ -78,36 +72,41 @@ export default function CommentModal(props: {
       await promise;
       await props.commentCallback(true, props.postId);
       setDisableSend(false);
-      if (onClose)
-        onClose();
+      if (onClose) onClose();
       return result;
     } catch (cause) {
       console.log(cause);
       setError("发表信息失败，可能是网络问题");
       return false;
     }
-    
   }
 
   function OnLoad(editor: any) {
     if (!editor) return;
-     editor.chain().focus().run();
+    editor.chain().focus().run();
   }
 
   return (
     <>
       <Modal isOpen={isOpen!} onClose={onClose!}>
-      <ModalOverlay 
-            bg='none'
-            pointerEvents="auto"
-            backdropFilter='auto'
-            backdropBlur='12px'
+        <ModalOverlay
+          bg="none"
+          pointerEvents="auto"
+          backdropFilter="auto"
+          backdropBlur="12px"
         />
-        <ModalContent padding={0}  bg={'none'} 
-           pointerEvents="auto"
-    containerProps={{ pointerEvents: "auto" }} >
+        <ModalContent
+          padding={0}
+          bg={"currentColor"}
+          pointerEvents="auto"
+          containerProps={{ pointerEvents: "auto" }}
+        >
           <ModalBody>
-            <TruthEngineEditor editorType={"COMMENT_TALL"} onSend={OnSend} onLoad={OnLoad} />
+            <TruthEngineEditor
+              editorType={"COMMENT_TALL"}
+              onSend={OnSend}
+              onLoad={OnLoad}
+            />
           </ModalBody>
           <ModalFooter></ModalFooter>
         </ModalContent>

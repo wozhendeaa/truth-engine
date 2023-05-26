@@ -60,7 +60,7 @@ interface SingleFeedProps {
 }
 
 export interface FeedProps {
-  posts: PostsWithUserData[];
+  posts: PostsWithUserData[] | undefined;
   isLoading: boolean;
   isError: boolean;
   hasMore: boolean | undefined;

@@ -1,4 +1,4 @@
-import { Fragment, useContext, useState } from "react";
+import { Fragment, useContext, useState, Dispatch } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { PencilIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "react-i18next";
@@ -7,6 +7,12 @@ import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { HomeIcon, ProfileIcon } from "./icons/Icons";
 import TE_Routes from "TE_Routes";
+import { useDispatch } from "react-redux";
+import {
+  selectHomePageState,
+  setDisplayingComponent,
+} from "Redux/homePageSlice";
+import { useAppSelector } from "Redux/hooks";
 
 const navigation = [
   TE_Routes.Index,
@@ -32,16 +38,79 @@ function classNames(...classes) {
 export default function TruthEngineSideMenuBar() {
   const user = useContext(UserContext);
   const location = useRouter();
-
   const { t } = useTranslation();
+  const dispatch = useDispatch();
+  const pageState = useAppSelector(selectHomePageState);
 
   function isActive(path: string) {
     if (path === "/") {
-      return location.pathname === "/";
+      return location.pathname === "/" && pageState === "FEED";
+    }
+    if (
+      path === TE_Routes.IndexNotification.path &&
+      pageState === "NOTIFICATION"
+    ) {
+      return true;
     }
 
     return location.pathname.includes(path);
   }
+
+  function renderButton(item: any) {
+    if (item.path === TE_Routes.Index.path) {
+      return (
+        <>
+          <a
+            href="#"
+            onClick={() => {
+              dispatch(setDisplayingComponent("FEED"));
+            }}
+            className={classNames(
+              isActive(item.path) ? "text-white" : "",
+              "group flex gap-x-3 rounded-lg p-2 text-xl font-semibold leading-6 tracking-widest  text-gray-300 hover:text-white"
+            )}
+          >
+            {item.icon}
+            <div className="hidden lg:block">{t(item.name)}</div>
+          </a>
+        </>
+      );
+    } else if (item.path === TE_Routes.IndexNotification.path) {
+      return (
+        <>
+          <a
+            href="#"
+            onClick={() => {
+              dispatch(setDisplayingComponent("NOTIFICATION"));
+            }}
+            className={classNames(
+              isActive(item.path) ? "text-white" : "",
+              "group flex gap-x-3 rounded-lg p-2 text-xl font-semibold leading-6 tracking-widest  text-gray-300 hover:text-white"
+            )}
+          >
+            {item.icon}
+            <div className="hidden lg:block">{t(item.name)}</div>
+          </a>
+        </>
+      );
+    } else {
+      return (
+        <>
+          <a
+            href={item.path}
+            className={classNames(
+              isActive(item.path) ? "text-white" : "",
+              "group flex gap-x-3 rounded-lg p-2 text-xl font-semibold leading-6 tracking-widest  text-gray-300 hover:text-white"
+            )}
+          >
+            {item.icon}
+            <div className="hidden lg:block">{t(item.name)}</div>
+          </a>
+        </>
+      );
+    }
+  }
+
   return (
     <>
       {/* Static sidebar for desktop */}
@@ -56,18 +125,7 @@ export default function TruthEngineSideMenuBar() {
               <li>
                 <ul role="list" className="mx-0 space-y-1 md:-mx-2 ">
                   {navigation.map((item) => (
-                    <li key={item.name}>
-                      <a
-                        href={item.path}
-                        className={classNames(
-                          isActive(item.path) ? "text-white" : "",
-                          "group flex gap-x-3 rounded-lg p-2 text-xl font-semibold leading-6 tracking-widest  text-gray-300 hover:text-white"
-                        )}
-                      >
-                        {item.icon}
-                        <div className="hidden lg:block">{t(item.name)}</div>
-                      </a>
-                    </li>
+                    <li key={item.name}>{renderButton(item)}</li>
                   ))}
                   <li className="-ml-[5px] md:ml-0">
                     <div className="hidden lg:block">

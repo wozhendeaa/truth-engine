@@ -18,46 +18,50 @@ import { HSeparator } from "components/separator/Separator";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import data from "@emoji-mart/data";
 import NimblePicker from "@emoji-mart/react";
-import { FileContent, FileError, FilePickerReturnTypes, SelectedFiles, useFilePicker } from "use-file-picker";
+import {
+  FileContent,
+  FileError,
+  FilePickerReturnTypes,
+  SelectedFiles,
+  useFilePicker,
+} from "use-file-picker";
 import DOMPurify from "dompurify";
 import Mention from "@tiptap/extension-mention";
 import CharacterCount from "@tiptap/extension-character-count";
 import Tippy from "components/Tippy";
 import Lucide from "components/Lucide";
-import { selectTruthEditor, setErrors} from 'Redux/truthEditorSlice';
+import { selectTruthEditor, setErrors } from "Redux/truthEditorSlice";
 import { useDispatch, useSelector } from "react-redux";
-import suggestion from './suggestion'
+import suggestion from "./suggestion";
 import UserContext from "helpers/userContext";
 import { User } from "@prisma/client";
 import { TFunction } from "i18next";
-import { Node } from '@tiptap/core'
-import { Link } from '@tiptap/extension-link'
+import { Node } from "@tiptap/core";
+import { Link } from "@tiptap/extension-link";
 
-
-import './styles.scss'
-import theme from 'theme/charkraTheme';
-const truthConfig = require('truth-engine-config.js')
+import "./styles.scss";
+import theme from "theme/charkraTheme";
+const truthConfig = require("truth-engine-config.js");
 
 function isNullOrEmpty(str: string | null | undefined): boolean {
   return !str || str.trim().length === 0;
 }
 
 const MenuBar = (props: {
-  editor: any,
-  picker: FilePickerReturnTypes,
-  mediaFileState: any,
-  sendButtonState:[boolean, React.Dispatch<React.SetStateAction<boolean>>],
-  editorType: any,
-  onSend: any,
+  editor: any;
+  picker: FilePickerReturnTypes;
+  mediaFileState: any;
+  sendButtonState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
+  editorType: any;
+  onSend: any;
 }) => {
   const { editor, picker, mediaFileState, editorType, onSend } = props;
   const { t } = useTranslation();
   const [showEmoji, setShowEmoji] = useState(false);
   const iconRef = useRef<HTMLButtonElement | null>(null);
   const [mediaFiles, setMediaFiles] = mediaFileState;
-  const [openFileSelector, {clear}] = picker;
+  const [openFileSelector, { clear }] = picker;
   const [disableSend, setDisableSend] = props.sendButtonState;
-
 
   if (!editor) {
     return null;
@@ -94,10 +98,10 @@ const MenuBar = (props: {
     if (preparedToSend()) {
       editor.setEditable(false);
       const result = await onSend(editor, mediaFiles, setDisableSend);
-      
+
       if (result) {
-        setMediaFiles([]);     
-       } 
+        setMediaFiles([]);
+      }
     }
   }
 
@@ -194,7 +198,7 @@ const MenuBar = (props: {
             </svg>
           </button>
         </li>
-        <li className="pl-1 hidden md:block">
+        <li className="hidden pl-1 md:block">
           {/* emoji */}
           <button
             ref={iconRef}
@@ -257,7 +261,7 @@ export function renderAsHTML(content: string) {
   try {
     result = DOMPurify.sanitize(content);
   } catch (cause) {
-    console.log("渲染html出错：", content)
+    console.log("渲染html出错：", content);
   }
 
   return (
@@ -273,7 +277,7 @@ type EditorType = (typeof types)[number];
 interface TruthEngineEditorOnSendCallback {
   (
     editor: any,
-    mediaFiles:FileContent[],//any data
+    mediaFiles: FileContent[], //any data
     setState: React.Dispatch<React.SetStateAction<boolean>>
   ): Promise<boolean>; //return if action is successful
 }
@@ -282,24 +286,23 @@ interface TruthEngineEditorOnLoadCallback {
   (editor: any): void;
 }
 
-
 interface TruthEngineEditorProps {
   editorType: EditorType;
-  onSend: TruthEngineEditorOnSendCallback;//编辑器发送任何东西的时候会触发这个玩意儿
-  onLoad?: TruthEngineEditorOnLoadCallback;//编辑器出生的时候会触发这个玩意儿
+  onSend: TruthEngineEditorOnSendCallback; //编辑器发送任何东西的时候会触发这个玩意儿
+  onLoad?: TruthEngineEditorOnLoadCallback; //编辑器出生的时候会触发这个玩意儿
 }
 
 const wordLimit = 500;
 
 const WordCountCircle = (props: { percentage: number }) => {
-  const {percentage} = props;
+  const { percentage } = props;
   let strokeColor = "";
   if (percentage >= 90) {
-    strokeColor = 'red'
+    strokeColor = "red";
   } else if (percentage >= 70) {
-    strokeColor = "yellow"
+    strokeColor = "yellow";
   } else {
-    strokeColor = "#818cf8"
+    strokeColor = "#818cf8";
   }
   return (
     <>
@@ -309,7 +312,7 @@ const WordCountCircle = (props: { percentage: number }) => {
         viewBox="0 0 20 20"
         className="character-count__graph pr-1"
       >
-        <circle r="10" cx="10" cy="10" fill="gray"  />
+        <circle r="10" cx="10" cy="10" fill="gray" />
         <circle
           r="5"
           cx="10"
@@ -329,7 +332,7 @@ const WordCountCircle = (props: { percentage: number }) => {
 function getConfigForUser(user: User | null | undefined) {
   const config = truthConfig.uploadSetting.settings;
   //@ts-ignore
-  const defaultConfig = config.find((u) => u.role === 'SHEEP');
+  const defaultConfig = config.find((u) => u.role === "SHEEP");
 
   if (!user) return defaultConfig;
 
@@ -341,24 +344,29 @@ function getConfigForUser(user: User | null | undefined) {
 }
 
 function handleUploaderErrors(
-  errors:FileError[],
-  config:any,
-  t: TFunction<"translation", undefined, "translation">) {
+  errors: FileError[],
+  config: any,
+  t: TFunction<"translation", undefined, "translation">
+) {
   if (errors.length && errors.length > 0) {
     if (errors[0]?.fileSizeTooSmall) {
-      return t('upload_image_too_small');
+      return t("upload_image_too_small");
     } else if (errors[0]?.fileSizeToolarge) {
-      return  t('upload_image_too_big') + config.maxPictureSize + 'mb';
+      return t("upload_image_too_big") + config.maxPictureSize + "mb";
     } else if (errors[0]?.readerError) {
-      return  t('upload_reading_error');
+      return t("upload_reading_error");
     } else if (errors[0]?.maxLimitExceeded) {
-      return  t('too_many_files') + config.maxPictures;
-    } else if (errors[0]?.imageHeightTooBig || errors[0]?.imageWidthTooBig
-|| errors[0]?.imageWidthTooSmall || errors[0]?.imageHeightTooSmall ) {
-      return  t('upload_wrong_dimension');
-  }else if (errors[0]?.imageNotLoaded) {
-    return  t('too_many_files');
-  }else {
+      return t("too_many_files") + config.maxPictures;
+    } else if (
+      errors[0]?.imageHeightTooBig ||
+      errors[0]?.imageWidthTooBig ||
+      errors[0]?.imageWidthTooSmall ||
+      errors[0]?.imageHeightTooSmall
+    ) {
+      return t("upload_wrong_dimension");
+    } else if (errors[0]?.imageNotLoaded) {
+      return t("too_many_files");
+    } else {
       return String(errors[0]);
     }
   }
@@ -387,7 +395,7 @@ function handleUploaderErrors(
 //     const displayName = node.attrs.displayName;
 //     const username = node.attrs.username;
 //     return [
-//       'div', 
+//       'div',
 //       mergeAttributes(HTMLAttributes, { class: 'text-sky-400 reply-to-user' }),
 //       [
 //         'span',
@@ -412,7 +420,6 @@ function handleUploaderErrors(
 //     };
 //   },
 // });
-
 
 const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
   editorType,
@@ -444,23 +451,21 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
     onFilesSuccessfulySelected: (data: SelectedFiles) => {
       setMediaFiles((prev) => {
         const unique = data.filesContent.filter((newFile) => {
-          return !mediaFiles.some((existingFile) => newFile.name === existingFile.name);
+          return !mediaFiles.some(
+            (existingFile) => newFile.name === existingFile.name
+          );
         });
         return prev.concat(unique);
       });
     },
   });
 
-  const [
-    openFileSelector,
-    {errors: pickerError, clear },
-  ] = filePicker;
+  const [openFileSelector, { errors: pickerError, clear }] = filePicker;
   const uploadError = handleUploaderErrors(pickerError, uploadConfig, t);
 
-  
   const editor = useEditor({
     onUpdate({ editor }) {
-      const disableSendButton = isNullOrEmpty(editor.getText())
+      const disableSendButton = isNullOrEmpty(editor.getText());
       setDisableSend(disableSendButton);
     },
     onFocus({ editor, event }) {
@@ -481,7 +486,7 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
       Color.configure({ types: [TextStyle.name, ListItem.name] }),
       Placeholder.configure({
         placeholder: getPlaceHolderForEditor(),
-      }),      
+      }),
       Mention.configure({
         HTMLAttributes: {
           class: "text-red-400 bg-te_dark_ui rounded-lg",
@@ -491,7 +496,7 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
             node.attrs.label ?? node.attrs.id
           }`;
         },
-        suggestion: suggestion
+        suggestion: suggestion,
       }),
       CharacterCount.configure({
         limit: wordLimit,
@@ -513,17 +518,15 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
     content: null,
   });
 
-
   function removePictureFromUploader(name_id: string) {
     let copy = mediaFiles.filter((file) => file.name !== name_id);
     setMediaFiles(copy);
   }
 
-
   function getPlaceHolderForEditor() {
     if (editorType === "POST") {
       return t("post_place_holder").toString();
-    } else if (editorType === "COMMENT") {
+    } else if (editorType === "COMMENT" || editorType === "COMMENT_TALL") {
       return t("comment_place_holder").toString();
     } else if (editorType === "LONG_POST") {
       return t("long_post_place_holder").toString();
@@ -559,7 +562,8 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
 
   if (!editor) return <></>;
 
-  let newPercentage = (editor.storage.characterCount.characters() / wordLimit) * 100.0;
+  let newPercentage =
+    (editor.storage.characterCount.characters() / wordLimit) * 100.0;
   return (
     <>
       <Flex direction="column" className="w-[100%]">
@@ -625,10 +629,22 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
           />
         </Flex>
         <Flex>
-          {errors && <span className="text-red-500 bg-red-100 
-          rounded-md font-chinese p-2">{errors}</span>}
-          {uploadError && <span className="text-red-500 bg-red-100 
-          rounded-md font-chinese p-2">{uploadError}</span>}
+          {errors && (
+            <span
+              className="rounded-md bg-red-100 
+          p-2 font-chinese text-red-500"
+            >
+              {errors}
+            </span>
+          )}
+          {uploadError && (
+            <span
+              className="rounded-md bg-red-100 
+          p-2 font-chinese text-red-500"
+            >
+              {uploadError}
+            </span>
+          )}
         </Flex>
       </Flex>
     </>

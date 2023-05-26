@@ -19,6 +19,9 @@ import { GetSekleton } from "../helpers/UIHelper";
 import { isUserVerified } from "helpers/userHelper";
 import { HSeparator, VSeparator } from "components/separator/Separator";
 import TruthEngineSideMenuBar from "components/QTruthEngineSideMenubar";
+import HomeNotification from "./notifications";
+import { useAppSelector } from "Redux/hooks";
+import { selectHomePageState } from "Redux/homePageSlice";
 
 //@ts-ignore
 function classNames(...classes) {
@@ -72,9 +75,8 @@ export function Tabs() {
   );
 }
 
-const HomeMiddleContent = ({ loadingState }: TabLoadingState) => {
+const HomeMiddleContent = () => {
   const [tab, setTab] = useState<(typeof tabs)[number]>("VERIFIED_ENGINE");
-  const [isLoading, setLoading] = loadingState;
 
   const engineFeedQuery = api.posts.getVerifiedEngineFeed.useInfiniteQuery(
     {},
@@ -100,11 +102,11 @@ const HomeMiddleContent = ({ loadingState }: TabLoadingState) => {
 
   const isVerified = isUserVerified(user);
 
-  if (tab == "VERIFIED_ENGINE") {
-    setLoading(isVerifiedLoading);
-  } else if (tab == "COMMUNITY") {
-    setLoading(isCommunityLoading);
-  }
+  // if (tab == "VERIFIED_ENGINE") {
+  //   setLoading(isVerifiedLoading);
+  // } else if (tab == "COMMUNITY") {
+  //   setLoading(isCommunityLoading);
+  // }
 
   function isCurrentTabLoading(currTab: (typeof tabs)[number]) {
     if (currTab == "VERIFIED_ENGINE") {
@@ -142,13 +144,13 @@ const HomeMiddleContent = ({ loadingState }: TabLoadingState) => {
               <div className={tab == "VERIFIED_ENGINE" ? "" : "hidden"}>
                 {
                   <EngineFeed
-                    //@ts-ignore
                     posts={engineFeedQuery.data?.pages.flatMap(
                       (page) => page.posts
                     )}
                     fetchNewFeed={engineFeedQuery.fetchNextPage}
                     hasMore={engineFeedQuery.hasNextPage}
                     isLoading={engineFeedQuery.isLoading}
+                    isError={engineFeedQuery.isError}
                   />
                 }
               </div>
@@ -165,13 +167,13 @@ const HomeMiddleContent = ({ loadingState }: TabLoadingState) => {
                 <Flex>
                   {
                     <EngineFeed
-                      //@ts-ignore
                       posts={communityFeedQuery.data?.pages.flatMap(
                         (page) => page.posts
                       )}
                       fetchNewFeed={communityFeedQuery.fetchNextPage}
                       hasMore={communityFeedQuery.hasNextPage}
                       isLoading={communityFeedQuery.isLoading}
+                      isError={engineFeedQuery.isError}
                     />
                   }
                 </Flex>
@@ -196,6 +198,7 @@ interface TabLoadingState {
 const Home: NextPage = () => {
   const tabLoadingState = useState<boolean>(false);
   const [isAnyTabLoading, setIsAnyTabLoading] = tabLoadingState;
+  const pageState = useAppSelector(selectHomePageState);
 
   return (
     <>
@@ -214,7 +217,12 @@ const Home: NextPage = () => {
           className="-mr-1 w-[100%] pl-[65px] md:float-right md:mr-0 md:w-[80%] md:pl-0  lg:w-[50%] "
           direction="column"
         >
-          <HomeMiddleContent loadingState={tabLoadingState} />
+          <div className={pageState === "FEED" ? "" : "hidden"}>
+            <HomeMiddleContent />
+          </div>
+          <div className={pageState === "NOTIFICATION" ? "" : "hidden"}>
+            <HomeNotification />
+          </div>
         </Flex>
         {/* 页面右边 */}
         <Flex className="hidden lg:block">

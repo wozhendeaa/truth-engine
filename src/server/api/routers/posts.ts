@@ -12,7 +12,7 @@ import { Redis } from "@upstash/redis";
 import { postSchema } from "components/posting/PostBox";
 import { ReactionType } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime";
-const truthConfig = require('truth-engine-config');
+const truthConfig = require("truth-engine-config");
 
 const ratelimitPost = new Ratelimit({
   redis: Redis.fromEnv(),
@@ -87,19 +87,18 @@ export const postsRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input }) => {
-      void await ctx.prisma.post.updateMany({
+      void (await ctx.prisma.post.updateMany({
         where: {
           id: {
             in: input.ids,
-          }
+          },
         },
-        data:{
+        data: {
           ViewCount: {
-            increment: 1
-          }
-        }
-      });
-     
+            increment: 1,
+          },
+        },
+      }));
     }),
 
   getPostById: publicProcedure
@@ -145,6 +144,7 @@ export const postsRouter = createTRPCRouter({
       return post;
     }),
 
+  //评论和点赞通知时用数据库触发器添加的
   likePost: privateProcedure
     .input(z.object({ postId: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -194,13 +194,13 @@ export const postsRouter = createTRPCRouter({
             likes: {
               decrement: 1,
             },
-            author:{
-              update:{
-                NiuBi:{
-                  decrement: authorNiubi
-                }
-              }
-            }  
+            author: {
+              update: {
+                NiuBi: {
+                  decrement: authorNiubi,
+                },
+              },
+            },
           },
         });
       } else {
@@ -220,13 +220,13 @@ export const postsRouter = createTRPCRouter({
             likes: {
               increment: 1,
             },
-            author:{
-              update:{
-                NiuBi:{
-                  increment: authorNiubi
-                }
-              }
-            }  
+            author: {
+              update: {
+                NiuBi: {
+                  increment: authorNiubi,
+                },
+              },
+            },
           },
         });
         return updatedPost;
@@ -243,7 +243,6 @@ export const postsRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input: { limit = 50, cursor } }) => {
-
       const posts = await ctx.prisma.post.findMany({
         take: limit + 1,
         cursor: cursor ? { createdAt_id: cursor } : undefined,
@@ -472,10 +471,10 @@ export const postsRouter = createTRPCRouter({
 
       //增加牛币
       const niubi = truthConfig.economy.makePost as number;
-      void await ctx.prisma.user.update({
+      void (await ctx.prisma.user.update({
         where: { id: authorId },
         data: { NiuBi: { increment: niubi } },
-      });
+      }));
       return post;
     }),
 });

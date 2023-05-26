@@ -189,20 +189,22 @@ model Notification{
   id         Int    @id @default(autoincrement())
   senderId  String 
   sender    User        @relation(name:"senderToNotification", fields: [senderId], references: [id])
-  recieverId  String 
-  reciever    User      @relation(name:"receiverToNotification", fields: [recieverId], references: [id])
-  conent      String 
+  receiverId  String 
+  receiver    User      @relation(name:"receiverToNotification", fields: [receiverId], references: [id])
+  content      String 
   createdAt   DateTime   @default(now())
   hasRead   Boolean @default(false)
   notificationType NotificationType 
-  @@index([recieverId])
+  @@index([receiverId])
   @@index([senderId])
 }
 
 enum NotificationType {
   PUBLIC_ANNOUNCEMENT
+  PUB_SUB
   SYSTEM
   COMMENT
+  REPLY
   LIKE
   UPDATE_NOTIFICATION
 }

@@ -9,6 +9,7 @@ import { isUserVerified } from "helpers/userHelper";
 import { HSeparator, VSeparator } from "components/separator/Separator";
 import UserContext from "helpers/userContext";
 import { GetSekleton } from "helpers/UIHelper";
+import NotificationFeed from "./NotificationFeed";
 
 //@ts-ignore
 function classNames(...classes) {
@@ -62,26 +63,37 @@ export function Tabs() {
   );
 }
 
-
-const HomeNotification: NextPage = () => {
+const HomeNotification = () => {
   const [tab, setTab] = useState<(typeof tabs)[number]>("COMMENTS_LIKES");
 
-  const engineFeedQuery = api.posts.getVerifiedEngineFeed.useInfiniteQuery({}, {
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-    enabled: tab == "COMMENTS_LIKES"
-  });
+  const engineFeedQuery = api.posts.getVerifiedEngineFeed.useInfiniteQuery(
+    {},
+    {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+      enabled: tab == "COMMENTS_LIKES",
+    }
+  );
 
-  const communityFeedQuery = api.posts.getCommunityEngineFeed.useInfiniteQuery({limit:1}, {
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-    enabled: tab == "ENGINE_UPDATES"
-  });
+  const communityFeedQuery = api.posts.getCommunityEngineFeed.useInfiniteQuery(
+    { limit: 1 },
+    {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+      enabled: tab == "ENGINE_UPDATES",
+    }
+  );
 
   const { isLoading: isVerifiedLoading } = engineFeedQuery;
-  const {isLoading: isCommunityLoading } = communityFeedQuery
-  
+  const { isLoading: isCommunityLoading } = communityFeedQuery;
+  const communityPosts = communityFeedQuery.data?.pages.flatMap(
+    (page) => page.posts
+  );
+
+  const enginePosts = engineFeedQuery.data?.pages.flatMap((page) => page.posts);
+
   const user = useContext(UserContext);
   const { t } = useTranslation();
-    function isAnyTabLoading() {
+
+  function isAnyTabLoading() {
     if (tab == "COMMENTS_LIKES") {
       return isVerifiedLoading;
     } else if (tab == "ENGINE_UPDATES") {
@@ -102,47 +114,28 @@ const HomeNotification: NextPage = () => {
 
   return (
     <>
-        <Flex>
-          {isCurrentTabLoading("COMMENTS_LIKES") ? (
-            <GetSekleton number={5} />
-          ) : (
-            <>
-              <selectedTabContext.Provider value={{ tab, setTab }}>
-                <Tabs />
-                <Box>
-                  <div className={tab == "COMMENTS_LIKES" ? "" : "hidden" } >
-                    {
-                      //@ts-ignore
-                      <EngineFeed posts={engineFeedQuery.data?.pages.flatMap((page) => page.posts)} 
-                      fetchNewFeed={engineFeedQuery.fetchNextPage}
-                      hasMore={engineFeedQuery.hasNextPage}
-                      isLoading={engineFeedQuery.isLoading}
-                       />
-                    }
-                  </div>
-                </Box>
+      <Flex className="flex flex-col">
+        {isCurrentTabLoading("COMMENTS_LIKES") ? (
+          <GetSekleton number={5} />
+        ) : (
+          <>
+            <selectedTabContext.Provider value={{ tab, setTab }}>
+              <Tabs />
+              <Box>
+                <div className={tab == "COMMENTS_LIKES" ? "" : "hidden"}>
+                  {<NotificationFeed />}
+                </div>
+              </Box>
 
-                <Flex direction={"column"}>
-                  <Box className={tab == "ENGINE_UPDATES" ? "" : " hidden "}>
-                    <Flex>
-                      <HSeparator className="mt-2" />
-                    </Flex>
-                    <Flex>
-                      {
-                      //@ts-ignore
-                      <EngineFeed posts={communityFeedQuery.data?.pages.flatMap((page) => page.posts)} 
-                      fetchNewFeed={communityFeedQuery.fetchNextPage}
-                      hasMore={communityFeedQuery.hasNextPage}
-                      isLoading={communityFeedQuery.isLoading}
-                       />
-                      }
-                    </Flex>
-                  </Box>
-                </Flex>
-              </selectedTabContext.Provider>
-            </>
-          )}
-        </Flex>
+              <Flex direction={"column"}>
+                <Box className={tab == "ENGINE_UPDATES" ? "" : " hidden "}>
+                  <Flex>{<NotificationFeed />}</Flex>
+                </Box>
+              </Flex>
+            </selectedTabContext.Provider>
+          </>
+        )}
+      </Flex>
     </>
   );
 };

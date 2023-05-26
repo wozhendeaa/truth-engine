@@ -32,10 +32,9 @@ import CommentThread from "components/PostComment/CommentFeed";
 import GeneralCommentThread from "components/PostComment/GeneralCommentFeed";
 import { User } from "@prisma/client";
 
-
 //@ts-ignore
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ");
 }
 
 const tabs = ["posts", "comments"] as const;
@@ -44,13 +43,12 @@ const selectedTabContext = createContext<{
   setTab: (newState: (typeof tabs)[number]) => void;
 }>({
   tab: "posts",
-  setTab: () => {}
+  setTab: () => {},
 });
 
-
 export function Tabs() {
-  const {t} = useTranslation();
-  const {tab: selectedTab, setTab} = useContext(selectedTabContext);
+  const { t } = useTranslation();
+  const { tab: selectedTab, setTab } = useContext(selectedTabContext);
 
   function changeTab(tab: (typeof tabs)[number]) {
     setTab(tab);
@@ -67,11 +65,12 @@ export function Tabs() {
                 key={tab}
                 className={classNames(
                   tab == selectedTab
-                    ? 'border-indigo-400 text-indigo-400 cursor-pointer w-[100%] '
-                    : 'border-transparent w-[100%] text-gray-300 hover:border-gray-300 hover:text-gray-700',
-                  'w-1/4 border-b-2 py-4 px-1 text-center text-sm font-medium cursor-pointer'
+                    ? "w-[100%] cursor-pointer border-indigo-400 text-indigo-400 "
+                    : "w-[100%] border-transparent text-gray-300 hover:border-gray-300 hover:text-gray-700",
+                  "w-1/4 cursor-pointer border-b-2 px-1 py-4 text-center text-sm font-medium"
                 )}
-                aria-current={tab == selectedTab ? 'page' : undefined}>
+                aria-current={tab == selectedTab ? "page" : undefined}
+              >
                 <span className="text-lg">{t(tab)}</span>
               </span>
             ))}
@@ -79,17 +78,16 @@ export function Tabs() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-
-type userWithStat = RouterOutputs["user"]["getUserWithProfileStatsByUserName"]
-export function ProfileBanner(props: {user:userWithStat}) {
-  const {user} = props;
-  const {t} = useTranslation();
+type userWithStat = RouterOutputs["user"]["getUserWithProfileStatsByUserName"];
+export function ProfileBanner(props: { user: userWithStat }) {
+  const { user } = props;
+  const { t } = useTranslation();
 
   // Chakra Color Mode
-  const textColorPrimary = useColorModeValue("secondaryGray.900","white");
+  const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "gray.400";
   const borderColor = useColorModeValue(
     "#111C44 !important",
@@ -111,10 +109,10 @@ export function ProfileBanner(props: {user:userWithStat}) {
         borderRadius="16px"
         h="131px"
         w="100%"
-    />
+      />
       <Avatar
         mx="auto"
-        src={user.profileImageUrl ?? '/public/images/default_avatar.png'}
+        src={user.profileImageUrl ?? "/public/images/default_avatar.png"}
         h="87px"
         w="87px"
         mt="-43px"
@@ -133,23 +131,23 @@ export function ProfileBanner(props: {user:userWithStat}) {
             {user._count.posts}
           </Text>
           <Text color={textColorSecondary} fontSize="sm" fontWeight="400">
-            {t('post_num')}
+            {t("post_num")}
           </Text>
         </Flex>
         <Flex mx="auto" me="60px" align="center" direction="column">
           <Text color={textColorPrimary} fontSize="2xl" fontWeight="700">
-          {user._count.comments}
+            {user._count.comments}
           </Text>
           <Text color={textColorSecondary} fontSize="sm" fontWeight="400">
-          {t('comment_num')}
+            {t("comment_num")}
           </Text>
         </Flex>
         <Flex mx="auto" align="center" direction="column">
           <Text color={textColorPrimary} fontSize="2xl" fontWeight="700">
-             {user.NiuBi}
+            {user.NiuBi}
           </Text>
           <Text color={textColorSecondary} fontSize="sm" fontWeight="400">
-           {t('niub')}
+            {t("niub")}
           </Text>
         </Flex>
       </Flex>
@@ -159,16 +157,19 @@ export function ProfileBanner(props: {user:userWithStat}) {
 
 export function Posts() {
   // Chakra Color Mode
-  const textColorPrimary = useColorModeValue("white","secondaryGray.900");
+  const textColorPrimary = useColorModeValue("white", "secondaryGray.900");
   const textColorSecondary = "gray.400";
   const user = useContext(UserContext);
 
-  const {data,  isLoading} = api.posts.getPostsByUserId.useQuery({userId: user?.id ?? ''});
+  const { data, isLoading } = api.posts.getPostsByUserId.useQuery({
+    userId: user?.id ?? "",
+  });
   if (!user || !data) return <></>;
   return (
     <>
-       {isLoading && <LoadingSpinner />}
-       <Box className={true ? "" : "" }>
+      {isLoading && <LoadingSpinner />}
+      <Box className={true ? "" : ""}>
+        {/* //@ts-ignore */}
         <EngineFeed postData={data} />
       </Box>
     </>
@@ -180,17 +181,16 @@ export function Comments() {
   const textColorSecondary = "gray.400";
   const user = useContext(UserContext);
 
-  const {data,  isLoading} = api.comment.getCommentsForUser
-  .useQuery({userId: user?.id ?? ''});
+  const { data, isLoading } = api.comment.getCommentsForUser.useQuery({
+    userId: user?.id ?? "",
+  });
 
   if (!user || !data) return <></>;
   return (
     <>
       {isLoading && <LoadingSpinner />}
-       <Box>
-          <GeneralCommentThread
-            comments={data}
-          />
+      <Box>
+        <GeneralCommentThread comments={data} />
       </Box>
     </>
   );
@@ -202,30 +202,37 @@ const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
   });
   const [tab, setTab] = useState<(typeof tabs)[number]>("posts");
 
-  if (!data) return <>500 错误。 用户被ban或不存在</>
+  if (!data) return <>500 错误。 用户被ban或不存在</>;
 
   return (
     <>
       <PageLayout>
-        <selectedTabContext.Provider value={{tab, setTab}}>
-        <Flex pt={{ base: "80px", md: "30px", xl: "30px" }} width={"full"} columnGap={-4}>
-          <Container maxW={{ base: "full", md: "70%", lg: "50%" }}>
-            <VStack gap={"-40px"}>
-              <Box width={'full'}>
-                <ProfileBanner user={data}/>
-              </Box>
-              <Box width={'full'}>
-                <Tabs />
-              </Box>
-              <Box width={'full'} className={tab == "posts" ? "" : "hidden"}>
-                <Posts />
-              </Box>
-              <Box width={'full'} className={tab == "comments" ? "" : "hidden"}>
-                <Comments />
-              </Box>
-            </VStack>
-          </Container>
-        </Flex>
+        <selectedTabContext.Provider value={{ tab, setTab }}>
+          <Flex
+            pt={{ base: "80px", md: "30px", xl: "30px" }}
+            width={"full"}
+            columnGap={-4}
+          >
+            <Container maxW={{ base: "full", md: "70%", lg: "50%" }}>
+              <VStack gap={"-40px"}>
+                <Box width={"full"}>
+                  <ProfileBanner user={data} />
+                </Box>
+                <Box width={"full"}>
+                  <Tabs />
+                </Box>
+                <Box width={"full"} className={tab == "posts" ? "" : "hidden"}>
+                  <Posts />
+                </Box>
+                <Box
+                  width={"full"}
+                  className={tab == "comments" ? "" : "hidden"}
+                >
+                  <Comments />
+                </Box>
+              </VStack>
+            </Container>
+          </Flex>
         </selectedTabContext.Provider>
       </PageLayout>
     </>

@@ -28,7 +28,7 @@ class MyDocument extends Document {
             <link
               href="/manifest.json"
               //@ts-ignore
-              crossorigin="use-credentials"
+              crossOrigin="use-credentials"
               rel="manifest"
             />
           }
