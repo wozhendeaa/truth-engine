@@ -27,10 +27,11 @@ import { useTranslation } from "react-i18next";
 import { ChangeEventHandler, createContext, useContext, useState } from "react";
 import UserContext from "helpers/userContext";
 import EngineFeed from "components/PostComment/EngineFeed";
-import { isUserVerified } from "helpers/userHelper";
-import CommentThread from "components/PostComment/CommentFeed";
 import GeneralCommentThread from "components/PostComment/GeneralCommentFeed";
-import { User } from "@prisma/client";
+import { PencilIcon } from "@heroicons/react/20/solid";
+import { GetSekleton } from "helpers/UIHelper";
+import Link from "next/link";
+import TE_Routes from "TE_Routes";
 
 //@ts-ignore
 function classNames(...classes) {
@@ -85,10 +86,11 @@ type userWithStat = RouterOutputs["user"]["getUserWithProfileStatsByUserName"];
 export function ProfileBanner(props: { user: userWithStat }) {
   const { user } = props;
   const { t } = useTranslation();
+  const currentUser = useContext(UserContext);
 
   // Chakra Color Mode
-  const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
-  const textColorSecondary = "gray.400";
+  const textColorPrimary = useColorModeValue("white", "white");
+  const textColorSecondary = "white";
   const borderColor = useColorModeValue(
     "#111C44 !important",
     "white !important"
@@ -119,6 +121,16 @@ export function ProfileBanner(props: { user: userWithStat }) {
         border="4px solid"
         borderColor={borderColor}
       />
+      {currentUser?.username === user.username && (
+        <div className="flex w-auto flex-row flex-nowrap">
+          <Link
+            href={TE_Routes.ExistingAccountSetup.path}
+            className="w-full flex-nowrap overflow-auto rounded-lg bg-te_dark_font px-5 font-chinese text-slate-100 hover:bg-slate-500"
+          >
+            <div className="flex">{t("change_profile")}</div>
+          </Link>
+        </div>
+      )}
       <Text color={textColorPrimary} fontWeight="bold" fontSize="xl" mt="10px">
         {user.displayname}
       </Text>
@@ -147,7 +159,7 @@ export function ProfileBanner(props: { user: userWithStat }) {
             {user.NiuBi}
           </Text>
           <Text color={textColorSecondary} fontSize="sm" fontWeight="400">
-            {t("niub")}
+            {t("niubi")}
           </Text>
         </Flex>
       </Flex>
@@ -199,12 +211,18 @@ export function Comments() {
 }
 
 const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
-  const { data } = api.user.getUserWithProfileStatsByUserName.useQuery({
-    username: username,
-  });
+  const { data, isLoading } =
+    api.user.getUserWithProfileStatsByUserName.useQuery({
+      username: username,
+    });
   const [tab, setTab] = useState<(typeof tabs)[number]>("posts");
 
-  if (!data) return <>500 错误。 用户被ban或不存在</>;
+  if (!isLoading && !data)
+    return (
+      <>
+        <PageLayout>用户被ban或不存在</PageLayout>
+      </>
+    );
 
   return (
     <>
@@ -215,25 +233,32 @@ const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
             width={"full"}
             columnGap={-4}
           >
-            <Container maxW={{ base: "full", md: "70%", lg: "50%" }}>
-              <VStack gap={"-40px"}>
-                <Box width={"full"}>
-                  <ProfileBanner user={data} />
-                </Box>
-                <Box width={"full"}>
-                  <Tabs />
-                </Box>
-                <Box width={"full"} className={tab == "posts" ? "" : "hidden"}>
-                  <Posts />
-                </Box>
-                <Box
-                  width={"full"}
-                  className={tab == "comments" ? "" : "hidden"}
-                >
-                  <Comments />
-                </Box>
-              </VStack>
-            </Container>
+            {isLoading ? (
+              <GetSekleton number={3} />
+            ) : (
+              <Container maxW={{ base: "full", md: "70%", lg: "50%" }}>
+                <VStack gap={"-40px"}>
+                  <Box width={"full"}>
+                    <ProfileBanner user={data} />
+                  </Box>
+                  <Box width={"full"}>
+                    <Tabs />
+                  </Box>
+                  <Box
+                    width={"full"}
+                    className={tab == "posts" ? "" : "hidden"}
+                  >
+                    <Posts />
+                  </Box>
+                  <Box
+                    width={"full"}
+                    className={tab == "comments" ? "" : "hidden"}
+                  >
+                    <Comments />
+                  </Box>
+                </VStack>
+              </Container>
+            )}
           </Flex>
         </selectedTabContext.Provider>
       </PageLayout>
@@ -243,9 +268,11 @@ const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const ssg = generateSSGHelper();
-  const locale = "zh-CN";
+  const locale = context.locale ?? "zh-CN";
   const slug = context.params?.profileId as string;
+
   if (typeof slug !== "string") throw new Error("slug is not a string");
+
   const username = slug.replace("@", "");
   await ssg.profile.getUserByUsername.prefetch({ username: username });
 

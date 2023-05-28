@@ -39,7 +39,7 @@ const TE_Routes = {
   //---users -----
   myProfile: {
     name: "profile_page",
-    path: "/myprofile/",
+    path: "/user/",
     // icon: <Icon as={ProfileIcon}  width={{base:12, md: 10, lg:7}} height={{base:12,md: 10, lg:7}}  color='inherit' />,
     icon: (
       <UserCircleIcon
@@ -53,9 +53,15 @@ const TE_Routes = {
     path: "/user/",
     // icon: <Icon as={MdHome} width='20px' height='20px' color='inherit' />,
   },
+
   NewAccountSetup: {
     name: "new_account_setup",
     path: "/NewAccountSetup/",
+    // icon: <Icon as={MdHome} width='20px' height='20px' color='inherit' />,
+  },
+  ExistingAccountSetup: {
+    name: "new_account_setup",
+    path: "/NewAccountSetup/editProfile",
     // icon: <Icon as={MdHome} width='20px' height='20px' color='inherit' />,
   },
   PrepareNewUser: {

@@ -83,8 +83,8 @@ export async function runOneSignal() {
 
     welcomeNotification: {
       disable: false,
-      title: "hello world",
-      message: "fucking not working",
+      title: "欢迎来到真相引擎",
+      message: "记得允许通知，我才可以发给你",
       url: "/",
     },
   });
@@ -94,13 +94,6 @@ export async function runOneSignal() {
     await OneSignal.showNativePrompt();
     console.log("notificationEnabled", isEnabled);
   }
-  await OneSignal.getUserId((id) => {
-    console.log(id);
-  });
-
-  await OneSignal.getTags((tags) => {
-    console.log("tags", tags);
-  });
 
   console.log("permission", await OneSignal.getNotificationPermission());
 }

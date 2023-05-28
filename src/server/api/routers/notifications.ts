@@ -36,7 +36,6 @@ export const notificationRouter = createTRPCRouter({
       let notifications = await ctx.prisma.postCommentNotification.findMany({
         where: {
           receiverId: ctx.curretnUserId,
-          hasRead: false,
         },
         cursor: cursor ? { id_createdAt: cursor } : undefined,
         take: limit,
@@ -78,4 +77,44 @@ export const notificationRouter = createTRPCRouter({
       }
       return { notifications, nextCursor };
     }),
+
+  getUnreadNotificationNumForUser: privateProcedure.query(async ({ ctx }) => {
+    let unread1 = await ctx.prisma.postCommentNotification.count({
+      where: {
+        receiverId: ctx.curretnUserId,
+        hasRead: false,
+      },
+    });
+
+    let unread2 = await ctx.prisma.platformNotification.count({
+      where: {
+        receiverId: ctx.curretnUserId,
+        hasRead: false,
+      },
+    });
+
+    return ((unread1 + unread2) as number) ?? 0;
+  }),
+
+  markNotificationsAsRead: privateProcedure.mutation(async ({ ctx }) => {
+    await ctx.prisma.postCommentNotification.updateMany({
+      where: {
+        receiverId: ctx.curretnUserId,
+        hasRead: false,
+      },
+      data: {
+        hasRead: true,
+      },
+    });
+
+    await ctx.prisma.platformNotification.updateMany({
+      where: {
+        receiverId: ctx.curretnUserId,
+        hasRead: false,
+      },
+      data: {
+        hasRead: true,
+      },
+    });
+  }),
 });

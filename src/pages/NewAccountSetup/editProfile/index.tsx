@@ -24,6 +24,7 @@ import { parse } from "url";
 import { api } from "utils/api";
 import { useProfileStore } from "zustand/ProfileEditStore";
 import { User } from "@prisma/client";
+import UserContext from "helpers/userContext";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -51,7 +52,7 @@ export const accountSetupSchema = z.object({
 
 export type AccountSetupSchema = z.infer<typeof accountSetupSchema>;
 
-export function AccountSetupSection(props: { user: UserResource }) {
+export function AccountSetupSection(props: { user: User }) {
   const { t } = useTranslation();
   const { user } = props;
 
@@ -65,8 +66,8 @@ export function AccountSetupSection(props: { user: UserResource }) {
   } = useForm<AccountSetupSchema>({
     resolver: zodResolver(accountSetupSchema),
     defaultValues: {
-      displayName: user.lastName + "" + user.firstName,
-      email: user.primaryEmailAddress?.emailAddress ?? "",
+      displayName: user.displayname ?? "",
+      email: user.email ?? "",
       profileImageUrl: user.profileImageUrl ?? "",
       username: user.username ?? "",
     },
@@ -300,20 +301,19 @@ export function AccountSetupSection(props: { user: UserResource }) {
   );
 }
 
-const PrepareNewUser: NextPage = () => {
-  const { user: clerkUser } = useUser();
-
-  if (!clerkUser) {
+const EditProfile: NextPage = () => {
+  const myUser = useContext(UserContext);
+  if (!myUser) {
     return null;
   }
 
+  if (!myUser) return null;
+
   return (
     <>
-      {clerkUser && (
-        <div className="flex min-h-screen w-full items-center justify-center bg-te_dark_darker ">
-          <AccountSetupSection user={clerkUser} />
-        </div>
-      )}
+      <div className="flex min-h-screen w-full items-center justify-center bg-te_dark_darker ">
+        <AccountSetupSection user={myUser} />
+      </div>
     </>
   );
 };
@@ -321,7 +321,6 @@ const PrepareNewUser: NextPage = () => {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { res, req, locale } = ctx;
   const user = getAuth(req);
-  const { query } = parse(req.url ?? "", true);
 
   const exist = await prisma.user.findFirst({
     select: {
@@ -332,7 +331,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     },
   });
 
-  if (exist) {
+  if (!exist) {
     return {
       redirect: {
         permanent: false,
@@ -351,4 +350,4 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
 };
 
-export default PrepareNewUser;
+export default EditProfile;

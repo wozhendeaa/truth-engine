@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-const tabs = ["COMMENTS_LIKES", "ENGINE_UPDATES"] as const;
+const tabs = ["COMMENTS_LIKES", "ENGINE_UPDATES", null] as const;
 export type Tab = (typeof tabs)[number];
 export interface TabState {
   currentlySelected: Tab;
@@ -9,8 +9,9 @@ export interface TabState {
 }
 
 export const useNotifTabsStore = create<TabState>()((set) => ({
-  currentlySelected: "COMMENTS_LIKES",
+  currentlySelected: null,
   tabs: tabs,
+
   changeTab: (tab: Tab) =>
     set((state) => ({
       currentlySelected: tab,

@@ -22,21 +22,21 @@ function renderNotification(
   reveiverName: string,
   t: TFunction<"translation", undefined, "translation">
 ) {
-  // console.log(notif.comment?.content);
-  // console.log(notif.post?.content);
   return (
     <>
       <div>{t(notif.type.toLowerCase())}</div>
       <div>{renderAsHTML(notif.content)}</div>
       <div>
         <div className="flex flex-row rounded-lg bg-te_dark_font p-2">
-          <Image
-            width={20}
-            height={20}
-            className="rounded-full"
-            src={receiverProfileurl ?? "/public/images/default_avatar.png"}
-            alt=""
-          />
+          <div className="">
+            <Image
+              width={30}
+              height={30}
+              className="  shrink-0 rounded-full object-cover"
+              src={receiverProfileurl ?? "/public/images/default_avatar.png"}
+              alt=""
+            />
+          </div>
           <div className="pl-2">{reveiverName}:</div>
           <div className="pl-2">
             <div>
@@ -68,7 +68,7 @@ export function SingleCommentLikeItem(props: { item: notificationItemType }) {
           <Image
             width={40}
             height={40}
-            className="rounded-full"
+            className="shrink-0 rounded-full"
             src={
               item.sender.profileImageUrl ?? "/public/images/default_avatar.png"
             }
@@ -101,10 +101,10 @@ export function SingleCommentLikeItem(props: { item: notificationItemType }) {
 
 function EndingMessage(message: string) {
   return (
-    <div className="z-40 rounded-md bg-te_dark_ui p-4">
+    <div className="z-40 flex w-full items-center justify-center rounded-md bg-te_dark_ui p-4">
       <div className="flex">
         <div className="ml-3">
-          <div className="text-sm font-medium text-slate-50">{message}</div>
+          <div className=" text-sm font-medium text-slate-50">{message}</div>
         </div>
         <div className="ml-auto pl-3">
           <div className="-mx-1.5 -my-1.5"></div>
@@ -131,11 +131,13 @@ const NotificationFeed = ({
   hasMore = false,
 }: FeedProps) => {
   const { t } = useTranslation();
+
   const notifications = data;
+
   if (!notifications) return <></>;
   return (
     <>
-      <Flex className="flex flex-col">
+      <Flex className="z-40 flex flex-col">
         <InfiniteScroll
           className="hide-scrollbar"
           dataLength={notifications.length}

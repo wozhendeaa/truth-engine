@@ -35,21 +35,23 @@ export function Tabs() {
       <div className="sm:bloc font-chinese">
         <div className="border-b border-gray-200 ">
           <nav className="-mb-px flex" aria-label="Tabs">
-            {tabs.map((tab) => (
-              <span
-                onClick={() => changeTab(tab)}
-                key={tab}
-                className={classNames(
-                  tab == selectedTab
-                    ? "w-[100%] cursor-pointer border-indigo-400 text-indigo-400 "
-                    : "w-[100%] border-transparent text-gray-300 hover:border-gray-300 hover:bg-te_dark_font",
-                  "w-1/4 cursor-pointer border-b-2 px-1 py-4 text-center text-sm font-medium"
-                )}
-                aria-current={tab == selectedTab ? "page" : undefined}
-              >
-                <span className="text-lg">{t(tab)}</span>
-              </span>
-            ))}
+            {tabs
+              .filter((t) => t)
+              .map((tab) => (
+                <span
+                  onClick={() => changeTab(tab)}
+                  key={tab}
+                  className={classNames(
+                    tab == selectedTab
+                      ? "w-[100%] cursor-pointer border-indigo-400 text-indigo-400 "
+                      : "w-[100%] border-transparent text-gray-300 hover:border-gray-300 hover:bg-te_dark_font",
+                    "w-1/4 cursor-pointer border-b-2 px-1 py-4 text-center text-sm font-medium"
+                  )}
+                  aria-current={tab == selectedTab ? "page" : undefined}
+                >
+                  <span className="text-lg">{t(tab!)}</span>
+                </span>
+              ))}
           </nav>
         </div>
       </div>

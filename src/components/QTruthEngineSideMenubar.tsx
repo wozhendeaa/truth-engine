@@ -1,11 +1,8 @@
 import { Fragment, useContext, useState, Dispatch } from "react";
-import { Dialog, Transition } from "@headlessui/react";
-import { PencilIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "react-i18next";
 import UserContext from "helpers/userContext";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { HomeIcon, ProfileIcon } from "./icons/Icons";
 import TE_Routes from "TE_Routes";
 import { useDispatch } from "react-redux";
 import {
@@ -13,6 +10,9 @@ import {
   setDisplayingComponent,
 } from "Redux/homePageSlice";
 import { useAppSelector } from "Redux/hooks";
+import { useNotifStore, NotifState } from "zustand/NotificationStore";
+import { api } from "utils/api";
+import { TabState, useNotifTabsStore } from "zustand/NotificationTabsStore";
 
 const navigation = [
   TE_Routes.Index,
@@ -21,14 +21,6 @@ const navigation = [
   TE_Routes.myProfile,
 ];
 const actions = [{ id: 1, name: "write_long_post", href: "#", initial: "H" }];
-
-function isActive(path: string) {
-  if (path === "/") {
-    return location.pathname === "/";
-  }
-
-  return location.pathname.includes(path);
-}
 
 //@ts-ignore
 function classNames(...classes) {
@@ -42,6 +34,21 @@ export default function TruthEngineSideMenuBar() {
   const dispatch = useDispatch();
   const pageState = useAppSelector(selectHomePageState);
 
+  const { data } = api.Notification.getUnreadNotificationNumForUser.useQuery();
+  const { mutate } = api.Notification.markNotificationsAsRead.useMutation({});
+  const { selectedTab, tabs, changeTab } = useNotifTabsStore(
+    (state: TabState) => ({
+      selectedTab: state.currentlySelected,
+      tabs: state.tabs,
+      changeTab: state.changeTab,
+    })
+  );
+
+  const { unread, setUnread } = useNotifStore((state: NotifState) => ({
+    unread: data ?? 0,
+    setUnread: state.setUnread,
+  }));
+
   function isActive(path: string) {
     if (path === "/") {
       return location.pathname === "/" && pageState === "FEED";
@@ -54,6 +61,19 @@ export default function TruthEngineSideMenuBar() {
     }
 
     return location.pathname.includes(path);
+  }
+
+  function gotoNotificationPage() {
+    changeTab("COMMENTS_LIKES");
+
+    mutate(undefined, {
+      onSuccess: () => {
+        setTimeout(() => {
+          setUnread(0);
+        }, 2000);
+      },
+    });
+    dispatch(setDisplayingComponent("NOTIFICATION"));
   }
 
   function renderButton(item: any) {
@@ -81,7 +101,7 @@ export default function TruthEngineSideMenuBar() {
           <a
             href="#"
             onClick={() => {
-              dispatch(setDisplayingComponent("NOTIFICATION"));
+              gotoNotificationPage();
             }}
             className={classNames(
               isActive(item.path) ? "text-white" : "",
@@ -90,6 +110,15 @@ export default function TruthEngineSideMenuBar() {
           >
             {item.icon}
             <div className="hidden lg:block">{t(item.name)}</div>
+            {unread > 0 && (
+              <span
+                className="hover:bg-indigo-400/10*3 inline-flex items-center
+             rounded-lg px-2 py-1 font-chinese text-xs font-medium text-indigo-300
+              ring-1 ring-inset ring-indigo-400/80 hover:text-indigo-500"
+              >
+                {unread > 99 ? "99+" : unread}
+              </span>
+            )}
           </a>
         </>
       );
@@ -97,7 +126,7 @@ export default function TruthEngineSideMenuBar() {
       return (
         <>
           <a
-            href={item.path}
+            href={item.path + user?.username}
             className={classNames(
               isActive(item.path) ? "text-white" : "",
               "group flex gap-x-3 rounded-lg p-2 text-xl font-semibold leading-6 tracking-widest  text-gray-300 hover:text-white"
@@ -127,7 +156,7 @@ export default function TruthEngineSideMenuBar() {
                   {navigation.map((item) => (
                     <li key={item.name}>{renderButton(item)}</li>
                   ))}
-                  <li className="-ml-[5px] md:ml-0">
+                  {/* <li className="-ml-[5px] md:ml-0">
                     <div className="hidden lg:block">
                       <button
                         type="button"
@@ -152,7 +181,7 @@ export default function TruthEngineSideMenuBar() {
                         />
                       </button>
                     </div>
-                  </li>
+                  </li> */}
                 </ul>
               </li>
             </ul>

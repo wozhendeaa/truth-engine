@@ -64,13 +64,13 @@ export const LoggedInUserSection = ({
   return (
     <>
       <div className="hidden shadow-xl md:ml-4 md:flex  md:items-center ">
-        <button
+        {/* <button
           type="button"
           className="flex-shrink-0 rounded-full bg-gray-700 p-1 text-slate-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         >
           <span className="sr-only"> {!isSSR && t("view_notifications")}</span>
           <BellIcon className="h-6 w-6" aria-hidden="true" />
-        </button>
+        </button> */}
         {/* Profile dropdown */}
         <Menu as="div" className="z-87 relative ml-4 flex-shrink-0 ">
           <div>
@@ -114,7 +114,7 @@ export const LoggedInUserSection = ({
               <Menu.Item>
                 {({ active }) => (
                   <a
-                    href={TE_Routes.NewAccountSetup.path + "?changeSetting=1"}
+                    href={TE_Routes.ExistingAccountSetup.path}
                     className={classNames(
                       active ? "bg-gray-100 dark:bg-purple-800" : "",
                       "block px-4 py-2 text-sm text-gray-700 dark:text-slate-300"

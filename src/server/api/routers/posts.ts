@@ -323,6 +323,10 @@ export const postsRouter = createTRPCRouter({
           author: {
             role: { not: { in: ["ADMIN_VERYFIED_ENGINE", "VERYFIED_ENGINE"] } },
           },
+          postType: {
+            not: { in: ["NEWS"] },
+          },
+
           MarkAsDelete: false,
         },
         include: {
