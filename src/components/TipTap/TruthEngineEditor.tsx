@@ -38,6 +38,7 @@ import { User } from "@prisma/client";
 import { TFunction } from "i18next";
 import { Node } from "@tiptap/core";
 import { Link } from "@tiptap/extension-link";
+import InnerHTML from "dangerously-set-html-content";
 
 import "./styles.scss";
 import theme from "theme/charkraTheme";
@@ -271,12 +272,41 @@ export function renderAsHTML(content: string) {
   );
 }
 
-export function renderAsHTMLWithoutSanitization(content: string) {
+function getNewsScriptTags(content: string): string[] {
+  const regex = /<script[\s\S]*?<\/script>/gi;
+  const matches = content.match(regex);
+  return matches || [];
+}
+function getNewsDivTags(content: string) {
+  const regex = /<div[^>]*>([\s\S]*?)<\/div>/gi;
+  const matches = [];
+  let match;
+  while ((match = regex.exec(content)) !== null) {
+    matches.push(match[1]);
+  }
+  return matches ?? [];
+}
+
+export function renderHTMLForFAQ(content: string) {
   return (
     <>
       <span dangerouslySetInnerHTML={{ __html: content }}></span>
     </>
   );
+}
+
+export function renderAsHTMLWithoutSanitization(content: string, divRef: any) {
+  const widgetHTMLString = getNewsScriptTags(content);
+  const contentHTMLString = getNewsDivTags(content);
+  useEffect(() => {
+    const fragment =
+      widgetHTMLString.length > 0
+        ? document.createRange().createContextualFragment(widgetHTMLString[0]!)
+        : content;
+    divRef.current.append(fragment);
+  }, []);
+
+  return <>{contentHTMLString}</>;
 }
 
 const types = ["POST", "LONG_POST", "COMMENT", "COMMENT_TALL"] as const;

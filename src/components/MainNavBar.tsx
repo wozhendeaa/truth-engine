@@ -58,6 +58,7 @@ export const LoggedInUserSection = ({
   function clearUserStorageOnSignOut() {
     localStorage.removeItem("user");
     signOut();
+    window.location.reload();
   }
 
   return (
@@ -97,7 +98,7 @@ export const LoggedInUserSection = ({
             leaveTo="transform opacity-0 scale-95"
           >
             <Menu.Items className="z-70 absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800">
-              <Menu.Item>
+              {/* <Menu.Item>
                 {({ active }) => (
                   <a
                     href={TE_Routes.myProfile.path + user?.id!}
@@ -109,17 +110,17 @@ export const LoggedInUserSection = ({
                     {!isSSR && t("profile_page")}
                   </a>
                 )}
-              </Menu.Item>
+              </Menu.Item> */}
               <Menu.Item>
                 {({ active }) => (
                   <a
-                    href="#"
+                    href={TE_Routes.NewAccountSetup.path + "?changeSetting=1"}
                     className={classNames(
                       active ? "bg-gray-100 dark:bg-purple-800" : "",
                       "block px-4 py-2 text-sm text-gray-700 dark:text-slate-300"
                     )}
                   >
-                    {!isSSR && t("settings")}
+                    {!isSSR && t("change_profile")}
                   </a>
                 )}
               </Menu.Item>
@@ -208,7 +209,7 @@ export default function MainNavBar() {
                     >
                       {!isSSR && t("index")}
                     </Link>
-                    <Link
+                    {/* <Link
                       href={TE_Routes.ProfessorVideos.path}
                       className={`font-Noto+Sans+TC inline-flex items-center px-1  pt-1 text-gray-900 hover:border-gray-300 dark:hover:text-purple-300 ${
                         isActive(TE_Routes.ProfessorVideos.path)
@@ -237,7 +238,7 @@ export default function MainNavBar() {
                       }`}
                     >
                       {!isSSR && t("redpill_academy")}
-                    </Link>
+                    </Link> */}
                     <Link
                       href={TE_Routes.FAQ.path}
                       className={`font-Noto+Sans+TC inline-flex items-center px-1  pt-1 text-gray-900 hover:border-gray-300 dark:hover:text-purple-300 ${

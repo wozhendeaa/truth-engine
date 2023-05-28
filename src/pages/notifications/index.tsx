@@ -3,31 +3,29 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Box, Flex } from "@chakra-ui/react";
 import { api } from "utils/api";
-import UserContext from "helpers/userContext";
 import { GetSekleton } from "helpers/UIHelper";
 import NotificationFeed from "./NotificationFeed";
+import {
+  Tab,
+  TabState,
+  useNotifTabsStore,
+} from "zustand/NotificationTabsStore";
+import UserContext from "helpers/userContext";
 
 //@ts-ignore
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const tabs = ["COMMENTS_LIKES", "ENGINE_UPDATES"] as const;
-const selectedTabContext = createContext<{
-  tab: (typeof tabs)[number];
-  setTab: (newState: (typeof tabs)[number]) => void;
-}>({
-  tab: "COMMENTS_LIKES",
-  setTab: () => {},
-});
-
 export function Tabs() {
   const { t } = useTranslation();
-  const { tab: selectedTab, setTab } = useContext(selectedTabContext);
-
-  function changeTab(tab: (typeof tabs)[number]) {
-    setTab(tab);
-  }
+  const { selectedTab, tabs, changeTab } = useNotifTabsStore(
+    (state: TabState) => ({
+      selectedTab: state.currentlySelected,
+      tabs: state.tabs,
+      changeTab: state.changeTab,
+    })
+  );
 
   return (
     <div
@@ -60,14 +58,16 @@ export function Tabs() {
 }
 
 const HomeNotification = () => {
-  const [tab, setTab] = useState<(typeof tabs)[number]>("COMMENTS_LIKES");
+  const { selectedTab } = useNotifTabsStore((state: TabState) => ({
+    selectedTab: state.currentlySelected,
+  }));
 
   const notificationFeedQuery =
     api.Notification.getNotificationForUser.useInfiniteQuery(
       {},
       {
         getNextPageParam: (lastPage) => lastPage.nextCursor,
-        enabled: tab == "COMMENTS_LIKES",
+        enabled: selectedTab == "COMMENTS_LIKES",
       }
     );
 
@@ -76,7 +76,7 @@ const HomeNotification = () => {
       {},
       {
         getNextPageParam: (lastPage) => lastPage.nextCursor,
-        enabled: tab == "ENGINE_UPDATES",
+        enabled: selectedTab == "ENGINE_UPDATES",
       }
     );
 
@@ -87,15 +87,15 @@ const HomeNotification = () => {
   const { t } = useTranslation();
 
   function isAnyTabLoading() {
-    if (tab == "COMMENTS_LIKES") {
+    if (selectedTab == "COMMENTS_LIKES") {
       return isNotificationLoading;
-    } else if (tab == "ENGINE_UPDATES") {
+    } else if (selectedTab == "ENGINE_UPDATES") {
       return isUpdateNotificationLoading;
     }
     return false;
   }
 
-  function isCurrentTabLoading(currTab: (typeof tabs)[number]) {
+  function isCurrentTabLoading(currTab: Tab) {
     if (currTab == "COMMENTS_LIKES") {
       return isNotificationLoading;
     } else if (currTab == "ENGINE_UPDATES") {
@@ -112,30 +112,30 @@ const HomeNotification = () => {
           <GetSekleton number={5} />
         ) : (
           <>
-            <selectedTabContext.Provider value={{ tab, setTab }}>
-              <Tabs />
-              <Box>
-                <div className={tab == "COMMENTS_LIKES" ? "" : "hidden"}>
-                  {
-                    <NotificationFeed
-                      data={notificationFeedQuery.data?.pages.flatMap(
-                        (page) => page.notifications
-                      )}
-                      fetchNewFeed={notificationFeedQuery.fetchNextPage}
-                      hasMore={notificationFeedQuery.hasNextPage}
-                      isLoading={notificationFeedQuery.isLoading}
-                      isError={notificationFeedQuery.isError}
-                    />
-                  }
-                </div>
-              </Box>
+            <Tabs />
+            <Box>
+              <div className={selectedTab == "COMMENTS_LIKES" ? "" : "hidden"}>
+                {
+                  <NotificationFeed
+                    data={notificationFeedQuery.data?.pages.flatMap(
+                      (page) => page.notifications
+                    )}
+                    fetchNewFeed={notificationFeedQuery.fetchNextPage}
+                    hasMore={notificationFeedQuery.hasNextPage}
+                    isLoading={notificationFeedQuery.isLoading}
+                    isError={notificationFeedQuery.isError}
+                  />
+                }
+              </div>
+            </Box>
 
-              <Flex direction={"column"}>
-                <Box className={tab == "ENGINE_UPDATES" ? "" : " hidden "}>
-                  {/* <Flex>{<NotificationFeed />}</Flex> */}
-                </Box>
-              </Flex>
-            </selectedTabContext.Provider>
+            <Flex direction={"column"}>
+              <Box
+                className={selectedTab == "ENGINE_UPDATES" ? "" : " hidden "}
+              >
+                {/* <Flex>{<NotificationFeed />}</Flex> */}
+              </Box>
+            </Flex>
           </>
         )}
       </Flex>

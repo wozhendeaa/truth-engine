@@ -12,7 +12,7 @@ import {
   Text,
   Icon,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { api } from "utils/api";
 import { Post, User } from "@prisma/client";
@@ -30,6 +30,7 @@ import TE_Routes from "TE_Routes";
 import TruthEngineEditor, {
   gettHtmlFromJson,
   renderAsHTML,
+  renderAsHTMLWithoutSanitization,
 } from "components/TipTap/TruthEngineEditor";
 import FeedActionMenu from "./FeedActionMenu";
 import { GetTime } from "helpers/UIHelper";
@@ -141,6 +142,7 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
   const { t, i18n } = useTranslation(["common", "footer"], {
     bindI18n: "languageChanged loaded",
   });
+  const widgetRef = useRef(null);
 
   const intl = useIntl();
   const formatter = Intl.NumberFormat(intl.locale, { notation: "compact" });
@@ -352,12 +354,22 @@ export function SingleFeed(singlePostData: SingleFeedProps) {
             pb={"0px"}
             pt={2}
             className="cursor-pointer overflow-hidden group-hover:bg-te_dark_ui"
-            maxH={onPostPage ? "full" : "250px"}
+            maxH={
+              onPostPage || postWithUser.postType === "NEWS" ? "full" : "250px"
+            }
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
           >
-            <span className="font-chinese text-xl font-bold text-slate-100 shadow-none ">
-              {renderAsHTML(postWithUser.content)}
+            <span
+              className="font-chinese text-xl font-bold text-slate-100 shadow-none "
+              ref={widgetRef}
+            >
+              {postWithUser.postType == "NEWS"
+                ? renderAsHTMLWithoutSanitization(
+                    postWithUser.content,
+                    widgetRef
+                  )
+                : renderAsHTML(postWithUser.content)}
             </span>
             <div
               className="grid 

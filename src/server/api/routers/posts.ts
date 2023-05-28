@@ -364,6 +364,62 @@ export const postsRouter = createTRPCRouter({
       return { posts, nextCursor };
     }),
 
+  getNewsEngineFeed: publicProcedure
+    .input(
+      z.object({
+        cursor: z.object({ id: z.string(), createdAt: z.date() }).optional(),
+        limit: z.number().optional(),
+      })
+    )
+    .query(async ({ ctx, input: { limit = 50, cursor } }) => {
+      const posts = await ctx.prisma.post.findMany({
+        take: limit + 1,
+        cursor: cursor ? { createdAt_id: cursor } : undefined,
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+        where: {
+          postType: "NEWS",
+          MarkAsDelete: false,
+        },
+        include: {
+          author: true,
+          reactions: {
+            where: {
+              userId: ctx.user?.id,
+            },
+            select: {
+              userId: true,
+            },
+          },
+          comments: {
+            take: 1,
+            orderBy: [
+              {
+                createdAt: "desc",
+              },
+              {
+                likes: "desc",
+              },
+            ],
+            where: {
+              author: {
+                id: ctx.userId ?? "",
+              },
+            },
+          },
+        },
+      });
+
+      let nextCursor: typeof cursor | undefined;
+      if (posts.length > limit) {
+        const nextItem = posts.pop();
+        if (nextItem) {
+          nextCursor = { id: nextItem.id, createdAt: nextItem.createdAt };
+        }
+      }
+      console.log(posts);
+      return { posts, nextCursor };
+    }),
+
   getAll: publicProcedure.query(async ({ ctx }) => {
     const posts = await ctx.prisma.post.findMany({
       take: 100,

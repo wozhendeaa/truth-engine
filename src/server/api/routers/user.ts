@@ -128,20 +128,6 @@ export const userRouter = createTRPCRouter({
       }
     }),
 
-  isEmailTaken: publicProcedure
-    .input(z.object({ email: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const user = await prisma.user.findFirst({
-        select: {
-          email: true,
-        },
-        where: {
-          email: input.email,
-        },
-      });
-      return user != null;
-    }),
-
   getAuthorizedUsers: publicProcedure.query(async ({ ctx }) => {
     const users = await prisma.user.findMany({
       where: {
@@ -155,6 +141,21 @@ export const userRouter = createTRPCRouter({
     return users;
   }),
 
+  isEmailTaken: publicProcedure
+    .input(z.object({ email: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const user = await prisma.user.findFirst({
+        select: {
+          email: true,
+        },
+        where: {
+          email: input.email,
+          id: { not: { in: [ctx.userId ?? ""] } },
+        },
+      });
+      return user != null;
+    }),
+
   isUsernameTaken: publicProcedure
     .input(z.object({ username: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -164,6 +165,7 @@ export const userRouter = createTRPCRouter({
         },
         where: {
           username: input.username,
+          id: { not: { in: [ctx.userId ?? ""] } },
         },
       });
       return user != null;

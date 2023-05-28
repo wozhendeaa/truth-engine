@@ -16,7 +16,7 @@ import { useAppSelector } from "Redux/hooks";
 
 const navigation = [
   TE_Routes.Index,
-  TE_Routes.Trending,
+  // TE_Routes.Trending,
   TE_Routes.IndexNotification,
   TE_Routes.myProfile,
 ];

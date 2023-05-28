@@ -13,6 +13,7 @@ import { LoadingSpinner } from "components/loading";
 import {
   renderAsHTML,
   renderAsHTMLWithoutSanitization,
+  renderHTMLForFAQ,
 } from "components/TipTap/TruthEngineEditor";
 
 //@ts-ignore
@@ -140,7 +141,7 @@ const FAQ: NextPage = () => {
                             </dt>
                             <Disclosure.Panel as="dd" className="mt-2 pr-12">
                               <p className="text-base leading-7 text-gray-300 ">
-                                {renderAsHTMLWithoutSanitization(faq.answer)}
+                                {renderHTMLForFAQ(faq.answer)}
                               </p>
                             </Disclosure.Panel>
                           </>

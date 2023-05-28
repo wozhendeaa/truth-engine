@@ -19,8 +19,9 @@ import { prisma } from "server/db";
 import { useUser } from "@clerk/nextjs";
 import TE_Routes from "TE_Routes";
 import { useContext, useState } from "react";
-import { api } from "utils/api";
 import toast from "react-hot-toast";
+import { parse } from "url";
+import { api } from "utils/api";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -31,7 +32,7 @@ export const accountSetupSchema = z.object({
     .string()
     .regex(/^[a-zA-Z0-9_]+$/, "username_hint")
     .min(8, "username_error_length")
-    .max(15, "username_error_length"),
+    .max(20, "username_error_length"),
 
   userId: z.string(),
 
@@ -40,7 +41,7 @@ export const accountSetupSchema = z.object({
   displayName: z
     .string()
     .min(2, "displayname_error_length")
-    .max(15, "displayname_error_length"),
+    .max(20, "displayname_error_length"),
 
   email: z.string().email({ message: "email_hint" }),
   receiveNotification: z.boolean().default(true),
@@ -62,9 +63,10 @@ export function AccountSetupSection(props: { user: UserResource }) {
   } = useForm<AccountSetupSchema>({
     resolver: zodResolver(accountSetupSchema),
     defaultValues: {
-      displayName: user.lastName + " " + user.firstName,
+      displayName: user.fullName ?? "",
       email: user.primaryEmailAddress?.emailAddress,
       profileImageUrl: user.profileImageUrl,
+      username: user.username ?? "",
     },
   });
   const [profileUrl, setProfileUrl] = useState(user.profileImageUrl);
@@ -73,6 +75,7 @@ export function AccountSetupSection(props: { user: UserResource }) {
     axios
       .post(TE_Routes.Register.path, data)
       .then(function (response) {
+        localStorage.removeItem("user");
         window.location.href = TE_Routes.Index.path;
       })
       .catch(function (e) {
@@ -296,15 +299,25 @@ export function AccountSetupSection(props: { user: UserResource }) {
 }
 
 const PrepareNewUser: NextPage = () => {
-  const { user } = useUser();
+  const { user: clerkUser } = useUser();
+  const { data: user } = api.user.getCurrentLoggedInUser.useQuery();
 
-  if (!user) {
+  if (!clerkUser) {
     return null;
+  }
+
+  if (user) {
+    clerkUser.username = user.username;
+    clerkUser.profileImageUrl = user.profileImageUrl ?? "";
+    if (clerkUser.primaryEmailAddress) {
+      clerkUser.primaryEmailAddress.emailAddress = user.email ?? "";
+    }
+    clerkUser.fullName = user.displayname ?? "";
   }
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-te_dark_darker ">
-      <AccountSetupSection user={user} />
+      <AccountSetupSection user={clerkUser} />
     </div>
   );
 };
@@ -312,6 +325,7 @@ const PrepareNewUser: NextPage = () => {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { res, req, locale } = ctx;
   const user = getAuth(req);
+  const { query } = parse(req.url ?? "", true);
 
   const exist = await prisma.user.findFirst({
     select: {
@@ -322,7 +336,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     },
   });
 
-  if (exist != null) {
+  if (exist != null && query?.changeSetting !== "1") {
     return {
       redirect: {
         permanent: false,

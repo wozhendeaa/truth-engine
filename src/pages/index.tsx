@@ -22,28 +22,23 @@ import TruthEngineSideMenuBar from "components/QTruthEngineSideMenubar";
 import HomeNotification from "./notifications";
 import { useAppSelector } from "Redux/hooks";
 import { selectHomePageState } from "Redux/homePageSlice";
+import { SelectedCategoryState, Tab } from "zustand/EngineFeedTabsStore";
+import { useEngineFeedTabsStore } from "zustand/EngineFeedTabsStore";
 
 //@ts-ignore
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const tabs = ["VERIFIED_ENGINE", "COMMUNITY", "NEWS"] as const;
-const selectedHomeTabContext = createContext<{
-  tab: (typeof tabs)[number];
-  setTab: (newState: (typeof tabs)[number]) => void;
-}>({
-  tab: "VERIFIED_ENGINE",
-  setTab: () => {},
-});
-
 export function Tabs() {
   const { t } = useTranslation();
-  const { tab: selectedTab, setTab } = useContext(selectedHomeTabContext);
-
-  function changeTab(tab: (typeof tabs)[number]) {
-    setTab(tab);
-  }
+  const { selectedTab, tabs, changeTab } = useEngineFeedTabsStore(
+    (state: SelectedCategoryState) => ({
+      selectedTab: state.currentlySelected,
+      tabs: state.tabs,
+      changeTab: state.changeTab,
+    })
+  );
 
   return (
     <div
@@ -76,13 +71,17 @@ export function Tabs() {
 }
 
 const HomeMiddleContent = () => {
-  const [tab, setTab] = useState<(typeof tabs)[number]>("VERIFIED_ENGINE");
+  const { selectedTab } = useEngineFeedTabsStore(
+    (state: SelectedCategoryState) => ({
+      selectedTab: state.currentlySelected,
+    })
+  );
 
   const engineFeedQuery = api.posts.getVerifiedEngineFeed.useInfiniteQuery(
     {},
     {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
-      enabled: tab == "VERIFIED_ENGINE",
+      enabled: selectedTab == "VERIFIED_ENGINE",
     }
   );
 
@@ -90,19 +89,28 @@ const HomeMiddleContent = () => {
     {},
     {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
-      enabled: tab == "COMMUNITY",
+      enabled: selectedTab == "COMMUNITY",
+    }
+  );
+
+  const newsFeedQuery = api.posts.getNewsEngineFeed.useInfiniteQuery(
+    {},
+    {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+      enabled: selectedTab == "NEWS",
     }
   );
 
   const { isLoading: isVerifiedLoading } = engineFeedQuery;
   const { isLoading: isCommunityLoading } = communityFeedQuery;
+  const { isLoading: isNewsLoading } = newsFeedQuery;
 
   const user = useContext(UserContext);
   const { t } = useTranslation();
 
   const isVerified = isUserVerified(user);
 
-  function isCurrentTabLoading(currTab: (typeof tabs)[number]) {
+  function isCurrentTabLoading(currTab: Tab) {
     if (currTab == "VERIFIED_ENGINE") {
       return isVerifiedLoading;
     } else if (currTab == "COMMUNITY") {
@@ -120,65 +128,73 @@ const HomeMiddleContent = () => {
         <GetSekleton number={5} />
       ) : (
         <>
-          <selectedHomeTabContext.Provider value={{ tab, setTab }}>
-            <Tabs />
-            <Box>
-              <Box
-                className={
-                  isVerified && tab == "VERIFIED_ENGINE" ? "" : "hidden"
-                }
-              >
-                <PostBox />
-                <Box>
-                  <HSeparator className="mt-2" />
-                </Box>
+          <Tabs />
+          <Box>
+            <Box
+              className={
+                isVerified && selectedTab == "VERIFIED_ENGINE" ? "" : "hidden"
+              }
+            >
+              <PostBox />
+              <Box>
+                <HSeparator className="mt-2" />
               </Box>
             </Box>
-            <Box>
-              <div className={tab == "VERIFIED_ENGINE" ? "" : "hidden"}>
+          </Box>
+          <Box>
+            <div className={selectedTab == "VERIFIED_ENGINE" ? "" : "hidden"}>
+              {
+                <EngineFeed
+                  posts={engineFeedQuery.data?.pages.flatMap(
+                    (page) => page.posts
+                  )}
+                  fetchNewFeed={engineFeedQuery.fetchNextPage}
+                  hasMore={engineFeedQuery.hasNextPage}
+                  isLoading={engineFeedQuery.isLoading}
+                  isError={engineFeedQuery.isError}
+                />
+              }
+            </div>
+          </Box>
+
+          <Flex direction={"column"}>
+            <Box className={selectedTab == "COMMUNITY" ? "" : " hidden "}>
+              <Flex>
+                <PostBox />
+              </Flex>
+              <Flex>
+                <HSeparator className="mt-2" />
+              </Flex>
+              <Flex>
                 {
                   <EngineFeed
-                    posts={engineFeedQuery.data?.pages.flatMap(
+                    posts={communityFeedQuery.data?.pages.flatMap(
                       (page) => page.posts
                     )}
-                    fetchNewFeed={engineFeedQuery.fetchNextPage}
-                    hasMore={engineFeedQuery.hasNextPage}
-                    isLoading={engineFeedQuery.isLoading}
-                    isError={engineFeedQuery.isError}
+                    fetchNewFeed={communityFeedQuery.fetchNextPage}
+                    hasMore={communityFeedQuery.hasNextPage}
+                    isLoading={communityFeedQuery.isLoading}
+                    isError={communityFeedQuery.isError}
                   />
                 }
-              </div>
+              </Flex>
             </Box>
-
-            <Flex direction={"column"}>
-              <Box className={tab == "COMMUNITY" ? "" : " hidden "}>
-                <Flex>
-                  <PostBox />
-                </Flex>
-                <Flex>
-                  <HSeparator className="mt-2" />
-                </Flex>
-                <Flex>
-                  {
-                    <EngineFeed
-                      posts={communityFeedQuery.data?.pages.flatMap(
-                        (page) => page.posts
-                      )}
-                      fetchNewFeed={communityFeedQuery.fetchNextPage}
-                      hasMore={communityFeedQuery.hasNextPage}
-                      isLoading={communityFeedQuery.isLoading}
-                      isError={engineFeedQuery.isError}
-                    />
-                  }
-                </Flex>
-              </Box>
-            </Flex>
-            <Box className="w-full">
-              <Box className={tab == "NEWS" ? "" : "hidden"}>
-                机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻机器人新闻
-              </Box>
+          </Flex>
+          <Box className="w-full">
+            <Box className={selectedTab == "NEWS" ? "" : "hidden"}>
+              {
+                <EngineFeed
+                  posts={newsFeedQuery.data?.pages.flatMap(
+                    (page) => page.posts
+                  )}
+                  fetchNewFeed={newsFeedQuery.fetchNextPage}
+                  hasMore={newsFeedQuery.hasNextPage}
+                  isLoading={newsFeedQuery.isLoading}
+                  isError={newsFeedQuery.isError}
+                />
+              }
             </Box>
-          </selectedHomeTabContext.Provider>
+          </Box>
         </>
       )}
     </>
