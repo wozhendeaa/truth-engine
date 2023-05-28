@@ -3,13 +3,13 @@ import { api } from "utils/api";
 import "styles/globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { useRouter } from "next/router";
-import { appWithTranslation, useTranslation } from 'next-i18next'
+import { appWithTranslation, useTranslation } from "next-i18next";
 import { Toaster, toast } from "react-hot-toast";
 import Head from "next/head";
-import { ChakraProvider } from '@chakra-ui/react'
+import { ChakraProvider } from "@chakra-ui/react";
 import theme from "theme/theme";
-import React, { useEffect } from "react";
-import { IntlProvider } from 'react-intl';
+import React, { useEffect, useState } from "react";
+import { IntlProvider } from "react-intl";
 import { Provider } from "react-redux";
 import { store } from "Redux/ReduxStore";
 import UserContext from "helpers/userContext";
@@ -17,8 +17,9 @@ import { User } from "@prisma/client";
 import axios from "axios";
 import TE_Routes from "TE_Routes";
 import { useQuery } from "@tanstack/react-query";
+import OneSignal from "react-onesignal";
 const truthConfig = require("truth-engine-config.js");
-const i18n = require('next-i18next.config')
+const i18n = require("next-i18next.config");
 interface UserLocalStorageItem {
   user: User;
   expiry: number;
@@ -71,10 +72,42 @@ async function getLoggedInUser(): Promise<User | null> {
   return user;
 }
 
-const QTruthEngine: AppType  = ({ Component, pageProps }) => {
+export async function runOneSignal() {
+  OneSignal.init({
+    appId: "1bfd55c8-c65d-4596-b434-adcd3723673d",
+    safari_web_id: "web.onesignal.auto.50fac9c2-9f7f-49e4-88a1-4637f1759b35",
+    notifyButton: {
+      enable: true,
+    },
+    allowLocalhostAsSecureOrigin: true,
+
+    welcomeNotification: {
+      disable: false,
+      title: "hello world",
+      message: "fucking not working",
+      url: "/",
+    },
+  });
+  const isEnabled = await OneSignal.isPushNotificationsEnabled();
+  if (!isEnabled) {
+    await OneSignal.setSubscription(true);
+    await OneSignal.showNativePrompt();
+    console.log("notificationEnabled", isEnabled);
+  }
+  await OneSignal.getUserId((id) => {
+    console.log(id);
+  });
+
+  await OneSignal.getTags((tags) => {
+    console.log("tags", tags);
+  });
+
+  console.log("permission", await OneSignal.getNotificationPermission());
+}
+
+const QTruthEngine: AppType = ({ Component, pageProps }) => {
   const locale = useRouter().locale ?? "ch-ZH";
-  const {t} = useTranslation();
-  
+  const { t } = useTranslation();
 
   //获取用户数据存到本地，存2小时
   //为什么不用nextauth session？
@@ -90,32 +123,32 @@ const QTruthEngine: AppType  = ({ Component, pageProps }) => {
     queryFn: () => getLoggedInUser(),
   }).data;
 
-  
-  return (    
-    <ChakraProvider  theme={theme }>
+  useEffect(() => {
+    runOneSignal();
+  }, []);
+
+  return (
+    <ChakraProvider theme={theme}>
       <ClerkProvider {...pageProps}>
         <Toaster position="bottom-center" />
-           <Head>
-            <title>{t('home_title')}</title>
-            <meta name="Q真相引擎" content="Q真相引擎" />
-            <link rel="icon" href="/favicon.ico" />
-            </Head>
-          <div className="dark">
-          <IntlProvider locale={locale}  >
-              <React.StrictMode>
+        <Head>
+          <title>{t("home_title")}</title>
+          <meta name="Q真相引擎" content="Q真相引擎" />
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+        <div className="dark">
+          <IntlProvider locale={locale}>
+            <React.StrictMode>
               <Provider store={store}>
-               <UserContext.Provider value={user}>
-
-                      <Component {...pageProps} />
-      </UserContext.Provider>
-
+                <UserContext.Provider value={user}>
+                  <Component {...pageProps} />
+                </UserContext.Provider>
               </Provider>
             </React.StrictMode>
           </IntlProvider>
         </div>
       </ClerkProvider>
-      </ChakraProvider>
-
+    </ChakraProvider>
   );
 };
 

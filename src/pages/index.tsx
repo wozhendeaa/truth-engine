@@ -102,12 +102,6 @@ const HomeMiddleContent = () => {
 
   const isVerified = isUserVerified(user);
 
-  // if (tab == "VERIFIED_ENGINE") {
-  //   setLoading(isVerifiedLoading);
-  // } else if (tab == "COMMUNITY") {
-  //   setLoading(isCommunityLoading);
-  // }
-
   function isCurrentTabLoading(currTab: (typeof tabs)[number]) {
     if (currTab == "VERIFIED_ENGINE") {
       return isVerifiedLoading;

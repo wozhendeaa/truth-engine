@@ -108,5 +108,7 @@
   "post_good": "传递信息成功",
   "action_failed": "发送失败，这都是命啊",
   "end_of_scroll": "已经到底了",
-  "empty": ""
+  "empty": "",
+
+  "faq_title": "常见问答"
 }

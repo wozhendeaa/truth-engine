@@ -5,6 +5,7 @@ import { userRouter } from "./routers/user";
 import { commentRouter } from "./routers/Comment";
 import { reportRouter } from "./routers/report";
 import { notificationRouter } from "./routers/notifications";
+import { faqRouter } from "./routers/FAQ";
 
 /**
  * This is the primary router for your server.
@@ -18,6 +19,7 @@ export const appRouter = createTRPCRouter({
   comment: commentRouter,
   report: reportRouter,
   Notification: notificationRouter,
+  faq: faqRouter,
 });
 
 export const apiRouter = createApiRouter({

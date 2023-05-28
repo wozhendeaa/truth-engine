@@ -240,6 +240,27 @@ model PubSubNotification {
   @@index([senderId])
 }
 
+model FAQ {
+  id           Int   @id @default(autoincrement())
+  title        String  @db.VarChar(100)
+  answer       String     @db.Text
+  categoryId   Int 
+  category     FAQCategory  @relation(fields: [categoryId], references: [id])
+  createdAt    DateTime @default(now())
+  @@index([id])
+  @@index([categoryId])
+}
+
+model FAQCategory {
+  id           Int   @id @default(autoincrement())
+  title     String  @db.VarChar(20)
+  createdAt    DateTime @default(now())
+  FAQId      Int?  
+  FAQ        FAQ[]
+  @@index([id])
+  @@index([FAQId])
+}
+
 enum ReactionType {
   LIKE
   DISLIKE
@@ -258,5 +279,4 @@ enum ReportType {
   EARMY
   OTHER  
 }
-
 

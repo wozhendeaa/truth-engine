@@ -151,7 +151,8 @@
     "xlsx": "^0.18.5",
     "yup": "^0.32.11",
     "zod": "^3.21.4",
-    "zoom-vanilla.js": "^2.0.6"
+    "zoom-vanilla.js": "^2.0.6",
+    "zustand": "^4.3.8"
   },
   "devDependencies": {
     "@types/eslint": "^8.37.0",

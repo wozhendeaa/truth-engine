@@ -132,7 +132,6 @@ const NotificationFeed = ({
 }: FeedProps) => {
   const { t } = useTranslation();
   const notifications = data;
-  console.log(notifications);
   if (!notifications) return <></>;
   return (
     <>
@@ -154,7 +153,7 @@ const NotificationFeed = ({
   );
 };
 
-export const getServerSideProps = async ({ locale }: { locale: string }) => ({
+export const getSrverSideProps = async ({ locale }: { locale: string }) => ({
   props: {
     ...(await serverSideTranslations(locale, ["common", "footer"])),
   },

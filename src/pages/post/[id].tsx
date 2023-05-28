@@ -65,8 +65,6 @@ const SinglePostPage: NextPage = (
     id: props.id,
   });
 
-  if (!data) return <GetSekleton number={1} />;
-
   return (
     <>
       <PageLayout>
@@ -77,7 +75,7 @@ const SinglePostPage: NextPage = (
             {/* </Link> */}
           </Box>
           <Flex className="w-full md:w-3/4 lg:w-2/4">
-            {isLoading ? (
+            {isLoading || !data ? (
               <GetSekleton number={1} />
             ) : (
               <SingleFeed

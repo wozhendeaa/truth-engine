@@ -32,7 +32,7 @@ class MyDocument extends Document {
               rel="manifest"
             />
           }
-          <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async />
+
           <meta
             name="Q真相引擎"
             content="习近平，蔡英文，拜登和精英政要，演员们最讨厌的地方."
