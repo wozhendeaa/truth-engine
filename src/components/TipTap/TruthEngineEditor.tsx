@@ -32,7 +32,7 @@ import Tippy from "components/Tippy";
 import Lucide from "components/Lucide";
 import { selectTruthEditor, setErrors } from "Redux/truthEditorSlice";
 import { useDispatch, useSelector } from "react-redux";
-import suggestion from "./suggestion";
+// import suggestion from "./suggestion";
 import UserContext from "helpers/userContext";
 import { User } from "@prisma/client";
 import { TFunction } from "i18next";
@@ -40,7 +40,6 @@ import { Node } from "@tiptap/core";
 import { Link } from "@tiptap/extension-link";
 import InnerHTML from "dangerously-set-html-content";
 
-// import "./styles.scss";
 import theme from "theme/charkraTheme";
 const truthConfig = require("truth-engine-config.js");
 
@@ -534,7 +533,7 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
             node.attrs.label ?? node.attrs.id
           }`;
         },
-        suggestion: suggestion,
+        // suggestion: suggestion,
       }),
       CharacterCount.configure({
         limit: wordLimit,
