@@ -32,7 +32,6 @@ import Tippy from "components/Tippy";
 import Lucide from "components/Lucide";
 import { selectTruthEditor, setErrors } from "Redux/truthEditorSlice";
 import { useDispatch, useSelector } from "react-redux";
-import suggestion from "./suggestion";
 import UserContext from "helpers/userContext";
 import { User } from "@prisma/client";
 import { TFunction } from "i18next";
@@ -502,7 +501,7 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
   const uploadError = handleUploaderErrors(pickerError, uploadConfig, t);
 
   const editor = useEditor({
-    onUpdate({ editor }) {
+    onUpdate({ editor:any }) {
       const disableSendButton = isNullOrEmpty(editor.getText());
       setDisableSend(disableSendButton);
     },
@@ -534,7 +533,7 @@ const TruthEngineEditor: React.FC<TruthEngineEditorProps> = ({
             node.attrs.label ?? node.attrs.id
           }`;
         },
-        suggestion: suggestion,
+        // suggestion: suggestion,
       }),
       CharacterCount.configure({
         limit: wordLimit,
