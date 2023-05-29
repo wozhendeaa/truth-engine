@@ -73,21 +73,30 @@ async function getLoggedInUser(): Promise<User | null> {
 }
 
 export async function runOneSignal() {
+  // OneSignal.init({
+  //   appId: "1bfd55c8-c65d-4596-b434-adcd3723673d",
+  //   safari_web_id: "web.onesignal.auto.50fac9c2-9f7f-49e4-88a1-4637f1759b35",
+  //   notifyButton: {
+  //     enable: true,
+  //   },
+  //   allowLocalhostAsSecureOrigin: true,
+
+  //   welcomeNotification: {
+  //     disable: false,
+  //     title: "欢迎来到真相引擎",
+  //     message: "记得允许通知，我才可以发给你",
+  //     url: "/",
+  //   },
+  // });
+
   OneSignal.init({
-    appId: "1bfd55c8-c65d-4596-b434-adcd3723673d",
-    safari_web_id: "web.onesignal.auto.50fac9c2-9f7f-49e4-88a1-4637f1759b35",
+    appId: "40af7903-40e1-4d7c-ada4-6dd19e3b11e4",
+    safari_web_id: "web.onesignal.auto.1cc5c601-0ab1-487a-96d1-0b685be1e018",
     notifyButton: {
       enable: true,
     },
-    allowLocalhostAsSecureOrigin: true,
-
-    welcomeNotification: {
-      disable: false,
-      title: "欢迎来到真相引擎",
-      message: "记得允许通知，我才可以发给你",
-      url: "/",
-    },
   });
+
   const isEnabled = await OneSignal.isPushNotificationsEnabled();
   if (!isEnabled) {
     await OneSignal.setSubscription(true);

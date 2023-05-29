@@ -40,7 +40,7 @@ import { Node } from "@tiptap/core";
 import { Link } from "@tiptap/extension-link";
 import InnerHTML from "dangerously-set-html-content";
 
-import "./styles.scss";
+// import "./styles.scss";
 import theme from "theme/charkraTheme";
 const truthConfig = require("truth-engine-config.js");
 
