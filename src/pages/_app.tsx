@@ -1,41 +1,148 @@
 import { type AppType } from "next/app";
-import { api } from "~/utils/api";
-import "~/styles/globals.css";
+import { api } from "utils/api";
+import "styles/globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { useRouter } from "next/router";
-import { TRPCClientError } from "@trpc/client";
-import { appWithTranslation, useTranslation } from 'next-i18next'
-import { Toaster } from "react-hot-toast";
+import { appWithTranslation, useTranslation } from "next-i18next";
+import { Toaster, toast } from "react-hot-toast";
 import Head from "next/head";
-import { Link } from "react-router-dom";
-import { ChakraProvider } from '@chakra-ui/react'
+import { ChakraProvider } from "@chakra-ui/react";
+import theme from "theme/theme";
+import React, { useEffect, useState } from "react";
+import { IntlProvider } from "react-intl";
+import { Provider } from "react-redux";
+import { store } from "Redux/ReduxStore";
+import UserContext from "helpers/userContext";
+import { User } from "@prisma/client";
+import axios from "axios";
+import TE_Routes from "TE_Routes";
+import { useQuery } from "@tanstack/react-query";
+import OneSignal from "react-onesignal";
+const truthConfig = require("truth-engine-config.js");
+const i18n = require("next-i18next.config");
+interface UserLocalStorageItem {
+  user: User;
+  expiry: number;
+}
 
-const MyApp: AppType = ({ Component, pageProps }) => {
-  const {locale} = useRouter();
-  const {t} = useTranslation();
+function checkExpiration() {
+  if (localStorage.getItem("user")) {
+    const item = JSON.parse(
+      localStorage.getItem("user")!
+    ) as UserLocalStorageItem;
+    const exp = truthConfig.system.user.sessionExpirationDuration + item.expiry;
+    if (new Date().getTime() > exp) {
+      localStorage.removeItem("user");
+    }
+  }
+}
 
-  if (!locale) {
-    throw new TRPCClientError("local undefined");
+async function getLoggedInUser(): Promise<User | null> {
+  let user: User | null = null;
+  checkExpiration();
+  if (!localStorage.getItem("user")) {
+    let data: any = null;
+    await axios(TE_Routes.getLoggedInUser.path)
+      .then((response) => {
+        data = response.data.user;
+      })
+      .catch((reason) => {
+        console.log(reason.message);
+        toast("网络出错了： " + reason.message);
+      });
+
+    if (!data) {
+      return user;
+    }
+
+    const item: UserLocalStorageItem = {
+      user: data as User,
+      expiry:
+        new Date().getTime() +
+        truthConfig.system.user.sessionExpirationDuration,
+    };
+
+    localStorage.setItem("user", JSON.stringify(item));
   }
 
-  return (    
-    <ChakraProvider>
+  const item = JSON.parse(
+    localStorage.getItem("user") ?? ""
+  ) as UserLocalStorageItem;
+  user = item.user;
+  return user;
+}
+
+export async function runOneSignal() {
+  OneSignal.init({
+    appId: "1bfd55c8-c65d-4596-b434-adcd3723673d",
+    safari_web_id: "web.onesignal.auto.50fac9c2-9f7f-49e4-88a1-4637f1759b35",
+    notifyButton: {
+      enable: true,
+    },
+    allowLocalhostAsSecureOrigin: true,
+
+    welcomeNotification: {
+      disable: false,
+      title: "欢迎来到真相引擎",
+      message: "记得允许通知，我才可以发给你",
+      url: "/",
+    },
+  });
+  const isEnabled = await OneSignal.isPushNotificationsEnabled();
+  if (!isEnabled) {
+    await OneSignal.setSubscription(true);
+    await OneSignal.showNativePrompt();
+    console.log("notificationEnabled", isEnabled);
+  }
+
+  console.log("permission", await OneSignal.getNotificationPermission());
+}
+
+const QTruthEngine: AppType = ({ Component, pageProps }) => {
+  const locale = useRouter().locale ?? "ch-ZH";
+  const { t } = useTranslation();
+
+  //获取用户数据存到本地，存2小时
+  //为什么不用nextauth session？
+  //这个问题问的好
+  //因为用户验证是用clerk处理的，他们会保存session
+  // 但是他们的数据跟我的数据是分开的，所以我不能直接拿他们的那边的数据过来
+  // 虽然我可以在用户更改他们数据的时候同步到那边，但他们那边只给了一个token字段给我存我的专属信息
+  // 我还他妈要转换，要同步，还不能有效率的用数据库查表，每次要从那里获取用户id然后用in来查（。。）滚
+  // 所以我自己要来存用户信息，这样简单的多
+  //先检测用户有没有登陆
+  const user = useQuery({
+    queryKey: ["user"],
+    queryFn: () => getLoggedInUser(),
+  }).data;
+
+  useEffect(() => {
+    runOneSignal();
+  }, []);
+
+  return (
+    <ChakraProvider theme={theme}>
       <ClerkProvider {...pageProps}>
         <Toaster position="bottom-center" />
-           <Head>
-            <title>{t('home_title')}</title>
-            <meta name="Q真相引擎" content="Q真相引擎" />
-            <link rel="icon" href="/favicon.ico" />
-            <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500&display=swap" rel="stylesheet" />
-            <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500&display=swap" rel="stylesheet" />
-          </Head>
-          <div className="dark">
-          <Component {...pageProps} />
+        <Head>
+          <title>{t("home_title")}</title>
+          <meta name="Q真相引擎" content="Q真相引擎" />
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+        <div className="dark">
+          <IntlProvider locale={locale}>
+            <React.StrictMode>
+              <Provider store={store}>
+                <UserContext.Provider value={user}>
+                  <Component {...pageProps} />
+                </UserContext.Provider>
+              </Provider>
+            </React.StrictMode>
+          </IntlProvider>
         </div>
       </ClerkProvider>
-      </ChakraProvider>
-
+    </ChakraProvider>
   );
 };
 
-export default api.withTRPC(appWithTranslation(MyApp));
+export default api.withTRPC(appWithTranslation(QTruthEngine, i18n));

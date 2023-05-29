@@ -2,10 +2,59 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-    @apply bg-black text-slate-100;
-    @apply font-chinese;
-    overscroll-behavior: none;
-
+div.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
+/* Hide scrollbar for IE, Edge and Firefox */
+div.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+html{
+    scroll-behavior: smooth;
+}
+
+body{
+  overflow: visible;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+@layer components {
+    .editor-menu-button {
+      @apply w-8 h-8  cursor-pointer bg-transparent
+       hover:bg-indigo-300 hover:bg-opacity-30 
+       hover:rounded-full fill-indigo-400 stroke-indigo-400 
+       active:bg-purple-400
+    }
+
+    .editor-menu-button-active {
+      @apply w-8 h-8 cursor-pointer bg-purple-500 
+      fill-black stroke-black rounded-md
+    }
+
+    .editor-send {
+      @apply w-8 h-8  cursor-pointer 
+      fill-indigo-400 stroke-indigo-400 
+      hover:fill-indigo-200 hover:stroke-indigo-200 
+      active:bg-transparent active:fill-te_dark_font
+    }
+
+    .editor-sending {
+      @apply w-8 h-8  cursor-default 
+      fill-gray-600 
+    }
+
+    .editor-send-active {
+      @apply w-8 h-8 cursor-pointer hover:bg-transparent
+      fill-indigo-200 stroke-indigo-200 
+    }
+
+}

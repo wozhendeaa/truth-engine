@@ -1,8 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { createTRPCRouter,  publicProcedure } from "~/server/api/trpc";
-import { filterMyUserForClient } from "~/server/helpers/filterUserForClient";
+import { createTRPCRouter,  publicProcedure } from "server/api/trpc";
+import { filterMyUserForClient } from "server/helpers/filterUserForClient";
 
 
 

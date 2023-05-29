@@ -20,27 +20,31 @@ model Post {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime?   @updatedAt
   reactions   Reaction[]
-  media       String?
+  media       String?    @db.MediumText
   postType    PostType   @default(POST)
-  likes       Int         @default(0)
+  likes       Int         @default(1)
   dislikes    Int         @default(0)
-  ViewCount   Int         @default(0)
-  repost      Int         @default(0)
-  reported    Int         @default(0)
+  ViewCount   Int         @default(1)
+  repostCount      Int         @default(0)
+  reportCount    Int         @default(0)
+  commentCount    Int     @default(0)
+  MarkAsDelete Boolean @default(false)
   comments    Comment[]
   hashtags    PostHashtag[]
   categories  Category[]
   reports     Report[]
-  
-
+  notifications   PostCommentNotification[] 
   @@index([originalAuthorId])
   @@index([authorId])
   @@index([id])
+  @@unique([createdAt, id])
 }
 
 enum PostType {
   POST
+  LONG_POST
   QUESTION
+  NEWS
 }
 
 
@@ -63,6 +67,8 @@ model PostHashtag {
   @@index([postId])
   @@index([hashtagId])
 }
+
+
 model Category {
   id    Int    @id @default(autoincrement())
   name  String
@@ -76,33 +82,39 @@ model User {
   displayname     String?
   email           String?   @unique
   token           String?
-  NiuBi           Decimal  @default(10)
+  NiuBi           Float  @default(10)
   role            Role     @default(SHEEP)
   followings      UserFollows[]  @relation("following")
   followers       UserFollows[]  @relation("follower")
   reenginedPosts    Post[] @relation(name: "repost")
   posts           Post[] @relation(name: "author")
+  comments        Comment[]
   reports         Report[]
   premiumStatus   Boolean   @default(false)
   reactions       Reaction[]
-  comments        Comment[]
-  notifications   Notification[]
+  followingNotifications PubSubNotification[]  @relation("followingNotifications")
+  platformNotifications PlatformNotification[] @relation("receiverToNotification")
+  sentPostCommentNotifications   PostCommentNotification[]   @relation(name:"senderToNotificationPostComment")
+  receivedPostCommentNotifications   PostCommentNotification[]   @relation(name:"receiverToNotificationPostComment")
   @@index([id])
+  @@index([username])
 }
 
 enum Role {
   SHEEP
   ENGIINE
+  VERYFIED_ENGINE
   ADMIN
+  ADMIN_VERYFIED_ENGINE
 }
 
 model UserFollows {
-  id          String @id @default(cuid())
+  id          Int @id @default(autoincrement())
   followingId String
   following   User   @relation("following", fields: [followingId], references: [id])
   followerId  String
   follower    User   @relation("follower", fields: [followerId], references: [id])
-  recieveImportantEmailNotification Boolean @default(true)
+  recieveImportantNotification Boolean @default(true)
 
   @@index([followerId])
   @@index([followingId])
@@ -123,26 +135,30 @@ model Reaction {
   @@index([userId])
   @@index([postId])
   @@index([commentID])
+  @@unique([userId, postId])
+  @@unique([userId, commentID])
 }
 
 model Comment {
   id          String        @id @default(cuid())
-  
   pinned      Boolean   @default(false)
   content     String      @db.Text
   authorId    String
   author      User       @relation(fields: [authorId], references: [id])
-  replyToPostId String?
-  post        Post?       @relation(fields: [replyToPostId], references: [id])
+  replyToPostId String
+  post        Post       @relation(fields: [replyToPostId], references: [id])
   replyToCommentId String? 
   replyToComment    Comment? @relation(name:"CommentToComment", fields: [replyToCommentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   comments Comment[] @relation(name: "CommentToComment")
   media       String?
   reactions   Reaction[] 
-  reports     Report[]
   likes       Int         @default(0)
+  reportCount     Int     @default(0)
+  reports    Report[]
   commentCount  Int         @default(0)
   reEnginedCount Int     @default(0)
+  MarkAsDelete Boolean @default(false)
+  notifications   PostCommentNotification[]    
   dislikes    Int         @default(0)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
@@ -154,27 +170,96 @@ model Comment {
 
 model Report {
   id          String    @id @default(cuid())
-  reporterId    String
-  reporter      User      @relation(fields: [reporterId], references: [id])
+  reporterId  String
+  reporter    User      @relation(fields: [reporterId], references: [id])
   postId      String?
   post        Post?       @relation(fields: [postId], references: [id])
-  commentId      String?
-  comment        Comment?       @relation(fields: [commentId], references: [id])
-
+  commentId   String?
+  comment     Comment?       @relation(fields: [commentId], references: [id])
   createdAt   DateTime   @default(now())
-
+  reportType  String     @default("other")
+  content     String?     @db.VarChar(255)
   @@index([reporterId])
   @@index([commentId])
   @@index([postId])
+
+  @@unique([reporterId, postId])
+  @@unique([reporterId, commentId])
 }
 
-model Notification{
-  id          String    @id @default(cuid())
-  senderId    String
-  sender      User      @relation(fields: [senderId], references: [id])
-  conent     String 
 
+
+model PostCommentNotification{
+  id                Int    @id @default(autoincrement())
+  senderId          String 
+  sender            User   @relation(name:"senderToNotificationPostComment", fields: [senderId], references: [id])
+  receiverId        String 
+  receiver          User   @relation(name:"receiverToNotificationPostComment", fields: [receiverId], references: [id])
+  content           String 
+  createdAt         DateTime   @default(now())
+  hasRead           Boolean @default(false)
+  postId            String? 
+  post              Post?   @relation(fields: [postId], references: [id])
+  commentId         String? 
+  comment           Comment?   @relation(fields: [commentId], references: [id])
+  type              NotificationType
+  @@index([receiverId])
   @@index([senderId])
+  @@unique([id, createdAt])
+  @@index([id])
+  @@index([postId])
+  @@index([commentId])
+}
+
+enum NotificationType {
+  PROMOTED_POST
+  LIKE_COMMENT
+  REPLY
+}
+
+model PlatformNotification{
+  id         Int    @id @default(autoincrement())
+  receiverId  String 
+  receiver    User      @relation(name:"receiverToNotification", fields: [receiverId], references: [id])
+  content      String 
+  createdAt   DateTime   @default(now())
+  hasRead   Boolean @default(false)
+  @@index([id])
+  @@index([receiverId])
+  @@unique([id, createdAt])
+}
+
+
+model PubSubNotification {
+  id           String   @id @default(cuid())
+  content      String
+  senderId     String
+  sender       User     @relation(name: "followingNotifications", fields: [senderId], references: [id])
+  createdAt    DateTime @default(now())
+
+  @@index([id])
+  @@index([senderId])
+}
+
+model FAQ {
+  id           Int   @id @default(autoincrement())
+  title        String  @db.VarChar(100)
+  answer       String     @db.Text
+  categoryId   Int 
+  category     FAQCategory  @relation(fields: [categoryId], references: [id])
+  createdAt    DateTime @default(now())
+  @@index([id])
+  @@index([categoryId])
+}
+
+model FAQCategory {
+  id           Int   @id @default(autoincrement())
+  title     String  @db.VarChar(20)
+  createdAt    DateTime @default(now())
+  FAQId      Int?  
+  FAQ        FAQ[]
+  @@index([id])
+  @@index([FAQId])
 }
 
 enum ReactionType {
@@ -187,4 +272,12 @@ enum ReactionType {
   ANGRY
 }
 
+enum ReportType {
+  SPAM
+  IRRLEVANT
+  PORN_VIOLENCE
+  FRAUD
+  EARMY
+  OTHER  
+}
 

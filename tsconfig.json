@@ -22,7 +22,7 @@
     "noUncheckedIndexedAccess": true,
     "baseUrl": ".",
     "paths": {
-      "~/*": [
+      "*": [
         "./src/*"
       ]
     },
@@ -39,8 +39,9 @@
     "**/*.tsx",
     "**/*.cjs",
     "**/*.mjs",
+    "next-i18next.config.js",
     ".next/types/**/*.ts"
-  ],
+, "src/pages/api/PostComment", "truth-engine.config.js"  ],
   "exclude": [
     "node_modules"
   ]

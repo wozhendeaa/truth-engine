@@ -5,7 +5,7 @@
 // import toast from "react-hot-toast";
 // import { useTranslation } from "react-i18next";
 // import { z } from "zod";
-// import { api } from "~/utils/api";
+// import { api } from "utils/api";
 // import { LoadingSpinner } from "../loading";
 
 // //create react hook validation schema for post

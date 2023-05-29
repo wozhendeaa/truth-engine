@@ -5,5 +5,6 @@ export const filterClerkUserForClient = (user: clerkUser) => {
 }
 
 export const filterMyUserForClient = (user: MyUser) => {
-    return {id: user.id, username: user.username, profileImageUrl: user.profileImageUrl}
+    return {id: user.id, username: user.username, profileImageUrl: user.profileImageUrl, displayName: user.displayname, 
+    email: user.email}
 }
